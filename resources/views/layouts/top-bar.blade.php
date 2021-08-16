@@ -2,8 +2,8 @@
 <div class="top-bar">
     <!-- BEGIN: Breadcrumb -->
     <div class="-intro-x breadcrumb mr-auto hidden sm:flex">
-        <a href="">Application</a> <i data-feather="chevron-right" class="breadcrumb__icon"></i>
-        <a href="" class="breadcrumb--active">Dashboard</a>
+        <a href="{{ url('') }}">Application</a> <i data-feather="chevron-right" class="breadcrumb__icon"></i>
+        <a href="" class="breadcrumb--active">@yield('breadcrumb')</a>
     </div>
     <!-- END: Breadcrumb -->
     <div class="intro-x relative mr-3 sm:mr-6">

@@ -49,6 +49,16 @@ License: You must have a valid license purchased only from themeforest(the above
 
             $(".side-menu:contains('@yield('menu')')").addClass('side-menu--active');
 
+            $(window).scroll(function() {
+                console.log('scrollTop:', $(window).scrollTop());
+                console.log('height:', $(window).height());
+                console.log('height:', $(document).height());
+                if ($(window).scrollTop() + $(window).height() + 5 >= $(document).height()) {
+                    $('.dark-mode-switcher').css('display', 'none');
+                } else {
+                    $('.dark-mode-switcher').removeAttr('style');
+                }
+            });
         });
     </script>
     @yield('script')

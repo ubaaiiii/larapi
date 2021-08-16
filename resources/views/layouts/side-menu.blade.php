@@ -7,33 +7,59 @@
     <div class="side-nav__devider my-6"></div>
     <ul>
         <li>
-            <a href="{{ url('/') }}/" class="side-menu">
+            <a href="{{ url('/') }}" class="side-menu">
                 <div class="side-menu__icon"> <i data-feather="home"></i> </div>
                 <div class="side-menu__title"> Dashboard </div>
             </a>
         </li>
         <li>
-            <a href="{{ url('/profile') }}/" class="side-menu">
+            <a href="{{ url('/profile') }}" class="side-menu">
                 <div class="side-menu__icon"> <i data-feather="trello"></i> </div>
                 <div class="side-menu__title"> Profile </div>
             </a>
         </li>
 
-        <?php
+        @php
         $pages = DB::table('pages')
-            ->where('user_level', '=', 'adm')
+            ->where('user_level', '=','adm')
+            ->whereNull('parent_id')
+            ->orderBy('index','asc')
             ->get();
-        ?>
-        @foreach ($pages as $page)
+
+        foreach ($pages as $page) {
+            $sub_pages = DB::table('pages')
+                ->where('user_level', '=', 'adm')
+                ->where('parent_id', '=', $page->id)
+                ->orderBy('index','asc')
+                ->get();
+
+        @endphp
             <li>
-                <a href="{{ url('/') . $page->link }}/" class="side-menu">
+                <a href="{{ ($page->link =='#') ? 'javascript:;' : url($page->link) }}" class="side-menu">
                     <div class="side-menu__icon"> <i data-feather="{{ $page->page_icon }}"></i> </div>
-                    <div class="side-menu__title"> {{ $page->page_name }} </div>
+                    <div class="side-menu__title"> {{ $page->page_name }}
+                        @if (!$sub_pages->isEmpty()) 
+                            <div class="side-menu__sub-icon "> <i data-feather="chevron-down"></i> </div>
+                        @endif
+                    </div>
                 </a>
+                @if (!empty($sub_pages))
+                <ul class="">
+                    @foreach ($sub_pages as $sub_page)
+                        <li>
+                            <a href="{{ url($sub_page->link) }}" class="side-menu">
+                                <div class="side-menu__icon"> <i data-feather="{{ $sub_page->page_icon }}"></i> </div>
+                                <div class="side-menu__title"> {{ $sub_page->page_name }} </div>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+                @endif
             </li>
-        @endforeach
-
-
+        @php
+        }
+        // dd(DB::getQueryLog());
+        @endphp
     </ul>
 </nav>
 <!-- END: Side Menu -->

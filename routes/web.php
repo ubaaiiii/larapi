@@ -17,6 +17,18 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('index');
 });
+Route::get('/profile', function () {
+    return view('profile');
+});
+Route::get('/pengajuan', function () {
+    return view('pengajuan');
+});
+Route::get('/inquiry', function () {
+    return view('inquiry');
+});
+Route::get('/laporan', function () {
+    return view('laporan');
+});
 // });
 
 Route::get('login', ['as' => 'login', 'uses' => function () {
