@@ -20,6 +20,8 @@ License: You must have a valid license purchased only from themeforest(the above
     <meta name="keywords"
         content="admin template, Rubick Admin Template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="LEFT4CODE">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <title>@yield('title') | BDS General</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="public/dist/css/app.css" />
@@ -40,6 +42,8 @@ License: You must have a valid license purchased only from themeforest(the above
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="public/dist/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
             $('.dark-mode-switcher').removeAttr('style');
@@ -50,18 +54,16 @@ License: You must have a valid license purchased only from themeforest(the above
             $(".side-menu:contains('@yield('menu')')").addClass('side-menu--active');
 
             $(window).scroll(function() {
-                console.log('scrollTop:', $(window).scrollTop());
-                console.log('height:', $(window).height());
-                console.log('height:', $(document).height());
                 if ($(window).scrollTop() + $(window).height() + 5 >= $(document).height()) {
                     $('.dark-mode-switcher').css('display', 'none');
                 } else {
                     $('.dark-mode-switcher').removeAttr('style');
                 }
             });
+
         });
     </script>
-    @yield('script')
+    @yield('script');
 </body>
 
 </html>

@@ -13,19 +13,18 @@ class AuthController extends Controller
     {
         $this->validate($request, [
             'username'  => 'required',
-            'email' => 'required|email',
             'password'  => 'required'
         ]);
 
         $user = User::where('username', $request->username)->first();
 
-        // if (!$user || !Hash::check($request->password, $user->password)) {
-        if (!$user || $request->password !== $user->password) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            // if (!$user || $request->password !== $user->password) {
             // return response()->json([
             //     'message'   => 'Unauthorized'
             // ], 401);
 
-            return view('welcome');
+            return view('login');
         }
 
         $token = $user->createToken($request->username)->plainTextToken;
@@ -44,5 +43,38 @@ class AuthController extends Controller
         return response()->json([
             'message'   => 'Berhasil Logout',
         ], 200);
+    }
+
+    function register(Request $request, User $user)
+    {
+        $this->validate($request, [
+            'name'      => 'required|string',
+            'username'  => 'required|unique:users|alpha_dash|max:16',
+            'email'     => 'required|email',
+            'notelp'    => 'required|regex:/(0)[0-9]{9}/',
+            'password'  => 'required|alpha_dash',
+            'cabang'    => 'required',
+            'level'     => 'required',
+            'parent_id' => 'required|numeric'
+        ]);
+
+        $user = User::create([
+            'name'      => $request->name,
+            'username'  => $request->username,
+            'email'     => $request->email,
+            'notelp'    => $request->notelp,
+            'password'  => Hash::make($request->password),
+            'cabang'    => $request->cabang,
+            'level'     => $request->level,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return response()->json(
+            [
+                'message'   => 'User ' . $request->name . ' Berhasil Ditambahkan',
+                'data'      => $user,
+            ],
+            200
+        );
     }
 }
