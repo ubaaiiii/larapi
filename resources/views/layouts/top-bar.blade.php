@@ -6,7 +6,7 @@
         <a href="" class="breadcrumb--active">@yield('breadcrumb')</a>
     </div>
     <!-- END: Breadcrumb -->
-    <div class="intro-x relative mr-3 sm:mr-6" <?php if (@yield('menu')=='inquiry') { echo "style='display:none;'"; }; ?>>
+    <div class="intro-x relative mr-3 sm:mr-6">
         <div class="search hidden sm:block">
             <input type="text" class="search__input form-control border-transparent placeholder-theme-13"
                 placeholder="Search...">

@@ -43,8 +43,8 @@ Route::get('/', [AuthController::class, 'showFormLogin'])->name('login');
 Route::get('login', [AuthController::class, 'showFormLogin'])->name('login');
 Route::post('login', [AuthController::class, 'login']);
 
+Route::post('register', [AuthController::class, 'register']);
 Route::group(['middleware' => 'auth'], function () {
-    Route::post('register', [AuthController::class, 'register']);
 
     Route::get('home', [PageController::class, 'dashboard'])->name('home');
     Route::get('profile', [PageController::class, 'profile'])->name('profile');

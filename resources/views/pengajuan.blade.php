@@ -32,6 +32,54 @@
                                 <option value="FIRE">Fire Insurance(PSAKI)</option>
                             </select>
                         </div>
+                        <div class="extended-clause">
+                            <div class="form-inline ml-3 mt-5">
+                                <label for="extend-clause" class="form-label sm:w-20">Extended Clause</label>
+                                <div class="input-group w-full">
+                                    <div id="rsmdcc" class="input-group-text @if (Auth::user()->level
+                                        != 'adm') w-full @endif">
+                                        <input id="extend-clause-1" class="form-check-input" type="checkbox"
+                                            name="extend-clause">
+                                        <label class="form-check-label" for="extend-clause-1">RSMDCC </label>
+                                    </div>
+                                    @if (Auth::user()->level == 'adm')
+                                        <input type="text" class="allow-decimal form-control" placeholder="Rate"
+                                            aria-label="Rate" aria-describedby="rsmdcc" style="text-align:right;">
+                                    @endif
+
+                                </div>
+                            </div>
+                            <div class="form-inline ml-3 mt-1">
+                                <label for="extend-clause" class="form-label sm:w-20"></label>
+                                <div class="input-group w-full">
+                                    <div id="tsfwd" class="input-group-text @if (Auth::user()->level
+                                        != 'adm') w-full @endif">
+                                        <input id="extend-clause-2" class="form-check-input" type="checkbox"
+                                            name="extend-clause">
+                                        <label class="form-check-label" for="extend-clause-2">TSFWD </label>
+                                    </div>
+                                    @if (Auth::user()->level == 'adm')
+                                        <input type="text" class="allow-decimal form-control" placeholder="Rate"
+                                            aria-label="Rate" aria-describedby="tsfwd" style="text-align:right;">
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="form-inline ml-3 mt-1">
+                                <label for="extend-clause" class="form-label sm:w-20"></label>
+                                <div class="input-group w-full">
+                                    <div id="others" class="input-group-text @if (Auth::user()->level
+                                        != 'adm') w-full @endif">
+                                        <input id="extend-clause-3" class="form-check-input" type="checkbox"
+                                            name="extend-clause">
+                                        <label class="form-check-label" for="extend-clause-3">Others </label>
+                                    </div>
+                                    @if (Auth::user()->level == 'adm')
+                                        <input type="text" class="allow-decimal form-control" placeholder="Rate"
+                                            aria-label="Rate" aria-describedby="others" style="text-align:right;">
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-inline mt-5">
                             <label for="insured" class="ml-3 form-label sm:w-20">Insured (QQ)</label>
                             <select id="insured" data-search="true" class="w-full" name="insured" required>
@@ -42,15 +90,11 @@
                             </select>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="noktp" class="form-label sm:w-20">KTP/NIK</label>
-                            <input type="text" id="noktp" class="form-control" required name="noktp">
-                        </div>
-                        <div class="form-inline mt-5">
                             <label for="insured-address" class="form-label sm:w-20">Insured Address</label>
                             <textarea id="insured-address" class="form-control"></textarea>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="noktp" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
+                            <label for="nopolis-lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
                             <div class="input-group w-full">
                                 <input type="text" class="form-control" placeholder="Nomor Polis Lama" name="nopolis-lama"
                                     id="nopolis-lama">
@@ -63,7 +107,7 @@
                                 class="datepicker form-control w-full block mx-auto">
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="range-periode" class="ml-3 form-label sm:w-20">Klausa</label>
+                            <label for="editor" class="ml-3 form-label sm:w-20">Klausa</label>
                             <div class="w-full">
                                 <div data-simple-toolbar="true" class="editor">
                                     <p>Contoh Klausa</p>
@@ -133,81 +177,86 @@
             <div class="intro-y box">
                 <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
                     <h2 class="font-medium text-base mr-auto">
-                        TSI
+                        Total Nilai Pertanggungan
                     </h2>
                 </div>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th width="4%">Code</th>
-                            <th width="20%">Description</th>
-                            <th>TSI</th>
+                            <th>Code / TSI</th>
                             <th>Remarks</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>MD</td>
                             <td>
-                                <input name="InterestCode[1]" type="hidden" value="M20">
-                                Material Damage
+                                <div class="input-group">
+                                    <div id="group-md" class="input-group-text">MD</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Material Damage"
+                                        aria-label="Material Damage" aria-describedby="group-md">
+                                </div>
                             </td>
-                            <td><input name="InterestIndemnity[1]" class="form-control form-control-sm" value=""></td>
-                            <td><input name="InterestRemarks[1]" class="form-control form-control-sm" value=""></td>
+                            <td><input name="InterestRemarks[1]" class="form-control" value=""></td>
                         </tr>
                         <tr>
-                            <td>B</td>
                             <td>
-                                <input name="InterestCode[0]" type="hidden" value="B01">
-                                Building
+                                <div class="input-group">
+                                    <div id="group-b" class="input-group-text">B</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Building" aria-label="Building"
+                                        aria-describedby="group-b">
+                                </div>
                             </td>
-                            <td><input name="InterestIndemnity[0]" class="form-control form-control-sm" value=""></td>
-                            <td><input name="InterestRemarks[0]" class="form-control form-control-sm" value=""></td>
+                            <td><input name="InterestRemarks[0]" class="form-control" value=""></td>
                         </tr>
                         <tr>
-                            <td>M</td>
                             <td>
-                                <input name="InterestCode[2]" type="hidden" value="M01">
-                                Machinery
+                                <div class="input-group">
+                                    <div id="group-s" class="input-group-text">M</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Machinery" aria-label="Machinery"
+                                        aria-describedby="group-s">
+                                </div>
                             </td>
-                            <td><input name="InterestIndemnity[2]" class="form-control form-control-sm" value=""></td>
-                            <td><input name="InterestRemarks[2]" class="form-control form-control-sm" value=""></td>
+                            <td><input name="InterestRemarks[2]" class="form-control" value=""></td>
                         </tr>
                         <tr>
-                            <td>S</td>
                             <td>
-                                <input name="InterestCode[3]" type="hidden" value="S01">
-                                Stock
+                                <div class="input-group">
+                                    <div id="group-s" class="input-group-text">S</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Stock" aria-label="Stock"
+                                        aria-describedby="group-s">
+                                </div>
                             </td>
-                            <td><input name="InterestIndemnity[3]" class="form-control form-control-sm" value=""></td>
-                            <td><input name="InterestRemarks[3]" class="form-control form-control-sm" value=""></td>
+                            <td><input name="InterestRemarks[3]" class="form-control" value=""></td>
                         </tr>
                         <tr>
-                            <td>O</td>
                             <td>
-                                <input name="InterestCode[4]" type="hidden" value="O03">
-                                Other
+                                <div class="input-group">
+                                    <div id="group-o" class="input-group-text">O</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Other" aria-label="Other"
+                                        aria-describedby="group-o">
+                                </div>
                             </td>
-                            <td><input name="InterestIndemnity[4]" class="form-control form-control-sm" value=""></td>
-                            <td><input name="InterestRemarks[4]" class="form-control form-control-sm" value=""></td>
+                            <td><input name="InterestRemarks[4]" class="form-control" value=""></td>
                         </tr>
                         <tr>
-                            <td>OE</td>
                             <td>
-                                <input name="InterestCode[5]" type="hidden" value="E01">
-                                Office Equipment
+                                <div class="input-group">
+                                    <div id="group-oe" class="input-group-text">OE</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Office Equipment"
+                                        aria-label="Office Equipment" aria-describedby="group-oe">
+                                </div>
                             </td>
-                            <td><input name="InterestIndemnity[5]" class="form-control form-control-sm" value=""></td>
-                            <td><input name="InterestRemarks[5]" class="form-control form-control-sm" value=""></td>
+                            <td><input name="InterestRemarks[5]" class="form-control" value=""></td>
                         </tr>
                         <tr>
-                            <td>C</td>
                             <td>
-                                <input name="InterestCode[6]" type="hidden" value="C02">
-                                Content
+                                <div class="input-group">
+                                    <div id="group-c" class="input-group-text">C</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Content" aria-label="Content"
+                                        aria-describedby="group-c">
+                                </div>
                             </td>
-                            <td><input name="InterestIndemnity[6]" class="form-control form-control-sm" value=""></td>
-                            <td><input name="InterestRemarks[6]" class="form-control form-control-sm" value=""></td>
+                            <td><input name="InterestRemarks[6]" class="form-control" value=""></td>
                         </tr>
                     </tbody>
                 </table>
@@ -304,7 +353,19 @@
 
 @section('script')
     <script>
+        function cekTypeInsurance() {
+            if ($('#type-insurance').val() == 'PAR') {
+                $('.extended-clause').removeAttr('style');
+            } else {
+                $('.extended-clause').css('display', 'none');
+            }
+        }
         $(document).ready(function() {
+            cekTypeInsurance();
+            $('#type-insurance').change(function() {
+                cekTypeInsurance();
+            });
+
             new TomSelect("#insured", {
                 create: true,
                 sortField: {

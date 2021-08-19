@@ -42,6 +42,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="public/dist/js/app.js"></script>
+    <script src="public/js/function.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
@@ -59,6 +60,26 @@ License: You must have a valid license purchased only from themeforest(the above
                 } else {
                     $('.dark-mode-switcher').removeAttr('style');
                 }
+            });
+
+            $(document).on('keydown', '.allow-decimal', function(event) {
+
+
+                if (event.shiftKey == true) {
+                    event.preventDefault();
+                }
+
+                if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <=
+                        105) || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 || event
+                    .keyCode == 39 || event.keyCode == 46 || event.keyCode == 190) {
+
+                } else {
+                    event.preventDefault();
+                }
+
+                if ($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
+                    event.preventDefault();
+
             });
 
         });

@@ -1,7 +1,7 @@
 <!-- BEGIN: Mobile Menu -->
 <div class="mobile-menu md:hidden">
     <div class="mobile-menu-bar">
-        <a href="" class="flex mr-auto">
+        <a href="{{ url('') }}" class="flex mr-auto">
             <img alt="Rubick Tailwind HTML Admin Template" class="w-6" src="public/dist/images/logo.svg">
         </a>
         <a href="javascript:;" id="mobile-menu-toggler"> <i data-feather="bar-chart-2"
@@ -20,20 +20,45 @@
                 <div class="menu__title"> Profile </div>
             </a>
         </li>
-
-        <?php
+        @php
         $pages = DB::table('pages')
-            ->where('user_level', '=', 'adm')
+            ->where('user_level', '=', Auth::user()->level)
+            ->whereNull('parent_id')
+            ->orderBy('index', 'asc')
             ->get();
-        ?>
-        @foreach ($pages as $page)
+        
+        foreach ($pages as $page) {
+            $sub_pages = DB::table('pages')
+                ->where('user_level', '=', Auth::user()->level)
+                ->where('parent_id', '=', $page->id)
+                ->orderBy('index','asc')
+                ->get();
+        @endphp
             <li>
-                <a href="{{ url($page->link) }}" class="menu">
+                <a href="{{ ($page->link =='#') ? 'javascript:;' : url($page->link) }}" class="menu">
                     <div class="menu__icon"> <i data-feather="{{ $page->page_icon }}"></i> </div>
-                    <div class="menu__title"> {{ $page->page_name }} </div>
+                    <div class="menu__title"> {{ $page->page_name }}
+                        @if (!$sub_pages->isEmpty()) 
+                            <i data-feather="chevron-down" class="menu__sub-icon "></i>
+                        @endif</div>
                 </a>
+                @if (!empty($sub_pages))
+                    <ul class="">
+                        @foreach ($sub_pages as $sub_page)
+                            <li>
+                                <a href="{{ url($sub_page->link) }}" class="menu">
+                                    <div class="menu__icon"> <i data-feather="{{ $sub_page->page_icon }}"></i> </div>
+                                    <div class="menu__title"> {{ $sub_page->page_name }} </div>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
             </li>
-        @endforeach
+        @php 
+        }
+        @endphp
+
     </ul>
 </div>
 <!-- END: Mobile Menu -->

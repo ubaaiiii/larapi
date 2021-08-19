@@ -21,14 +21,14 @@
 
         @php
         $pages = DB::table('pages')
-            ->where('user_level', '=','adm')
+            ->where('user_level', '=',Auth::user()->level)
             ->whereNull('parent_id')
             ->orderBy('index','asc')
             ->get();
 
         foreach ($pages as $page) {
             $sub_pages = DB::table('pages')
-                ->where('user_level', '=', 'adm')
+                ->where('user_level', '=', Auth::user()->level)
                 ->where('parent_id', '=', $page->id)
                 ->orderBy('index','asc')
                 ->get();
