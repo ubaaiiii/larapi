@@ -33,14 +33,16 @@ class AuthController extends Controller
         // }
 
         $data = [
-            'username'     => $request->input('username'),
+            'username'  => $request->input('username'),
             'password'  => $request->input('password'),
         ];
 
-        Auth::attempt($data);
+        Auth::attempt($data, $request->remember_me);
 
         if (Auth::check()) { // true sekalian session field di users nanti bisa dipanggil via Auth
             //Login Success
+            session()->regenerate();
+            session(['mode', 'light']);
             return redirect()->route('home');
         } else {
             //Login Fail
@@ -87,5 +89,28 @@ class AuthController extends Controller
         return redirect()->route('login');
         // pindahin ke api/authcontroller/logout
         // $user->currentAccessToken()->delete();
+    }
+
+    public function DarkMode($value)
+    {
+        if ($value == 1) {
+            $mode = "dark";
+        } else {
+            $mode = "light";
+        }
+
+        $user = User::find(Auth::user()->id);
+        try {
+            $user = $user->update([
+                'mode' => $mode
+            ]);
+            return response()->json([
+                'message'   => 'Success'
+            ], 200);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'message'   => 'Error'
+            ], 400);
+        }
     }
 }

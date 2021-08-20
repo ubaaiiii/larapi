@@ -20,7 +20,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <meta name="keywords"
         content="admin template, Rubick Admin Template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="LEFT4CODE">
-    <title>Login - Rubick - Tailwind HTML Admin Template</title>
+    <title>Login | BDS General</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="{{ url('public/dist/css/app.css') }}" />
     <!-- END: CSS Assets-->
@@ -41,12 +41,11 @@ License: You must have a valid license purchased only from themeforest(the above
                     <img alt="Rubick Tailwind HTML Admin Template" class="-intro-x w-1/2 -mt-16"
                         src="{{ url('public/dist/images/illustration.svg') }}">
                     <div class="-intro-x text-white font-medium text-4xl leading-tight mt-10">
-                        A few more clicks to
-                        <br>
-                        sign in to your account.
+                        Bina Dana Sejahtera
                     </div>
-                    <div class="-intro-x mt-5 text-lg text-white text-opacity-70 dark:text-gray-500">Manage all your
-                        Insurance data in one place</div>
+                    <div class="-intro-x mt-5 text-lg text-white text-opacity-70 dark:text-gray-500">Sistem Informasi
+                        Asuransi Perbankan
+                    </div>
                 </div>
             </div>
             <!-- END: Login Info -->
@@ -57,11 +56,10 @@ License: You must have a valid license purchased only from themeforest(the above
                     <form id="form-login" method="POST" action="{{ route('login') }}">
                         @csrf
                         <h2 class="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">
-                            Sign In
+                            Login
                         </h2>
-                        <div class="intro-x mt-2 text-gray-500 xl:hidden text-center">A few more clicks to sign in to
-                            your
-                            account. Manage all your Insurance data in one place</div>
+                        <div class="intro-x mt-2 text-gray-500 xl:hidden text-center">Bina Dana Sejahtera. Sistem
+                            Informasi Asuransi Perbankan</div>
                         <div class="intro-x mt-8">
                             <input type="text" class="intro-x login__input form-control py-3 px-4 border-gray-300 block"
                                 name="username" placeholder="Username">
@@ -72,9 +70,17 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <h4>{{ $errors->first() }}</h4>
                             @endif
                         </div>
+                        <div class="intro-x flex text-gray-700 dark:text-gray-600 text-xs sm:text-sm mt-4">
+                            <div class="flex items-center mr-auto">
+                                <input name="remember_me" id="remember-me" type="checkbox"
+                                    class="form-check-input border mr-2">
+                                <label class="cursor-pointer select-none" for="remember-me">Remember me</label>
+                            </div>
+                            {{-- <a href="">Forgot Password?</a> --}}
+                        </div>
                         <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
                             <button type="submit"
-                                class="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Login</button>
+                                class="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Masuk</button>
                         </div>
                     </form>
                 </div>

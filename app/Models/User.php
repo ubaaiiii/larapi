@@ -26,6 +26,7 @@ class User extends Authenticatable
         'level',
         'parent_id',
         'api_token',
+        'mode'
     ];
 
     /**

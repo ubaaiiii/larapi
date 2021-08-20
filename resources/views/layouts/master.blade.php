@@ -8,7 +8,7 @@ Purchase: https://themeforest.net/user/left4code/portfolio
 Renew Support: https://themeforest.net/user/left4code/portfolio
 License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
 -->
-<html lang="en" class="light">
+<html class="{{ Auth::user()->mode }}">
 <!-- BEGIN: Head -->
 
 <head>
@@ -42,48 +42,33 @@ License: You must have a valid license purchased only from themeforest(the above
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="public/dist/js/app.js"></script>
-    <script src="public/js/function.js"></script>
+
+    {{-- script vendor --}}
     <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    {{-- script yang biasa diload saat awal awal --}}
+    <script src="public/js/function.js"></script>
     <script>
         $(document).ready(function() {
-            $('.dark-mode-switcher').removeAttr('style');
-            $('.dark-mode-switcher__toggle').click(function() {
-                $("html").toggleClass('light dark');
-            });
-
-            $(".side-menu:contains('@yield('menu')')").addClass('side-menu--active');
-
-            $(window).scroll(function() {
-                if ($(window).scrollTop() + $(window).height() + 5 >= $(document).height()) {
-                    $('.dark-mode-switcher').css('display', 'none');
-                } else {
-                    $('.dark-mode-switcher').removeAttr('style');
+            $(".dark-mode-switcher__toggle").click(function() {
+                $("html").toggleClass("light dark");
+                var v = 1;
+                if ($("html").hasClass("light")) {
+                    v = 0;
                 }
+                $.ajax({
+                    url: "{{ url('mode') }}" + "/" + v,
+                    type: "GET",
+                    success: function(d) {
+                        console.log(d);
+                    },
+                });
             });
-
-            $(document).on('keydown', '.allow-decimal', function(event) {
-
-
-                if (event.shiftKey == true) {
-                    event.preventDefault();
-                }
-
-                if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <=
-                        105) || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 || event
-                    .keyCode == 39 || event.keyCode == 46 || event.keyCode == 190) {
-
-                } else {
-                    event.preventDefault();
-                }
-
-                if ($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
-                    event.preventDefault();
-
-            });
-
         });
     </script>
+
+    {{-- script bawaan halaman yang diload --}}
     @yield('script');
 </body>
 
