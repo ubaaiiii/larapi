@@ -38,6 +38,7 @@ class PageController extends Controller
             'cabang'    => Master::where('mstype', 'cabang')->get(),
             'level'     => Master::where('mstype', 'level')->get(),
             'provinsi'  => KodePos::select('provinsi')->distinct()->get(),
+            'search'    => 'hidden',
         ];
         return view('inquiry', $data);
     }

@@ -51,6 +51,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <script src="public/js/function.js"></script>
     <script>
         $(document).ready(function() {
+            $(".side-menu:contains('@yield('menu')')").addClass("side-menu--active");
             $(".dark-mode-switcher__toggle").click(function() {
                 $("html").toggleClass("light dark");
                 var v = 1;
@@ -61,10 +62,27 @@ License: You must have a valid license purchased only from themeforest(the above
                     url: "{{ url('mode') }}" + "/" + v,
                     type: "GET",
                     success: function(d) {
-                        console.log(d);
+                        // console.log(d);
                     },
                 });
             });
+
+            $('#keluar').click(function() {
+                $.ajax({
+                    url: "{{ url('api/logout') }}",
+                    type: 'GET',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('Authorization',
+                            'Bearer {{ Auth::user()->api_token }}');
+                    },
+                    success: function(data) {
+                        window.location.replace("{{ url('logout') }}");
+                    },
+                    error: function(data) {
+                        console.log('error', data);
+                    }
+                })
+            })
         });
     </script>
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -39,10 +40,19 @@ class AuthController extends Controller
     function logout(Request $request)
     {
         $user = $request->user();
-        $user->currentAccessToken()->delete();
-        return response()->json([
-            'message'   => 'Berhasil Logout',
-        ], 200);
+        try {
+            $user->update([
+                'api_token' => null
+            ]);
+            $user->tokens()->where('tokenable_id', $user->id)->delete();
+            return response()->json([
+                'message'   => 'Berhasil Logout',
+            ], 200);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'message'   => 'Error'
+            ], 400);
+        }
     }
 
     function register(Request $request, User $user)

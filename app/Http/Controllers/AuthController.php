@@ -23,6 +23,10 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+        
         $this->validate($request, [
             'username'  => 'required|',
             'password'  => 'required|string'
@@ -41,8 +45,10 @@ class AuthController extends Controller
 
         if (Auth::check()) { // true sekalian session field di users nanti bisa dipanggil via Auth
             //Login Success
-            session()->regenerate();
-            session(['mode', 'light']);
+            $user = User::find(Auth::user()->id);
+            $token = $user->createToken($request->username)->plainTextToken;
+            $user->update(['api_token'=>$token]);
+
             return redirect()->route('home');
         } else {
             //Login Fail

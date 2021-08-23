@@ -25,19 +25,18 @@
                                 value="BDS{{ date('my') }}00001" disabled>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="type-insurance" class="ml-3 form-label sm:w-20">Type of Insurance</label>
+                            <label for="type-insurance" class="ml-3 form-label sm:w-20">Tipe Asuransi</label>
                             <select id="type-insurance" data-search="true" class="tom-select w-full" name="type-insurance"
                                 required>
                                 <option value="PAR" selected>Property All Risk</option>
                                 <option value="FIRE">Fire Insurance(PSAKI)</option>
                             </select>
                         </div>
-                        <div class="extended-clause">
+                        {{-- <div class="extended-clause">
                             <div class="form-inline ml-3 mt-5">
                                 <label for="extend-clause" class="form-label sm:w-20">Extended Clause</label>
                                 <div class="input-group w-full">
-                                    <div id="rsmdcc" class="input-group-text @if (Auth::user()->level
-                                        != 'adm') w-full @endif">
+                                    <div id="rsmdcc" class="input-group-text @if (Auth::user()->level != 'adm') w-full @endif">
                                         <input id="extend-clause-1" class="form-check-input" type="checkbox"
                                             name="extend-clause">
                                         <label class="form-check-label" for="extend-clause-1">RSMDCC </label>
@@ -52,8 +51,7 @@
                             <div class="form-inline ml-3 mt-1">
                                 <label for="extend-clause" class="form-label sm:w-20"></label>
                                 <div class="input-group w-full">
-                                    <div id="tsfwd" class="input-group-text @if (Auth::user()->level
-                                        != 'adm') w-full @endif">
+                                    <div id="tsfwd" class="input-group-text @if (Auth::user()->level != 'adm') w-full @endif">
                                         <input id="extend-clause-2" class="form-check-input" type="checkbox"
                                             name="extend-clause">
                                         <label class="form-check-label" for="extend-clause-2">TSFWD </label>
@@ -67,8 +65,7 @@
                             <div class="form-inline ml-3 mt-1">
                                 <label for="extend-clause" class="form-label sm:w-20"></label>
                                 <div class="input-group w-full">
-                                    <div id="others" class="input-group-text @if (Auth::user()->level
-                                        != 'adm') w-full @endif">
+                                    <div id="others" class="input-group-text @if (Auth::user()->level != 'adm') w-full @endif">
                                         <input id="extend-clause-3" class="form-check-input" type="checkbox"
                                             name="extend-clause">
                                         <label class="form-check-label" for="extend-clause-3">Others </label>
@@ -79,9 +76,9 @@
                                     @endif
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="form-inline mt-5">
-                            <label for="insured" class="ml-3 form-label sm:w-20">Insured (QQ)</label>
+                            <label for="insured" class="ml-3 form-label sm:w-20">Tetanggung (QQ)</label>
                             <select id="insured" data-search="true" class="w-full" name="insured" required>
                                 <option value="bpk">Bpk. Tambunan</option>
                                 <option value="ynt">Yanti Susimiloyo</option>
@@ -90,7 +87,11 @@
                             </select>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="insured-address" class="form-label sm:w-20">Insured Address</label>
+                            <label for="nik" class="form-label sm:w-20">NIK / No KTP</label>
+                            <input type="text" id="nik" class="form-control" required name="nik">
+                        </div>
+                        <div class="form-inline mt-5">
+                            <label for="insured-address" class="form-label sm:w-20">Alamat Tertanggung</label>
                             <textarea id="insured-address" class="form-control"></textarea>
                         </div>
                         <div class="form-inline mt-5">
@@ -106,14 +107,16 @@
                             <input id="range-periode" data-daterange="true"
                                 class="datepicker form-control w-full block mx-auto">
                         </div>
-                        <div class="form-inline mt-5">
-                            <label for="editor" class="ml-3 form-label sm:w-20">Klausa</label>
-                            <div class="w-full">
-                                <div data-simple-toolbar="true" class="editor">
-                                    <p>Contoh Klausa</p>
+                        @if (Auth::user()->level !== 'ao')
+                            <div class="form-inline mt-5">
+                                <label for="editor" class="ml-3 form-label sm:w-20">Klausa</label>
+                                <div class="w-full">
+                                    <div data-simple-toolbar="true" class="editor">
+                                        <p>Contoh Klausa</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                         <div class="form-inline mt-5">
                             <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
                             <select id="okupasi" data-search="true" class="tom-select w-full" name="okupasi" required>
@@ -154,7 +157,7 @@
                         </div>
                         <div class="form-inline mt-5">
                             <label for="kelurahan" class="ml-3 form-label sm:w-20">Kelurahan / Kode Pos</label>
-                            <select id="kelurahan" data-search="true" class="w-full" name="kelurahan" required disabled>
+                            <select id="kelurahan" class="w-full js-data-example-ajax" name="kelurahan" required>
                             </select>
                         </div>
                         <div class="sm:ml-20 sm:pl-5 mt-5">
@@ -177,32 +180,22 @@
             <div class="intro-y box">
                 <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
                     <h2 class="font-medium text-base mr-auto">
-                        Total Nilai Pertanggungan
+                        Nilai Pertanggungan
                     </h2>
                 </div>
-                <table class="table table-bordered">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th>Code / TSI</th>
-                            <th>Remarks</th>
+                            <th>Kode / Nilai Pertanggungan</th>
+                            <th>Deskripsi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>
                                 <div class="input-group">
-                                    <div id="group-md" class="input-group-text">MD</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Material Damage"
-                                        aria-label="Material Damage" aria-describedby="group-md">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[1]" class="form-control" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="input-group">
                                     <div id="group-b" class="input-group-text">B</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Building" aria-label="Building"
+                                        type="text" class="form-control" placeholder="Bangunan" aria-label="Bangunan"
                                         aria-describedby="group-b">
                                 </div>
                             </td>
@@ -212,7 +205,7 @@
                             <td>
                                 <div class="input-group">
                                     <div id="group-s" class="input-group-text">M</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Machinery" aria-label="Machinery"
+                                        type="text" class="form-control" placeholder="Mesin" aria-label="Mesin"
                                         aria-describedby="group-s">
                                 </div>
                             </td>
@@ -221,9 +214,9 @@
                         <tr>
                             <td>
                                 <div class="input-group">
-                                    <div id="group-s" class="input-group-text">S</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Stock" aria-label="Stock"
-                                        aria-describedby="group-s">
+                                    <div id="group-s" class="input-group-text">K</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Ketersediaan"
+                                        aria-label="Ketersediaan" aria-describedby="group-s">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[3]" class="form-control" value=""></td>
@@ -231,19 +224,9 @@
                         <tr>
                             <td>
                                 <div class="input-group">
-                                    <div id="group-o" class="input-group-text">O</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Other" aria-label="Other"
-                                        aria-describedby="group-o">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[4]" class="form-control" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="input-group">
-                                    <div id="group-oe" class="input-group-text">OE</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Office Equipment"
-                                        aria-label="Office Equipment" aria-describedby="group-oe">
+                                    <div id="group-pk" class="input-group-text">PK</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Peralatan Kantor"
+                                        aria-label="Peralatan Kantor" aria-describedby="group-pk">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[5]" class="form-control" value=""></td>
@@ -251,17 +234,35 @@
                         <tr>
                             <td>
                                 <div class="input-group">
-                                    <div id="group-c" class="input-group-text">C</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Content" aria-label="Content"
-                                        aria-describedby="group-c">
+                                    <div id="group-ip" class="input-group-text">I/P</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Isi / Perabotan"
+                                        aria-label="Isi / Perabotan" aria-describedby="group-ip">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[6]" class="form-control" value=""></td>
                         </tr>
+                        <tr>
+                            <td>
+                                <div class="input-group">
+                                    <div id="group-l" class="input-group-text">L</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Lain-Lain" aria-label="Lain-Lain"
+                                        aria-describedby="group-l">
+                                </div>
+                            </td>
+                            <td><input name="InterestRemarks[4]" class="form-control" value=""></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="input-group">
+                                    <div id="group-t" class="input-group-text">Total</div> <input style="text-align:right;"
+                                        type="text" class="form-control" placeholder="Total Nilai Pertanggungan"
+                                        aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" disabled>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-
         </div>
         <div class="intro-y col-span-12 lg:col-span-6">
             <div class="intro-y box">
@@ -353,27 +354,33 @@
 
 @section('script')
     <script>
-        function cekTypeInsurance() {
-            if ($('#type-insurance').val() == 'PAR') {
-                $('.extended-clause').removeAttr('style');
-            } else {
-                $('.extended-clause').css('display', 'none');
-            }
-        }
         $(document).ready(function() {
-            cekTypeInsurance();
-            $('#type-insurance').change(function() {
-                cekTypeInsurance();
-            });
-
-            new TomSelect("#insured", {
-                create: true,
-                sortField: {
-                    field: "text",
-                    direction: "asc"
+            $('.js-data-example-ajax').select2({
+                minimumInputLength: 2,
+                tags: [],
+                ajax: {
+                    url: URL,
+                    dataType: 'json',
+                    type: "GET",
+                    quietMillis: 50,
+                    data: function(term) {
+                        return {
+                            term: term
+                        };
+                    },
+                    results: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: item.completeName,
+                                    slug: item.slug,
+                                    id: item.id
+                                }
+                            })
+                        };
+                    }
                 }
             });
-
         });
     </script>
 @endsection

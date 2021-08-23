@@ -1,5 +1,5 @@
-$(document).ready(function() {
-    $(".allow_decimal").on("input", function(evt) {
+$(document).ready(function () {
+    $(".allow_decimal").on("input", function (evt) {
         var self = $(this);
         self.val(self.val().replace(/[^0-9\.]/g, ""));
         if (
@@ -11,9 +11,7 @@ $(document).ready(function() {
     });
     $(".dark-mode-switcher").removeAttr("style");
 
-    $(".side-menu:contains('@yield('menu')')").addClass("side-menu--active");
-
-    $(window).scroll(function() {
+    $(window).scroll(function () {
         if (
             $(window).scrollTop() + $(window).height() + 5 >=
             $(document).height()
@@ -24,7 +22,7 @@ $(document).ready(function() {
         }
     });
 
-    $(document).on("keydown", ".allow-decimal", function(event) {
+    $(document).on("keydown", ".allow-decimal", function (event) {
         if (event.shiftKey == true) {
             event.preventDefault();
         }
@@ -38,7 +36,8 @@ $(document).ready(function() {
             event.keyCode == 39 ||
             event.keyCode == 46 ||
             event.keyCode == 190
-        ) {} else {
+        ) {
+        } else {
             event.preventDefault();
         }
 
