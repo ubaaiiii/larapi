@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\FormController;
+use App\Http\Controllers\api\DataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,10 +21,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/form', [FormController::class, 'index']);
-    Route::post('/form/create', [FormController::class, 'create']);
-    Route::get('/form/edit/{id}', [FormController::class, 'edit']);
+    // Auth
     Route::get('/logout', [AuthController::class, 'logout']);
+
+    // data
+    Route::get('/selectkodepos', [DataController::class, 'selectKodepos']);
+    Route::get('/selectinsured', [DataController::class, 'selectInsured']);
+    Route::get('/selectokupasi', [DataController::class, 'selectOkupasi']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);

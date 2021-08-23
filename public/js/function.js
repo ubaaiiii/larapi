@@ -1,14 +1,4 @@
 $(document).ready(function () {
-    $(".allow_decimal").on("input", function (evt) {
-        var self = $(this);
-        self.val(self.val().replace(/[^0-9\.]/g, ""));
-        if (
-            (evt.which != 46 || self.val().indexOf(".") != -1) &&
-            (evt.which < 48 || evt.which > 57)
-        ) {
-            evt.preventDefault();
-        }
-    });
     $(".dark-mode-switcher").removeAttr("style");
 
     $(window).scroll(function () {
@@ -22,26 +12,34 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on("keydown", ".allow-decimal", function (event) {
-        if (event.shiftKey == true) {
-            event.preventDefault();
-        }
+    $("select").on("select2:open", function () {
+        // uppercase select2 search
+        $(".select2-search__field").css("text-transform", "uppercase");
+    });
+    $("select").keyup(function () {
+        console.log("change");
+    });
 
-        if (
-            (event.keyCode >= 48 && event.keyCode <= 57) ||
-            (event.keyCode >= 96 && event.keyCode <= 105) ||
-            event.keyCode == 8 ||
-            event.keyCode == 9 ||
-            event.keyCode == 37 ||
-            event.keyCode == 39 ||
-            event.keyCode == 46 ||
-            event.keyCode == 190
-        ) {
-        } else {
-            event.preventDefault();
-        }
+    $(".currency").inputmask("decimal", {
+        alias: "numeric",
+        groupSeparator: ",",
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ".",
+        digitsOptional: false,
+        allowMinus: false,
+        placeholder: "0",
+    });
 
-        if ($(this).val().indexOf(".") !== -1 && event.keyCode == 190)
-            event.preventDefault();
+    $(".tsi").keyup(function () {
+        var sum = 0;
+        $(".tsi").each(function () {
+            if ($(this).val() == "") {
+                sum += 0;
+            } else {
+                sum += parseFloat($(this).inputmask("unmaskedvalue"));
+            }
+        });
+        $("#tsi").val(sum);
     });
 });

@@ -5,7 +5,10 @@
 @section('content')
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
-            Formulir Pengajuan <button class="btn btn-sm btn-primary">Simpan</button>
+            Formulir Pengajuan
+            @if ($act !== 'view')
+                <button class="btn btn-sm btn-primary">Simpan</button>
+            @endif
         </h2>
     </div>
     <div class="grid grid-cols-12 gap-6 mt-5">
@@ -19,18 +22,24 @@
                 </div>
                 <div id="horizontal-form" class="p-5">
                     <div class="preview">
-                        <div class="form-inline mt-5">
-                            <label for="noapp" class="form-label sm:w-20">Nomor Aplikasi</label>
-                            <input type="text" id="noapp" class="form-control" required name="noapp"
-                                value="BDS{{ date('my') }}00001" disabled>
-                        </div>
+                        @if ($act == 'view')
+                            <div class="form-inline mt-5">
+                                <label for="noapp" class="form-label sm:w-20">Nomor Aplikasi</label>
+                                <input type="text" id="noapp" class="form-control" required name="noapp"
+                                    value="BDS{{ date('my') }}00001" disabled>
+                            </div>
+                        @endif
                         <div class="form-inline mt-5">
                             <label for="type-insurance" class="ml-3 form-label sm:w-20">Tipe Asuransi</label>
-                            <select id="type-insurance" data-search="true" class="tom-select w-full" name="type-insurance"
-                                required>
-                                <option value="PAR" selected>Property All Risk</option>
-                                <option value="FIRE">Fire Insurance(PSAKI)</option>
+                            <select id="type-insurance" name="type-insurance" required style="width:100%">
+                                @foreach ($instype as $val)
+                                    <option value="{{ $val->msid }}" selected>{{ $val->msdesc }}</option>
+                                @endforeach
                             </select>
+                        </div>
+                        <div class="form-inline mt-1 extended-clause" style="display:none">
+                            <label class="form-label sm:w-20"></label>
+                            <label>Termasuk: RSMDCC, TSFWD, Others</label>
                         </div>
                         {{-- <div class="extended-clause">
                             <div class="form-inline ml-3 mt-5">
@@ -78,12 +87,9 @@
                             </div>
                         </div> --}}
                         <div class="form-inline mt-5">
-                            <label for="insured" class="ml-3 form-label sm:w-20">Tetanggung (QQ)</label>
-                            <select id="insured" data-search="true" class="w-full" name="insured" required>
-                                <option value="bpk">Bpk. Tambunan</option>
-                                <option value="ynt">Yanti Susimiloyo</option>
-                                <option value="slm">Sulaiman B. Mail</option>
-                                <option value="sdr">Sudarsono</option>
+                            <label for="insured" class="ml form-label sm:w-20">Tertanggung (QQ)</label>
+                            <select id="insured" style="width:100%;text-transform: uppercase;" class="select2"
+                                name="insured" required>
                             </select>
                         </div>
                         <div class="form-inline mt-5">
@@ -107,7 +113,7 @@
                             <input id="range-periode" data-daterange="true"
                                 class="datepicker form-control w-full block mx-auto">
                         </div>
-                        @if (Auth::user()->level !== 'ao')
+                        {{-- @if (Auth::user()->level !== 'ao')
                             <div class="form-inline mt-5">
                                 <label for="editor" class="ml-3 form-label sm:w-20">Klausa</label>
                                 <div class="w-full">
@@ -116,48 +122,19 @@
                                     </div>
                                 </div>
                             </div>
-                        @endif
+                        @endif --}}
                         <div class="form-inline mt-5">
                             <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
-                            <select id="okupasi" data-search="true" class="tom-select w-full" name="okupasi" required>
-                                <option disabled selected>- Pilih Okupasi -</option>
-                                <option value="2976|0.0294%">2976 - Rumah Tinggal (0.0294%)</option>
-                                <option value="2971|0.0368%">2971 - Kantor / Apartemen s/d 6 lantai(0.0368%)</option>
-                                <option value="2971|0.0385%">2971 - Kantor / Apartemen 6 s/d 18 lantai(0.0385%)</option>
-                                <option value="2971|0.0376%">2971 - Kantor / Apartemen diatas 18 lantai(0.0376%)</option>
-                                <option value="2934|0.1520%">2934 - Toko / Ruko (0.1520%)</option>
-                                <option value="2971-1|0.1127%">29371 - Gudang Pribadi (Building Only , 0.1127%)</option>
-                                <option value="2945|0.1479%">2945 - Restaurants (0.1479%)</option>
-                                <option value="2930|0.0889%">2930 - Dispensaries (Apotik, 0.0889%)</option>
-                                <option value="2951|0.0378%">2951 - Sanotarium,hospitals,doctors consulting rooms, old
-                                    peoples and childrens home(0.0378%)</option>
+                            <select id="okupasi" style="width:100%" name="okupasi" required>
                             </select>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="lokasi" class="form-label sm:w-20">Lokasi</label>
+                            <label for="lokasi" class="form-label sm:w-20">Lokasi Okupasi</label>
                             <textarea id="lokasi" class="form-control"></textarea>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="provinsi" class="ml-3 form-label sm:w-20">Provinsi</label>
-                            <select id="provinsi" data-search="true" class="tom-select w-full" name="provinsi" required>
-                                @foreach ($provinsi as $prv)
-                                    <option value="{{ $prv->provinsi }}">{{ $prv->provinsi }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-inline mt-5">
-                            <label for="kabupaten" class="ml-3 form-label sm:w-20">Kota / Kabupaten</label>
-                            <select id="kabupaten" data-search="true" class="w-full" name="kabupaten" required disabled>
-                            </select>
-                        </div>
-                        <div class="form-inline mt-5">
-                            <label for="kecamatan" class="ml-3 form-label sm:w-20">Kecamatan</label>
-                            <select id="kecamatan" data-search="true" class="w-full" name="kecamatan" required disabled>
-                            </select>
-                        </div>
-                        <div class="form-inline mt-5">
-                            <label for="kelurahan" class="ml-3 form-label sm:w-20">Kelurahan / Kode Pos</label>
-                            <select id="kelurahan" class="w-full js-data-example-ajax" name="kelurahan" required>
+                            <label for="kecamatan" class="ml-3 form-label sm:w-20">Kode Pos</label>
+                            <select id="kecamatan" style="width:100%" name="kecamatan" required>
                             </select>
                         </div>
                         <div class="sm:ml-20 sm:pl-5 mt-5">
@@ -195,8 +172,8 @@
                             <td>
                                 <div class="input-group">
                                     <div id="group-b" class="input-group-text">B</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Bangunan" aria-label="Bangunan"
-                                        aria-describedby="group-b">
+                                        type="text" class="form-control allow-decimal tsi currency" placeholder="Bangunan"
+                                        aria-label="Bangunan" aria-describedby="group-b">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[0]" class="form-control" value=""></td>
@@ -205,8 +182,8 @@
                             <td>
                                 <div class="input-group">
                                     <div id="group-s" class="input-group-text">M</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Mesin" aria-label="Mesin"
-                                        aria-describedby="group-s">
+                                        type="text" class="form-control allow-decimal tsi currency" placeholder="Mesin"
+                                        aria-label="Mesin" aria-describedby="group-s">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[2]" class="form-control" value=""></td>
@@ -215,8 +192,8 @@
                             <td>
                                 <div class="input-group">
                                     <div id="group-s" class="input-group-text">K</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Ketersediaan"
-                                        aria-label="Ketersediaan" aria-describedby="group-s">
+                                        type="text" class="form-control allow-decimal tsi currency"
+                                        placeholder="Ketersediaan" aria-label="Ketersediaan" aria-describedby="group-s">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[3]" class="form-control" value=""></td>
@@ -225,8 +202,9 @@
                             <td>
                                 <div class="input-group">
                                     <div id="group-pk" class="input-group-text">PK</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Peralatan Kantor"
-                                        aria-label="Peralatan Kantor" aria-describedby="group-pk">
+                                        type="text" class="form-control allow-decimal tsi currency"
+                                        placeholder="Peralatan Kantor" aria-label="Peralatan Kantor"
+                                        aria-describedby="group-pk">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[5]" class="form-control" value=""></td>
@@ -235,8 +213,9 @@
                             <td>
                                 <div class="input-group">
                                     <div id="group-ip" class="input-group-text">I/P</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Isi / Perabotan"
-                                        aria-label="Isi / Perabotan" aria-describedby="group-ip">
+                                        type="text" class="form-control allow-decimal tsi currency"
+                                        placeholder="Isi / Perabotan" aria-label="Isi / Perabotan"
+                                        aria-describedby="group-ip">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[6]" class="form-control" value=""></td>
@@ -245,8 +224,8 @@
                             <td>
                                 <div class="input-group">
                                     <div id="group-l" class="input-group-text">L</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Lain-Lain" aria-label="Lain-Lain"
-                                        aria-describedby="group-l">
+                                        type="text" class="form-control allow-decimal tsi currency" placeholder="Lain-Lain"
+                                        aria-label="Lain-Lain" aria-describedby="group-l">
                                 </div>
                             </td>
                             <td><input name="InterestRemarks[4]" class="form-control" value=""></td>
@@ -255,8 +234,9 @@
                             <td colspan="2">
                                 <div class="input-group">
                                     <div id="group-t" class="input-group-text">Total</div> <input style="text-align:right;"
-                                        type="text" class="form-control" placeholder="Total Nilai Pertanggungan"
-                                        aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" disabled>
+                                        id="tsi" name="tsi" type="text" class="currency form-control allow-decimal"
+                                        placeholder="Total Nilai Pertanggungan" aria-label="Total Nilai Pertanggungan"
+                                        aria-describedby="group-t" disabled>
                                 </div>
                             </td>
                         </tr>
@@ -278,20 +258,11 @@
                                 <input name="file" type="file" multiple />
                             </div>
                             <div class="dz-message" data-dz-message>
-                                <div class="text-lg font-medium">Drop files here or click to upload.</div>
-                                <div class="text-gray-600"> This is just a demo dropzone. Selected files are <span
-                                        class="font-medium">not</span> actually uploaded. </div>
+                                <div class="text-lg font-medium">Tarik dokumen kesini atau klik untuk memilih dokumen.</div>
+                                <div class="text-gray-600"> Ini hanya demonstrasi. File yang terpilih <span
+                                        class="font-medium">tidak</span> benar benar diupload. </div>
                             </div>
                         </form>
-                    </div>
-                    <div class="source-code hidden">
-                        <button data-target="#copy-multiple-file-upload"
-                            class="copy-code btn py-1 px-2 btn-outline-secondary"> <i data-feather="file"
-                                class="w-4 h-4 mr-2"></i> Copy example code </button>
-                        <div class="overflow-y-auto mt-3 rounded-md">
-                            <pre id="copy-multiple-file-upload"
-                                class="source-preview"> <code class="text-xs p-0 rounded-md html pl-5 pt-8 pb-4 -mb-10 -mt-10"> HTMLOpenTagform action=&quot;/file-upload&quot; class=&quot;dropzone&quot;HTMLCloseTag HTMLOpenTagdiv class=&quot;fallback&quot;HTMLCloseTag HTMLOpenTaginput name=&quot;file&quot; type=&quot;file&quot; multiple/HTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;dz-message&quot; data-dz-messageHTMLCloseTag HTMLOpenTagdiv class=&quot;text-lg font-medium&quot;HTMLCloseTagDrop files here or click to upload.HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;text-gray-600&quot;HTMLCloseTag This is just a demo dropzone. Selected files are HTMLOpenTagspan class=&quot;font-medium&quot;HTMLCloseTagnotHTMLOpenTag/spanHTMLCloseTag actually uploaded. HTMLOpenTag/divHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTag/formHTMLCloseTag </code> </pre>
-                        </div>
                     </div>
                 </div>
                 <div class="p-5" id="responsive-table">
@@ -301,16 +272,42 @@
                                 <thead>
                                     <tr>
                                         <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">#</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">First Name</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Last Name</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Username</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Email</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Address</th>
+                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Nama Dokumen</th>
+                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tgl. Upload</th>
+                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tipe Dokumen</th>
+                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Ukuran</th>
+                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="border-b whitespace-nowrap">1</td>
+                                        <td class="border-b whitespace-nowrap">
+                                            <div class="dropdown"> <button
+                                                    class="btn btn-primary mr-1 mb-2 dropdown-toggle btn-sm"> <i
+                                                        data-feather="align-left" class="w-5 h-5"></i> </button>
+                                                <div class="dropdown-menu w-40">
+                                                    <div class="dropdown-menu__content box dark:bg-dark-1">
+                                                        <div
+                                                            class="px-4 py-2 border-b border-gray-200 dark:border-dark-5 font-medium">
+                                                            Aksi</div>
+                                                        <div class="p-2">
+                                                            <a href=""
+                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                                <i data-feather="printer"
+                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                                Lihat
+                                                            </a>
+                                                            <a href=""
+                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                                <i data-feather="external-link"
+                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                                Hapus
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td class="border-b whitespace-nowrap">Angelina</td>
                                         <td class="border-b whitespace-nowrap">Jolie</td>
                                         <td class="border-b whitespace-nowrap">@angelinajolie</td>
@@ -318,7 +315,33 @@
                                         <td class="border-b whitespace-nowrap">260 W. Storm Street New York, NY 10025.</td>
                                     </tr>
                                     <tr>
-                                        <td class="border-b whitespace-nowrap">2</td>
+                                        <td class="border-b whitespace-nowrap">
+                                            <div class="dropdown"> <button
+                                                    class="btn btn-primary mr-1 mb-2 dropdown-toggle btn-sm"> <i
+                                                        data-feather="align-left" class="w-5 h-5"></i> </button>
+                                                <div class="dropdown-menu w-40">
+                                                    <div class="dropdown-menu__content box dark:bg-dark-1">
+                                                        <div
+                                                            class="px-4 py-2 border-b border-gray-200 dark:border-dark-5 font-medium">
+                                                            Aksi</div>
+                                                        <div class="p-2">
+                                                            <a href=""
+                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                                <i data-feather="printer"
+                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                                Lihat
+                                                            </a>
+                                                            <a href=""
+                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                                <i data-feather="external-link"
+                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                                Hapus
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td class="border-b whitespace-nowrap">Brad</td>
                                         <td class="border-b whitespace-nowrap">Pitt</td>
                                         <td class="border-b whitespace-nowrap">@bradpitt</td>
@@ -326,7 +349,33 @@
                                         <td class="border-b whitespace-nowrap">47 Division St. Buffalo, NY 14241.</td>
                                     </tr>
                                     <tr>
-                                        <td class="border-b whitespace-nowrap">3</td>
+                                        <td class="border-b whitespace-nowrap">
+                                            <div class="dropdown"> <button
+                                                    class="btn btn-primary mr-1 mb-2 dropdown-toggle btn-sm"> <i
+                                                        data-feather="align-left" class="w-5 h-5"></i> </button>
+                                                <div class="dropdown-menu w-40">
+                                                    <div class="dropdown-menu__content box dark:bg-dark-1">
+                                                        <div
+                                                            class="px-4 py-2 border-b border-gray-200 dark:border-dark-5 font-medium">
+                                                            Aksi</div>
+                                                        <div class="p-2">
+                                                            <a href=""
+                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                                <i data-feather="external-link"
+                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                                Lihat
+                                                            </a>
+                                                            <a href=""
+                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                                <i data-feather="trash"
+                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                                Hapus
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td class="border-b whitespace-nowrap">Charlie</td>
                                         <td class="border-b whitespace-nowrap">Hunnam</td>
                                         <td class="border-b whitespace-nowrap">@charliehunnam</td>
@@ -337,48 +386,153 @@
                             </table>
                         </div>
                     </div>
-                    <div class="source-code hidden">
-                        <button data-target="#copy-responsive-table" class="copy-code btn py-1 px-2 btn-outline-secondary">
-                            <i data-feather="file" class="w-4 h-4 mr-2"></i> Copy example code </button>
-                        <div class="overflow-y-auto mt-3 rounded-md">
-                            <pre class="source-preview"
-                                id="copy-responsive-table"> <code class="text-xs p-0 rounded-md html pl-5 pt-8 pb-4 -mb-10 -mt-10"> HTMLOpenTagdiv class=&quot;overflow-x-auto&quot;HTMLCloseTag HTMLOpenTagtable class=&quot;table&quot;HTMLCloseTag HTMLOpenTagtheadHTMLCloseTag HTMLOpenTagtrHTMLCloseTag HTMLOpenTagth class=&quot;border-b-2 dark:border-dark-5 whitespace-nowrap&quot;HTMLCloseTag#HTMLOpenTag/thHTMLCloseTag HTMLOpenTagth class=&quot;border-b-2 dark:border-dark-5 whitespace-nowrap&quot;HTMLCloseTagFirst NameHTMLOpenTag/thHTMLCloseTag HTMLOpenTagth class=&quot;border-b-2 dark:border-dark-5 whitespace-nowrap&quot;HTMLCloseTagLast NameHTMLOpenTag/thHTMLCloseTag HTMLOpenTagth class=&quot;border-b-2 dark:border-dark-5 whitespace-nowrap&quot;HTMLCloseTagUsernameHTMLOpenTag/thHTMLCloseTag HTMLOpenTagth class=&quot;border-b-2 dark:border-dark-5 whitespace-nowrap&quot;HTMLCloseTagEmailHTMLOpenTag/thHTMLCloseTag HTMLOpenTagth class=&quot;border-b-2 dark:border-dark-5 whitespace-nowrap&quot;HTMLCloseTagAddressHTMLOpenTag/thHTMLCloseTag HTMLOpenTag/trHTMLCloseTag HTMLOpenTag/theadHTMLCloseTag HTMLOpenTagtbodyHTMLCloseTag HTMLOpenTagtrHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag1HTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagAngelinaHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagJolieHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag@angelinajolieHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagangelinajolie@gmail.comHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag260 W. Storm Street New York, NY 10025.HTMLOpenTag/tdHTMLCloseTag HTMLOpenTag/trHTMLCloseTag HTMLOpenTagtrHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag2HTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagBradHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagPittHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag@bradpittHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagbradpitt@gmail.comHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag47 Division St. Buffalo, NY 14241.HTMLOpenTag/tdHTMLCloseTag HTMLOpenTag/trHTMLCloseTag HTMLOpenTagtrHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag3HTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagCharlieHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagHunnamHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag@charliehunnamHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTagcharliehunnam@gmail.comHTMLOpenTag/tdHTMLCloseTag HTMLOpenTagtd class=&quot;border-b whitespace-nowrap&quot;HTMLCloseTag8023 Amerige Street Harriman, NY 10926.HTMLOpenTag/tdHTMLCloseTag HTMLOpenTag/trHTMLCloseTag HTMLOpenTag/tbodyHTMLCloseTag HTMLOpenTag/tableHTMLCloseTag HTMLOpenTag/divHTMLCloseTag </code> </pre>
-                        </div>
-                    </div>
                 </div>
             </div>
 
         </div>
+        @if ($act !== '')
+            <div class="intro-y col-span-12 lg:col-span-6">
+                <div class="intro-y box">
+                    <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
+                        <h2 class="font-medium text-base mr-auto">
+                            Catatan Aktifitas
+                        </h2>
+                    </div>
+                    <div class="p-5" id="responsive-table">
+                        <div class="preview">
+                            <div class="overflow-x-auto">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Status</th>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">User</th>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tanggal</th>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border-b whitespace-nowrap">Angelina</td>
+                                            <td class="border-b whitespace-nowrap">Jolie</td>
+                                            <td class="border-b whitespace-nowrap">@angelinajolie</td>
+                                            <td class="border-b whitespace-nowrap">angelinajolie@gmail.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-b whitespace-nowrap">Brad</td>
+                                            <td class="border-b whitespace-nowrap">Pitt</td>
+                                            <td class="border-b whitespace-nowrap">@bradpitt</td>
+                                            <td class="border-b whitespace-nowrap">bradpitt@gmail.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-b whitespace-nowrap">Charlie</td>
+                                            <td class="border-b whitespace-nowrap">Hunnam</td>
+                                            <td class="border-b whitespace-nowrap">@charliehunnam</td>
+                                            <td class="border-b whitespace-nowrap">charliehunnam@gmail.com</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        @endif
     </div>
 @endsection
 
 @section('script')
     <script>
+        function cekType() {
+            if ($("#type-insurance").val() === "PAR") {
+                $('.extended-clause').removeAttr('style');
+            } else {
+                $('.extended-clause').css('display', 'none');
+            }
+        }
         $(document).ready(function() {
-            $('.js-data-example-ajax').select2({
-                minimumInputLength: 2,
-                tags: [],
+            cekType();
+            $('select').select2();
+            $('#type-insurance').change(function() {
+                cekType();
+            });
+
+            $("#kecamatan").select2({
+                minimumInputLength: 3,
+                allowClear: true,
+                placeholder: "Masukkan Nama Kecamatan / Kelurahan / Kode Pos",
                 ajax: {
-                    url: URL,
-                    dataType: 'json',
-                    type: "GET",
-                    quietMillis: 50,
-                    data: function(term) {
+                    dataType: "json",
+                    url: "api/selectkodepos",
+                    data: function(params) {
                         return {
-                            term: term
+                            search: params.term,
                         };
                     },
-                    results: function(data) {
+                    processResults: function(data, page) {
                         return {
-                            results: $.map(data, function(item) {
-                                return {
-                                    text: item.completeName,
-                                    slug: item.slug,
-                                    id: item.id
-                                }
-                            })
+                            results: data,
                         };
-                    }
+                    },
+                },
+            });
+
+            $("#okupasi").select2({
+                minimumInputLength: 3,
+                allowClear: true,
+                placeholder: "Pilih Okupasi",
+                ajax: {
+                    dataType: "json",
+                    url: "api/selectokupasi",
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            instype: $('#type-insurance').val()
+                        };
+                    },
+                    processResults: function(data, page) {
+                        return {
+                            results: data,
+                        };
+                    },
+                },
+            });
+
+            $("#insured").select2({
+                minimumInputLength: 3,
+                allowClear: true,
+                tags: true,
+                placeholder: "Masukkan Nama Tertanggung",
+                ajax: {
+                    dataType: "json",
+                    url: "api/selectinsured",
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                        };
+                    },
+                    processResults: function(data, page) {
+                        console.log('data', data);
+                        return {
+                            results: data,
+                        };
+                    },
+                },
+            });
+
+            $('#insured').on('select2:select', function(e) {
+                var data = e.params.data;
+                $('#nik').val("");
+                $('#insured-address').val("");
+                $('#nik').attr('disabled', false);
+                $('#insured-address').attr('disabled', false);
+                if (data.noktp !== undefined) {
+                    $('#nik').val(data.noktp);
+                    $('#nik').attr('disabled', true);
+                }
+                if (data.alamat !== undefined) {
+                    $('#insured-address').val(data.alamat);
+                    $('#insured-address').attr('disabled', true);
                 }
             });
         });

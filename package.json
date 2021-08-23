@@ -16,6 +16,7 @@
         "postcss": "^8.1.14"
     },
     "dependencies": {
-        "currency.js": "^2.0.4"
+        "currency.js": "^2.0.4",
+        "inputmask": "^5.0.6"
     }
 }

@@ -22,13 +22,17 @@ class PageController extends Controller
         return view('profile', $data);
     }
 
-    function pengajuan()
+    function pengajuan($noapp = null)
     {
         $data = [
             'cabang'    => Master::where('mstype', 'cabang')->get(),
             'level'     => Master::where('mstype', 'level')->get(),
-            'provinsi'  => KodePos::select('provinsi')->distinct()->get(),
+            'instype'   => Master::where('mstype', 'instype')->get(),
+            'act'       => 'add'
         ];
+        if (!empty($noapp)) {
+            $data['act'] = 'edit';
+        }
         return view('pengajuan', $data);
     }
 

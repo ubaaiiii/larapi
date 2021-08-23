@@ -49,7 +49,10 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('home', [PageController::class, 'dashboard'])->name('home');
     Route::get('profile', [PageController::class, 'profile'])->name('profile');
-    Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan');
     Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+    // pengajuan
+    Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan');
+    Route::get('pengajuan/{noapp}', [PageController::class, 'pengajuan'])->name('pengajuan');
 });

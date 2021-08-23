@@ -48,10 +48,12 @@ License: You must have a valid license purchased only from themeforest(the above
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     {{-- script yang biasa diload saat awal awal --}}
+    <script src="public/js/jquery.inputmask.min.js"></script>
     <script src="public/js/function.js"></script>
     <script>
         $(document).ready(function() {
             $(".side-menu:contains('@yield('menu')')").addClass("side-menu--active");
+
             $(".dark-mode-switcher__toggle").click(function() {
                 $("html").toggleClass("light dark");
                 var v = 1;
