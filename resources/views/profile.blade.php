@@ -76,40 +76,36 @@
                                         <div class="mt-3">
                                             <label for="cabang" class="form-label">Cabang</label>
                                             <select id="cabang" data-search="true" class="tom-select w-full" name="cabang"
-                                                required>
+                                                required @if (Auth::user()->level !== 'broker') disabled @endif>
                                                 @foreach ($cabang as $cab)
                                                     <option value="{{ $cab->msid }}" @if ($cab->msid === Auth::user()->cabang) selected="true" @endif>
                                                         {{ $cab->msdesc }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div>
-                                    <div class="col-span-12 2xl:col-span-6">
-                                        <div class="mt-3 2xl:mt-0">
-                                            <label for="cabang" class="form-label">Postal Code</label>
-                                            <select id="cabang" data-search="true" class="tom-select w-full">
-                                                <option value="1">018906 - 1 STRAITS BOULEVARD SINGA...</option>
-                                                <option value="2">018910 - 5A MARINA GARDENS DRIVE...</option>
-                                                <option value="3">018915 - 100A CENTRAL BOULEVARD...</option>
-                                                <option value="4">018925 - 21 PARK STREET MARINA...</option>
-                                                <option value="5">018926 - 23 PARK STREET MARINA...</option>
+                                        <div class="mt-3">
+                                            <label for="level" class="form-label">Level</label>
+                                            <select id="level" data-search="true" class="tom-select w-full" name="level"
+                                                required @if (Auth::user()->level !== 'broker') disabled @endif>
+                                                @foreach ($level as $lvl)
+                                                    <option value="{{ $lvl->msid }}" @if ($lvl->msid === Auth::user()->level) selected="true" @endif>
+                                                        {{ $lvl->msdesc }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                         <div class="mt-3">
-                                            <label for="update-profile-form-4" class="form-label">Phone Number</label>
-                                            <input id="update-profile-form-4" type="text" class="form-control"
-                                                placeholder="Input text" value="65570828">
-                                        </div>
-                                    </div>
-                                    <div class="col-span-12">
-                                        <div class="mt-3">
-                                            <label for="update-profile-form-5" class="form-label">Address</label>
-                                            <textarea id="update-profile-form-5" class="form-control"
-                                                placeholder="Adress">10 Anson Road, International Plaza, #10-11, 079903 Singapore, Singapore</textarea>
+                                            <label for="parent" class="form-label">Parent</label>
+                                            <select id="parent" data-search="true" class="tom-select w-full" name="parent"
+                                                required @if (Auth::user()->level !== 'broker') disabled @endif>
+                                                @foreach ($parent as $prt)
+                                                    <option value="{{ $prt->id }}" @if ($prt->id === Auth::user()->parent_id) selected="true" @endif>
+                                                        {{ $prt->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-primary w-20 mt-3">Save</button>
+                                <button type="button" class="btn btn-primary w-20 mt-3">Simpan</button>
                             </div>
                         </div>
                     </form>
@@ -127,59 +123,24 @@
                     <div class="grid grid-cols-12 gap-x-5">
                         <div class="col-span-12 xl:col-span-6">
                             <div>
-                                <label for="update-profile-form-6" class="form-label">Email</label>
-                                <input id="update-profile-form-6" type="text" class="form-control" placeholder="Input text"
-                                    value="arnoldschwarzenegger@left4code.com" disabled>
+                                <label for="update-profile-form-6" class="form-label">Katasandi Lama</label>
+                                <input id="update-profile-form-6" type="password" class="form-control"
+                                    placeholder="Katasandi Lama">
                             </div>
                             <div class="mt-3">
-                                <label for="update-profile-form-7" class="form-label">Name</label>
-                                <input id="update-profile-form-7" type="text" class="form-control" placeholder="Input text"
-                                    value="Arnold Schwarzenegger" disabled>
+                                <label for="update-profile-form-7" class="form-label">Katasandi Baru</label>
+                                <input id="update-profile-form-7" type="password" class="form-control"
+                                    placeholder="Katasandi Baru">
                             </div>
                             <div class="mt-3">
-                                <label for="update-profile-form-8" class="form-label">ID Type</label>
-                                <select id="update-profile-form-8" class="form-select">
-                                    <option>IC</option>
-                                    <option>FIN</option>
-                                    <option>Passport</option>
-                                </select>
-                            </div>
-                            <div class="mt-3">
-                                <label for="update-profile-form-9" class="form-label">ID Number</label>
-                                <input id="update-profile-form-9" type="text" class="form-control" placeholder="Input text"
-                                    value="357821204950001">
-                            </div>
-                        </div>
-                        <div class="col-span-12 xl:col-span-6">
-                            <div class="mt-3 xl:mt-0">
-                                <label for="update-profile-form-10" class="form-label">Phone Number</label>
-                                <input id="update-profile-form-10" type="text" class="form-control" placeholder="Input text"
-                                    value="65570828">
-                            </div>
-                            <div class="mt-3">
-                                <label for="update-profile-form-11" class="form-label">Address</label>
-                                <input id="update-profile-form-11" type="text" class="form-control" placeholder="Input text"
-                                    value="10 Anson Road, International Plaza, #10-11, 079903 Singapore, Singapore">
-                            </div>
-                            <div class="mt-3">
-                                <label for="update-profile-form-12" class="form-label">Bank Name</label>
-                                <select id="update-profile-form-12" data-search="true" class="tom-select w-full">
-                                    <option value="1">SBI - STATE BANK OF INDIA</option>
-                                    <option value="1">CITI BANK - CITI BANK</option>
-                                </select>
-                            </div>
-                            <div class="mt-3">
-                                <label for="update-profile-form-13" class="form-label">Bank Account</label>
-                                <input id="update-profile-form-13" type="text" class="form-control" placeholder="Input text"
-                                    value="DBS Current 011-903573-0">
+                                <label for="update-profile-form-7" class="form-label">Ulangi Katasandi Baru</label>
+                                <input id="update-profile-form-7" type="password" class="form-control"
+                                    placeholder="Ulangi Katasandi Baru">
                             </div>
                         </div>
                     </div>
                     <div class="flex justify-end mt-4">
-                        <button type="button" class="btn btn-primary w-20 mr-auto">Save</button>
-                        <a href="" class="text-theme-6 flex items-center"> <i data-feather="trash-2"
-                                class="w-4 h-4 mr-1"></i>
-                            Delete Account </a>
+                        <button type="button" class="btn btn-primary w-20 mr-auto">Simpan</button>
                     </div>
                 </div>
             </div>

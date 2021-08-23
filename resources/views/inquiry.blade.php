@@ -8,26 +8,6 @@
     </h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-            <div class="dropdown">
-                <button class="dropdown-toggle btn px-2 box text-gray-700 dark:text-gray-300" aria-expanded="false">
-                    <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4"
-                            data-feather="more-horizontal"></i>
-                    </span>
-                </button>
-                <div class="dropdown-menu w-40">
-                    <div class="dropdown-menu__content box dark:bg-dark-1 p-2">
-                        <a href=""
-                            class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                            <i data-feather="printer" class="w-4 h-4 mr-2"></i> Print </a>
-                        <a href=""
-                            class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                            <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Export to Excel </a>
-                        <a href=""
-                            class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                            <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Export to PDF </a>
-                    </div>
-                </div>
-            </div>
             <div class="hidden md:block mx-auto text-gray-600">Showing 1 to 10 of 150 entries</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-gray-700 dark:text-gray-300">
@@ -42,13 +22,13 @@
                 <thead>
                     <tr>
                         <th class="whitespace-nowrap">No. App</th>
-                        <th class="whitespace-nowrap">Type of Ins.</th>
-                        <th class="whitespace-nowrap">Insured</th>
-                        <th class="whitespace-nowrap">Policy No.</th>
-                        <th class="whitespace-nowrap">Created Dt</th>
-                        <th class="whitespace-nowrap">TSI</th>
+                        <th class="whitespace-nowrap">Tipe Asuransi</th>
+                        <th class="whitespace-nowrap">Tertanggung</th>
+                        <th class="whitespace-nowrap">No. Polis</th>
+                        <th class="whitespace-nowrap">Tanggal Dibuat</th>
+                        <th class="whitespace-nowrap">Nilai Pertanggungan</th>
                         <th class="whitespace-nowrap">Status</th>
-                        <th class="whitespace-nowrap">Process</th>
+                        <th class="whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,14 +39,16 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Tertunda</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="check-square" class="w-4 h-4 mr-1"></i> Ajukan </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="edit"
+                                        class="w-4 h-4 mr-1"></i> Ubah </a>
                                 <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
                                     data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                        class="w-4 h-4 mr-1"></i> Hapus </a>
                             </div>
                         </td>
                     </tr>
@@ -77,14 +59,16 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Tertunda</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="check-square" class="w-4 h-4 mr-1"></i> Ajukan </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="edit"
+                                        class="w-4 h-4 mr-1"></i> Ubah </a>
                                 <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
                                     data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                        class="w-4 h-4 mr-1"></i> Hapus </a>
                             </div>
                         </td>
                     </tr>
@@ -95,14 +79,11 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Diajukan</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
-                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
                             </div>
                         </td>
                     </tr>
@@ -113,14 +94,11 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Diajukan</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
-                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
                             </div>
                         </td>
                     </tr>
@@ -131,14 +109,13 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Verifikasi</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
-                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                            class="w-4 h-4 mr-1"></i> Lihat </a>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -149,14 +126,13 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Verifikasi</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
-                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                            class="w-4 h-4 mr-1"></i> Lihat </a>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -167,14 +143,16 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Disetujui</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="check-square" class="w-4 h-4 mr-1"></i> Aktifkan </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
                                 <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                    data-target="#delete-confirmation-modal"> <i data-feather="rotate-ccw"
+                                        class="w-4 h-4 mr-1"></i> Kembalikan </a>
                             </div>
                         </td>
                     </tr>
@@ -185,14 +163,16 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Aktif</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="file-text" class="w-4 h-4 mr-1"></i> Invoice </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
                                 <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                    data-target="#delete-confirmation-modal"> <i data-feather="rotate-ccw"
+                                        class="w-4 h-4 mr-1"></i> Kembalikan </a>
                             </div>
                         </td>
                     </tr>
@@ -203,14 +183,11 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Dibayar</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
-                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
                             </div>
                         </td>
                     </tr>
@@ -221,14 +198,11 @@
                         <td>489876543214456</td>
                         <td>1 Jan 2021</td>
                         <td>Rp. 9.000.000.000</td>
-                        <td>Pending</td>
+                        <td>Ditolak</td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square"
-                                        class="w-4 h-4 mr-1"></i> Edit </a>
-                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
-                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
-                                        class="w-4 h-4 mr-1"></i> Delete </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
                             </div>
                         </td>
                     </tr>

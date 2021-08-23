@@ -41,6 +41,15 @@
                             <label class="form-label sm:w-20"></label>
                             <label>Termasuk: RSMDCC, TSFWD, Others</label>
                         </div>
+                        <div class="form-inline mt-5">
+                            <label for="cabang" class="ml-3 form-label sm:w-20">Cabang</label>
+                            <select id="cabang" name="cabang" required style="width:100%">
+                                @foreach ($cabang as $val)
+                                    <option value="{{ $val->msid }}" @if ($val->msid === Auth::user()->cabang) selected="true" @endif>{{ $val->msdesc }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         {{-- <div class="extended-clause">
                             <div class="form-inline ml-3 mt-5">
                                 <label for="extend-clause" class="form-label sm:w-20">Extended Clause</label>
@@ -276,7 +285,6 @@
                                         <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tgl. Upload</th>
                                         <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tipe Dokumen</th>
                                         <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Ukuran</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -308,11 +316,10 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="border-b whitespace-nowrap">Angelina</td>
-                                        <td class="border-b whitespace-nowrap">Jolie</td>
-                                        <td class="border-b whitespace-nowrap">@angelinajolie</td>
-                                        <td class="border-b whitespace-nowrap">angelinajolie@gmail.com</td>
-                                        <td class="border-b whitespace-nowrap">260 W. Storm Street New York, NY 10025.</td>
+                                        <td class="border-b whitespace-nowrap">Surat Pernyataan Kepemilikan</td>
+                                        <td class="border-b whitespace-nowrap">2021-08-23</td>
+                                        <td class="border-b whitespace-nowrap">PDF</td>
+                                        <td class="border-b whitespace-nowrap">120 KB</td>
                                     </tr>
                                     <tr>
                                         <td class="border-b whitespace-nowrap">
@@ -342,11 +349,10 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="border-b whitespace-nowrap">Brad</td>
-                                        <td class="border-b whitespace-nowrap">Pitt</td>
-                                        <td class="border-b whitespace-nowrap">@bradpitt</td>
-                                        <td class="border-b whitespace-nowrap">bradpitt@gmail.com</td>
-                                        <td class="border-b whitespace-nowrap">47 Division St. Buffalo, NY 14241.</td>
+                                        <td class="border-b whitespace-nowrap">NPWP</td>
+                                        <td class="border-b whitespace-nowrap">2021-08-23</td>
+                                        <td class="border-b whitespace-nowrap">PDF</td>
+                                        <td class="border-b whitespace-nowrap">120 KB</td>
                                     </tr>
                                     <tr>
                                         <td class="border-b whitespace-nowrap">
@@ -376,11 +382,10 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="border-b whitespace-nowrap">Charlie</td>
-                                        <td class="border-b whitespace-nowrap">Hunnam</td>
-                                        <td class="border-b whitespace-nowrap">@charliehunnam</td>
-                                        <td class="border-b whitespace-nowrap">charliehunnam@gmail.com</td>
-                                        <td class="border-b whitespace-nowrap">8023 Amerige Street Harriman, NY 10926.</td>
+                                        <td class="border-b whitespace-nowrap">Kartu Tanda Penduduk</td>
+                                        <td class="border-b whitespace-nowrap">2021-08-23</td>
+                                        <td class="border-b whitespace-nowrap">PDF</td>
+                                        <td class="border-b whitespace-nowrap">120 KB</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -404,30 +409,59 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Status</th>
-                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">User</th>
-                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tanggal</th>
-                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Keterangan</th>
+                                            <th class="border-b-2 dark:border-dark-5">#</th>
+                                            <th class="border-b-2 dark:border-dark-5">Status</th>
+                                            <th class="border-b-2 dark:border-dark-5">Tanggal</th>
+                                            <th class="border-b-2 dark:border-dark-5">User</th>
+                                            <th class="border-b-2 dark:border-dark-5">Keterangan</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="border-b whitespace-nowrap">Angelina</td>
-                                            <td class="border-b whitespace-nowrap">Jolie</td>
-                                            <td class="border-b whitespace-nowrap">@angelinajolie</td>
-                                            <td class="border-b whitespace-nowrap">angelinajolie@gmail.com</td>
+                                            <td class="border-b">1</td>
+                                            <td class="border-b">Tertunda</td>
+                                            <td class="border-b whitespace-nowrap">2021-08-23 07:00</td>
+                                            <td class="border-b whitespace-nowrap">Rizqi Ubaidillah</td>
+                                            <td class="border-b">Pengajuan pertama kali dibuat</td>
                                         </tr>
                                         <tr>
-                                            <td class="border-b whitespace-nowrap">Brad</td>
-                                            <td class="border-b whitespace-nowrap">Pitt</td>
-                                            <td class="border-b whitespace-nowrap">@bradpitt</td>
-                                            <td class="border-b whitespace-nowrap">bradpitt@gmail.com</td>
+                                            <td class="border-b">2</td>
+                                            <td class="border-b">Diajukan</td>
+                                            <td class="border-b">2021-08-23 08:00</td>
+                                            <td class="border-b">Rizqi Ubaidillah</td>
+                                            <td class="border-b">Mengajukan ke broker</td>
                                         </tr>
                                         <tr>
-                                            <td class="border-b whitespace-nowrap">Charlie</td>
-                                            <td class="border-b whitespace-nowrap">Hunnam</td>
-                                            <td class="border-b whitespace-nowrap">@charliehunnam</td>
-                                            <td class="border-b whitespace-nowrap">charliehunnam@gmail.com</td>
+                                            <td class="border-b">3</td>
+                                            <td class="border-b">Verifikasi</td>
+                                            <td class="border-b">2021-08-23 09:00</td>
+                                            <td class="border-b">BROKER</td>
+                                            <td class="border-b">Kelengkapan dokumen dan detail formulir
+                                                sudah dicek</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-b">4</td>
+                                            <td class="border-b">Disetujui</td>
+                                            <td class="border-b">2021-08-23 10:00</td>
+                                            <td class="border-b">ASURANSI</td>
+                                            <td class="border-b">Asuransi menyatakan setuju terhadap
+                                                pengajuan ini</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-b">5</td>
+                                            <td class="border-b">Aktif</td>
+                                            <td class="border-b">2021-08-23 11:00</td>
+                                            <td class="border-b">CHECKER</td>
+                                            <td class="border-b">Pengajuan diaktifkan oleh checker cabang
+                                                JAKARTA PLUIT</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-b">6</td>
+                                            <td class="border-b">Dibayar</td>
+                                            <td class="border-b">2021-08-23 12:00</td>
+                                            <td class="border-b">BROKER</td>
+                                            <td class="border-b">Pengajuan telah dibayar oleh PT. Bank KB
+                                                Bukopin, Tbk. pada tanggal tersebut.</td>
                                         </tr>
                                     </tbody>
                                 </table>
