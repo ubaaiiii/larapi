@@ -50,6 +50,10 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="form-inline mt-5">
+                            <label for="cabang-address" class="form-label sm:w-20">Alamat Cabang</label>
+                            <textarea id="cabang-address" class="form-control"></textarea>
+                        </div>
                         {{-- <div class="extended-clause">
                             <div class="form-inline ml-3 mt-5">
                                 <label for="extend-clause" class="form-label sm:w-20">Extended Clause</label>
@@ -102,12 +106,8 @@
                             </select>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="nik" class="form-label sm:w-20">NIK / No KTP</label>
-                            <input type="text" id="nik" class="form-control" required name="nik">
-                        </div>
-                        <div class="form-inline mt-5">
-                            <label for="insured-address" class="form-label sm:w-20">Alamat Tertanggung</label>
-                            <textarea id="insured-address" class="form-control"></textarea>
+                            <label for="npwp" class="form-label sm:w-20">NPWP</label>
+                            <input type="text" id="npwp" class="form-control" required name="npwp">
                         </div>
                         <div class="form-inline mt-5">
                             <label for="nopolis-lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
@@ -556,13 +556,13 @@
 
             $('#insured').on('select2:select', function(e) {
                 var data = e.params.data;
-                $('#nik').val("");
+                $('#npwp').val("");
                 $('#insured-address').val("");
-                $('#nik').attr('disabled', false);
+                $('#npwp').attr('disabled', false);
                 $('#insured-address').attr('disabled', false);
-                if (data.noktp !== undefined) {
-                    $('#nik').val(data.noktp);
-                    $('#nik').attr('disabled', true);
+                if (data.npwp !== undefined) {
+                    $('#npwp').val(data.npwp);
+                    $('#npwp').attr('disabled', true);
                 }
                 if (data.alamat !== undefined) {
                     $('#insured-address').val(data.alamat);

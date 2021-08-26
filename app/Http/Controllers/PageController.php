@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\KodePos;
+use App\Models\Laporan;
 use App\Models\Master;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PageController extends Controller
 {
@@ -36,6 +38,23 @@ class PageController extends Controller
             $data['act'] = 'edit';
         }
         return view('pengajuan', $data);
+    }
+
+    function laporan($noapp = null)
+    {
+        $data = [
+            'cabang'    => Master::where('mstype', 'cabang')->get(),
+            'asuransi'  => Master::where('mstype', 'insurance')->get(),
+            'laporan'   => Laporan::where('laplevel', Auth::user()->level)->get(),
+            'level'     => Master::where('mstype', 'level')->get(),
+            'instype'   => Master::where('mstype', 'instype')->get(),
+            'act'       => 'add',
+        ];
+
+        if (!empty($noapp)) {
+            $data['act'] = 'edit';
+        }
+        return view('laporan', $data);
     }
 
     function inquiry()

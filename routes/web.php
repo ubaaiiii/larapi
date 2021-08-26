@@ -50,6 +50,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('home', [PageController::class, 'dashboard'])->name('home');
     Route::get('profile', [PageController::class, 'profile'])->name('profile');
     Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
+    Route::get('laporan', [PageController::class, 'laporan'])->name('laporan');
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
     // pengajuan
