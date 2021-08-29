@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Insured;
 use App\Models\KodePos;
 use App\Models\Okupasi;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -74,5 +75,11 @@ class DataController extends Controller
             $key++;
         }
         return response()->json($list);
+    }
+
+    public function dataTransaksi(Request $request)
+    {
+        $data = Transaksi::all();
+        return response()->json($data);
     }
 }

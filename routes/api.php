@@ -24,10 +24,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Auth
     Route::get('/logout', [AuthController::class, 'logout']);
 
-    // data
+    // data select
     Route::get('/selectkodepos', [DataController::class, 'selectKodepos']);
     Route::get('/selectinsured', [DataController::class, 'selectInsured']);
     Route::get('/selectokupasi', [DataController::class, 'selectOkupasi']);
+
+    // data table
+    Route::get('/datatransaksi', [DataController::class, 'dataTransaksi']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
