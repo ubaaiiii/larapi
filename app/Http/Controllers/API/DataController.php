@@ -41,7 +41,7 @@ class DataController extends Controller
 
     public function selectInsured(Request $request)
     {
-        $insured = Insured::select('id', 'kode', 'noktp', 'alamat');
+        $insured = Insured::select('id', 'kode', 'npwp', 'alamat');
         if (!empty($request->search)) {
             $insured->where('kode', 'like', '%' . $request->search . '%');
         }
@@ -51,7 +51,7 @@ class DataController extends Controller
         foreach ($insured as $row) {
             $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['kode'];
-            $list[$key]['noktp'] = $row['noktp'];
+            $list[$key]['npwp'] = $row['npwp'];
             $list[$key]['alamat'] = $row['alamat'];
             $key++;
         }
@@ -70,7 +70,7 @@ class DataController extends Controller
         $list = [];
         $key = 0;
         foreach ($okupasi as $row) {
-            $list[$key]['id'] = $row['id'];
+            $list[$key]['id'] = $row['kode_okupasi'];
             $list[$key]['text'] = $row['kode_okupasi'] . " - " . $row['nama_okupasi'] . " (" . $row['rate'] . ")";
             $key++;
         }
@@ -79,7 +79,35 @@ class DataController extends Controller
 
     public function dataTransaksi(Request $request)
     {
-        $data = Transaksi::all();
-        return response()->json($data);
+        $columns = [
+            0 => 'noapp',
+            1 => 'itp.msdesc',
+            2 => 'insured.kode',
+            3 => 'policy_no',
+            4 => 'trans.created_at',
+            5 => 'trans.created_at',
+        ];
+
+        $trans = DB::table('transaksi')
+            ->leftJoin('insured', 'insured_id', '=', 'insured.id')
+            ->leftJoin('masters itp', 'instype', '=', 'masters.msid')
+            ->leftJoin('masters sts', 'status', '=', 'masters.msid')
+            ->select('transaksi.*', 'insured.kode', 'itp.msdesc tipeins', 'sts.msdesc statusnya');
+
+        if (!empty($request->search)) {
+            $trans->where('noapp', 'like', '%' . $request->search . '%')
+                ->orWhere('masters.msdesc', 'like', '%' . $request->search . '%')
+                ->orWhere('insured.kode', 'like', '%' . $request->search . '%')
+                ->orWhere('policy_no', 'like', '%' . $request->search . '%')
+                ->orWhere('transaksi.created_at', 'like', '%' . $request->search . '%')
+                ->orWhere('transaksi.created_at', 'like', '%' . $request->search . '%');
+        }
+
+        foreach ($trans as $row) {
+            $baris = [
+                $row['noapp'],
+
+            ];
+        }
     }
 }
