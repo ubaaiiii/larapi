@@ -77,13 +77,70 @@ class DataController extends Controller
         return response()->json($list);
     }
 
-    public function generateQuery($request, $sql)
+    public function generateQuery($request, $table, $columns, $select, $joins)
     {
+        // DB::enableQueryLog();
+
+        $table = DB::table($table);
+
+        if (!empty($joins)) {
+            foreach ($joins as $join) {
+                if (is_array($join[1])) {
+                    $table->leftJoin($join[0], function ($jn) use ($join) {
+                        $pecah = explode(" ", $join[1][0]);
+                        $jn->on($pecah[0], $pecah[1], $pecah[2]);
+                        for ($i = 1; $i < count($join[1]); $i++) {
+                            $pecah = explode(" ", $join[1][$i]);
+                            $jn->where($pecah[0], $pecah[1], $pecah[2]);
+                        }
+                    });
+                } else {
+                    $pecah = explode(" ", $join[1]);
+                    $table->leftJoin($join[0], $pecah[0], $pecah[1], $pecah[2]);
+                }
+            }
+        }
+
+        $table->select($select);
+        $awal = $table->get()->count();
+
+        if (!empty($request->search)) {
+            for ($i = 0; $i < count($columns); $i++) {
+                if ($i == 0) {
+                    $table->where($columns[$i], 'like', '%' . $request->search . '%');
+                } else {
+                    $table->orWhere($columns[$i], 'like', '%' . $request->search . '%');
+                }
+            }
+        }
+
+        if (!empty($request->start)) {
+            $table->skip($request->start);
+        } else {
+            $table->skip(0);
+        }
+
+        if (!empty($request->length)) {
+            $table->take($request->length);
+        } else {
+            $table->take(10);
+        }
+
+        $result = $table->get();
+
+        // return DB::getQueryLog();
+        return [$awal, $result->count(), $result];
+        // return response()->json([
+        //     "draw"              => 1,
+        //     "recordsTotal"      => $awal,
+        //     "recordsFiltered"   => $result->count(),
+        //     "data"              => (object) $result,
+        // ], 200);
     }
 
     public function dataTransaksi(Request $request)
     {
-        DB::enableQueryLog();
+        // buat sorting kolomnya
         $columns = [
             0 => 'transid',
             1 => 'itp.msdesc',
@@ -93,39 +150,27 @@ class DataController extends Controller
             5 => 'tsi.value',
             6 => 'sts.msdesc',
         ];
+        // buat as as nya, misalkan ada field yang sama
+        $select = [
+            0 => 'transid',
+            1 => 'itp.msdesc as tipeins',
+            2 => 'insured.kode',
+            3 => 'policy_no',
+            4 => 'transaksi.created_at as tgl_dibuat',
+            5 => 'tsi.value as tsi',
+            6 => 'sts.msdesc as statusnya',
+            7 => 'transid as aksi',
+        ];
 
-        $trans = DB::table('transaksi')
-            ->leftJoin('insured', 'id_insured', '=', 'insured.id')
-            ->leftJoin('masters as itp', 'id_instype', '=', 'itp.msid')
-            ->leftJoin('masters as sts', 'id_status', '=', 'sts.msid')
-            ->leftJoin('transpricing as tsi', function ($join) {
-                $join->on('transid', '=', 'id_transaksi')
-                    ->where('id_kodetrans', '=', 1);
-            })
-            ->select('transid', 'policy_no', 'transaksi.created_at', 'tsi.value', 'insured.kode as tertanggung', 'itp.msdesc as tipeins', 'sts.msdesc as statusnya');
+        $table = "transaksi";
 
-        $awal = $trans->get()->count();
-        if (!empty($request->search)) {
-            for ($i = 0; $i < count($columns); $i++) {
-                if ($i == 0) {
-                    $trans->where($columns[$i], 'like', '%' . $request->search . '%');
-                } else {
-                    $trans->orWhere($columns[$i], 'like', '%' . $request->search . '%');
-                }
-            }
-        }
+        $joins = [
+            ['insured', 'id_insured = insured.id'],
+            ['masters as itp', ['id_instype = itp.msid', 'itp.mstype = "instype"']],
+            ['masters as sts', ['id_status = sts.msid', 'sts.mstype = "status"']],
+            ['transpricing as tsi', ['transid = id_transaksi', 'id_kodetrans = 1']],
+        ];
 
-        if (!empty($request->start)) {
-        }
-
-        $result = $trans->get();
-
-        return response()->json([
-            "draw"              => 1,
-            "recordsTotal"      => $awal,
-            "recordsFiltered"   => $result->count(),
-            "data"              => $result,
-        ]);
-        return DB::getQueryLog();
+        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
     }
 }
