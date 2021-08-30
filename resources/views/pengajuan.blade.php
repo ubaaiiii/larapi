@@ -45,7 +45,8 @@
                             <label for="cabang" class="ml-3 form-label sm:w-20">Cabang</label>
                             <select id="cabang" name="cabang" required style="width:100%">
                                 @foreach ($cabang as $val)
-                                    <option value="{{ $val->msid }}" @if ($val->msid === Auth::user()->cabang) selected="true" @endif>{{ $val->msdesc }}
+                                    <option value="{{ $val->id }}" @if ($val->id === Auth::user()->cabang) selected="true" @endif>
+                                        {{ $val->nama_cabang }}
                                     </option>
                                 @endforeach
                             </select>

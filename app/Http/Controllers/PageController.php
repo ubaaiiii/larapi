@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cabang;
 use App\Models\KodePos;
 use App\Models\Laporan;
 use App\Models\Master;
@@ -19,7 +20,7 @@ class PageController extends Controller
     function profile()
     {
         $data = [
-            'cabang'    => Master::where('mstype', 'cabang')->get(),
+            'cabang'    => Cabang::all(),
             'level'     => Master::where('mstype', 'level')->get(),
             'parent'    => User::all(),
         ];
@@ -29,11 +30,12 @@ class PageController extends Controller
     function pengajuan($noapp = null)
     {
         $data = [
-            'cabang'    => Master::where('mstype', 'cabang')->get(),
+            'cabang'    => Cabang::all(),
             'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Master::where('mstype', 'instype')->get(),
             'act'       => 'add',
         ];
+        // dd($data['cabang']);
         if (!empty($noapp)) {
             $data['act'] = 'edit';
         }
@@ -43,7 +45,7 @@ class PageController extends Controller
     function laporan($noapp = null)
     {
         $data = [
-            'cabang'    => Master::where('mstype', 'cabang')->get(),
+            'cabang'    => Cabang::all(),
             'asuransi'  => Master::where('mstype', 'insurance')->get(),
             'laporan'   => Laporan::where('laplevel', Auth::user()->level)->get(),
             'level'     => Master::where('mstype', 'level')->get(),
@@ -60,7 +62,7 @@ class PageController extends Controller
     function inquiry()
     {
         $data = [
-            'cabang'    => Master::where('mstype', 'cabang')->get(),
+            'cabang'    => Cabang::all(),
             'level'     => Master::where('mstype', 'level')->get(),
             'provinsi'  => KodePos::select('provinsi')->distinct()->get(),
             'search'    => 'hidden',

@@ -77,37 +77,55 @@ class DataController extends Controller
         return response()->json($list);
     }
 
+    public function generateQuery($request, $sql)
+    {
+    }
+
     public function dataTransaksi(Request $request)
     {
+        DB::enableQueryLog();
         $columns = [
-            0 => 'noapp',
+            0 => 'transid',
             1 => 'itp.msdesc',
             2 => 'insured.kode',
             3 => 'policy_no',
-            4 => 'trans.created_at',
-            5 => 'trans.created_at',
+            4 => 'transaksi.created_at',
+            5 => 'tsi.value',
+            6 => 'sts.msdesc',
         ];
 
         $trans = DB::table('transaksi')
-            ->leftJoin('insured', 'insured_id', '=', 'insured.id')
-            ->leftJoin('masters itp', 'instype', '=', 'masters.msid')
-            ->leftJoin('masters sts', 'status', '=', 'masters.msid')
-            ->select('transaksi.*', 'insured.kode', 'itp.msdesc tipeins', 'sts.msdesc statusnya');
+            ->leftJoin('insured', 'id_insured', '=', 'insured.id')
+            ->leftJoin('masters as itp', 'id_instype', '=', 'itp.msid')
+            ->leftJoin('masters as sts', 'id_status', '=', 'sts.msid')
+            ->leftJoin('transpricing as tsi', function ($join) {
+                $join->on('transid', '=', 'id_transaksi')
+                    ->where('id_kodetrans', '=', 1);
+            })
+            ->select('transid', 'policy_no', 'transaksi.created_at', 'tsi.value', 'insured.kode as tertanggung', 'itp.msdesc as tipeins', 'sts.msdesc as statusnya');
 
+        $awal = $trans->get()->count();
         if (!empty($request->search)) {
-            $trans->where('noapp', 'like', '%' . $request->search . '%')
-                ->orWhere('masters.msdesc', 'like', '%' . $request->search . '%')
-                ->orWhere('insured.kode', 'like', '%' . $request->search . '%')
-                ->orWhere('policy_no', 'like', '%' . $request->search . '%')
-                ->orWhere('transaksi.created_at', 'like', '%' . $request->search . '%')
-                ->orWhere('transaksi.created_at', 'like', '%' . $request->search . '%');
+            for ($i = 0; $i < count($columns); $i++) {
+                if ($i == 0) {
+                    $trans->where($columns[$i], 'like', '%' . $request->search . '%');
+                } else {
+                    $trans->orWhere($columns[$i], 'like', '%' . $request->search . '%');
+                }
+            }
         }
 
-        foreach ($trans as $row) {
-            $baris = [
-                $row['noapp'],
-
-            ];
+        if (!empty($request->start)) {
         }
+
+        $result = $trans->get();
+
+        return response()->json([
+            "draw"              => 1,
+            "recordsTotal"      => $awal,
+            "recordsFiltered"   => $result->count(),
+            "data"              => $result,
+        ]);
+        return DB::getQueryLog();
     }
 }
