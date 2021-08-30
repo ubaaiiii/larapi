@@ -2,6 +2,11 @@
 @section('title', 'Inquiry')
 @section('breadcrumb', 'Inquiry')
 @section('menu', 'Inquiry')
+
+@section('header')
+    {{-- <link href="//cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css" rel="stylesheet"> --}}
+@endsection
+
 @section('content')
     <h2 class="intro-y text-lg font-medium mt-5">
         Inquiry
@@ -19,7 +24,7 @@
         <!-- BEGIN: Data List -->
         <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
 
-            <table id="tb-inquiry" class="table table-report -mt-2">
+            <table id="tb-inquiry" class="table table-report mt-2">
                 <thead>
                     <tr>
                         <th class="whitespace-nowrap">No. App</th>
@@ -32,7 +37,182 @@
                         <th class="whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Property All Risk</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Tertunda</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="check-square" class="w-4 h-4 mr-1"></i> Ajukan </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="edit"
+                                        class="w-4 h-4 mr-1"></i> Ubah </a>
+                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
+                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
+                                        class="w-4 h-4 mr-1"></i> Hapus </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Property All Risk</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Tertunda</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="check-square" class="w-4 h-4 mr-1"></i> Ajukan </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="edit"
+                                        class="w-4 h-4 mr-1"></i> Ubah </a>
+                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
+                                    data-target="#delete-confirmation-modal"> <i data-feather="trash-2"
+                                        class="w-4 h-4 mr-1"></i> Hapus </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Property All Risk</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Diajukan</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Property All Risk</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Diajukan</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Property All Risk</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Verifikasi</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                            class="w-4 h-4 mr-1"></i> Lihat </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Fire Insurance (PSAKI)</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Verifikasi</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                            class="w-4 h-4 mr-1"></i> Lihat </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Fire Insurance (PSAKI)</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Disetujui</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="check-square" class="w-4 h-4 mr-1"></i> Aktifkan </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
+                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
+                                    data-target="#delete-confirmation-modal"> <i data-feather="rotate-ccw"
+                                        class="w-4 h-4 mr-1"></i> Kembalikan </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Fire Insurance (PSAKI)</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Aktif</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center text-theme-1 mr-3" href="javascript:;"> <i
+                                        data-feather="file-text" class="w-4 h-4 mr-1"></i> Invoice </a>
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
+                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal"
+                                    data-target="#delete-confirmation-modal"> <i data-feather="rotate-ccw"
+                                        class="w-4 h-4 mr-1"></i> Kembalikan </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Fire Insurance (PSAKI)</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Dibayar</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>123456789</td>
+                        <td>Fire</td>
+                        <td>Bpk. Sulaiman</td>
+                        <td>489876543214456</td>
+                        <td>1 Jan 2021</td>
+                        <td>Rp. 9.000.000.000</td>
+                        <td>Ditolak</td>
+                        <td class="table-report__action w-56">
+                            <div class="flex justify-center items-center">
+                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="search"
+                                        class="w-4 h-4 mr-1"></i> Lihat </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
         <!-- END: Data List -->
@@ -93,9 +273,10 @@
 @endsection
 
 @section('script')
+    <script src="//cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-
+            $('#tb-inquiry').DataTable();
         });
     </script>
 @endsection

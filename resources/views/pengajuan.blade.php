@@ -546,7 +546,7 @@
                         };
                     },
                     processResults: function(data, page) {
-                        console.log('data', data);
+                        // console.log('data', data);
                         return {
                             results: data,
                         };

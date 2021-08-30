@@ -26,6 +26,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="public/dist/css/app.css" />
     <!-- END: CSS Assets-->
+    @yield('header')
 </head>
 <!-- END: Head -->
 
@@ -89,7 +90,7 @@ License: You must have a valid license purchased only from themeforest(the above
     </script>
 
     {{-- script bawaan halaman yang diload --}}
-    @yield('script');
+    @yield('script')
 </body>
 
 </html>
