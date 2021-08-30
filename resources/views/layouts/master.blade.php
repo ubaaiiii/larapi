@@ -1,13 +1,4 @@
 <!DOCTYPE html>
-<!--
-Template Name: Rubick - HTML Admin Dashboard Template
-Author: Left4code
-Website: http://www.left4code.com/
-Contact: muhammadrizki@left4code.com
-Purchase: https://themeforest.net/user/left4code/portfolio
-Renew Support: https://themeforest.net/user/left4code/portfolio
-License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
--->
 <html class="{{ Auth::user()->mode }}">
 <!-- BEGIN: Head -->
 
@@ -21,7 +12,7 @@ License: You must have a valid license purchased only from themeforest(the above
         content="admin template, Rubick Admin Template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="LEFT4CODE">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/css/tom-select.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="public/vendor/select2/select2.min.css" rel="stylesheet" />
     <title>@yield('title') | BDS General</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="public/dist/css/app.css" />
@@ -41,12 +32,12 @@ License: You must have a valid license purchased only from themeforest(the above
     </div>
     @include('layouts.footer')
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="public/vendor/jquery/jquery-3.6.0.min.js"></script>
     <script src="public/dist/js/app.js"></script>
 
     {{-- script vendor --}}
     <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="public/vendor/select2/select2.min.js"></script>
 
     {{-- script yang biasa diload saat awal awal --}}
     <script src="public/js/jquery.inputmask.min.js"></script>

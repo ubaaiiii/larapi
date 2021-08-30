@@ -16,7 +16,8 @@
             <div class="hidden md:block mx-auto text-gray-600">Showing 1 to 10 of 150 entries</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-gray-700 dark:text-gray-300">
-                    <input type="text" class="form-control w-56 box pr-10 placeholder-theme-13" placeholder="Search...">
+                    <input type="text" id="filterSearch" class="form-control w-56 box pr-10 placeholder-theme-13"
+                        placeholder="Search...">
                     <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-feather="search"></i>
                 </div>
             </div>
@@ -38,7 +39,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    {{-- <tr>
                         <td>123456789</td>
                         <td>Property All Risk</td>
                         <td>Bpk. Sulaiman</td>
@@ -211,7 +212,7 @@
                                         class="w-4 h-4 mr-1"></i> Lihat </a>
                             </div>
                         </td>
-                    </tr>
+                    </tr> --}}
                 </tbody>
             </table>
         </div>
@@ -273,10 +274,57 @@
 @endsection
 
 @section('script')
-    <script src="//cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#tb-inquiry').DataTable();
+            $('#tb-inquiry').DataTable({
+                "aLengthMenu": [
+                    [10, 20, 50, 100, -1],
+                    [10, 20, 50, 100, "All"]
+                ],
+                "processing": true,
+                "serverSide": true,
+                "pagingType": "full_numbers",
+                "bLengthChange": true,
+                "bFilter": false,
+                // "aoColumns": [{
+                //         "bSortable": true
+                //     },
+                //     {
+                //         "bSortable": true
+                //     },
+                //     {
+                //         "bSortable": true
+                //     },
+                //     {
+                //         "bSortable": true
+                //     },
+                //     {
+                //         "bSortable": true
+                //     },
+                //     {
+                //         "bSortable": true
+                //     },
+                //     {
+                //         "bSortable": true
+                //     },
+                //     {
+                //         "bSortable": true
+                //     },
+                // ],
+                "ajax": {
+                    url: "{{ url('api/datatransaksi') }}",
+                    type: "POST",
+                    data: function(d) {
+                        d.search = $("#filterSearch").val();
+                        d.length = $("#filterlength").val();
+                        d._token = '{{ csrf_token() }}';
+                    },
+                    error: function() {
+
+                    }
+                },
+            });
         });
     </script>
 @endsection

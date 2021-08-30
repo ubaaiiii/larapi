@@ -30,7 +30,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/selectokupasi', [DataController::class, 'selectOkupasi']);
 
     // data table
-    Route::get('/datatransaksi', [DataController::class, 'dataTransaksi']);
+    Route::post('/datatransaksi', [DataController::class, 'dataTransaksi']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
