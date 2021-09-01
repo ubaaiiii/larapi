@@ -1,4 +1,12 @@
 <?php
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    $link = 'https://';
+} else {
+    $link = 'http://';
+}
+
+$link .= $_SERVER['HTTP_HOST'] . '/' . explode('/', $_SERVER['REQUEST_URI'])[1];
+
 
 return [
 
@@ -52,7 +60,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', $link),
 
     'asset_url' => env('ASSET_URL', null),
 

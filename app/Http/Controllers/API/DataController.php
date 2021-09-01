@@ -79,7 +79,7 @@ class DataController extends Controller
 
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
-        // DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $table = DB::table($table);
 
@@ -114,6 +114,14 @@ class DataController extends Controller
             }
         }
 
+        if (!empty($request->order)) {
+            for ($i = 0; $i < count($request->order); $i++) {
+                $table->orderBy($columns[$request->order[$i]['column']], $request->order[$i]['dir']);
+            }
+        }
+
+        $all_record = $table->get()->count();
+
         if (!empty($request->start)) {
             $table->skip($request->start);
         } else {
@@ -129,7 +137,7 @@ class DataController extends Controller
         $result = $table->get();
 
         // return DB::getQueryLog();
-        return [$awal, $result->count(), $result];
+        return [$result, $awal, $all_record, DB::getQueryLog()];
         // return response()->json([
         //     "draw"              => 1,
         //     "recordsTotal"      => $awal,
@@ -142,35 +150,122 @@ class DataController extends Controller
     {
         // buat sorting kolomnya
         $columns = [
-            0 => 'transid',
-            1 => 'itp.msdesc',
-            2 => 'insured.kode',
-            3 => 'policy_no',
-            4 => 'transaksi.created_at',
-            5 => 'tsi.value',
-            6 => 'sts.msdesc',
+            'transid',
+            'itp.msdesc',
+            'cbg.msdesc',
+            'insured.kode',
+            'policy_no',
+            'periode_start',
+            'transaksi.created_at',
+            'tsi.value',
+            'premi.value',
+            'sts.msdesc',
         ];
         // buat as as nya, misalkan ada field yang sama
         $select = [
-            0 => 'transid',
-            1 => 'itp.msdesc as tipeins',
-            2 => 'insured.kode',
-            3 => 'policy_no',
-            4 => 'transaksi.created_at as tgl_dibuat',
-            5 => 'tsi.value as tsi',
-            6 => 'sts.msdesc as statusnya',
-            7 => 'transid as aksi',
+            'transid',
+            'itp.msdesc as tipeins',
+            'insured.kode as tertanggung',
+            'policy_no',
+            'transaksi.created_at as tgl_dibuat',
+            'tsi.value as tsi',
+            'premi.value as premi',
+            'sts.msdesc as statusnya',
+            'id_status',
+            'periode_start',
+            'periode_end',
+            'cbg.msdesc as cabang',
         ];
 
         $table = "transaksi";
 
         $joins = [
             ['insured', 'id_insured = insured.id'],
-            ['masters as itp', ['id_instype = itp.msid', 'itp.mstype = "instype"']],
-            ['masters as sts', ['id_status = sts.msid', 'sts.mstype = "status"']],
-            ['transpricing as tsi', ['transid = id_transaksi', 'id_kodetrans = 1']],
+            ['masters as itp', ['id_instype = itp.msid', 'itp.mstype = instype']],
+            ['masters as sts', ['id_status = sts.msid', 'sts.mstype = status']],
+            ['masters as cbg', ['id_cabang = cbg.msid', 'cbg.mstype = cabang']],
+            ['transpricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+            ['transpricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
 
         $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+        // return $query;
+
+        $data = array();
+        foreach ($query[0] as $row) {
+            $nestedData = array();
+            $nestedData[] = $row->transid;
+            $nestedData[] = $row->tipeins;
+            $nestedData[] = $row->cabang;
+            $nestedData[] = $row->tertanggung;
+            $nestedData[] = $row->policy_no;
+            $nestedData[] = date_format(date_create($row->periode_start), "d-M-Y") . " s/d " . date_format(date_create($row->periode_end), "d-M-Y");
+            $nestedData[] = $row->tgl_dibuat;
+            $nestedData[] = number_format($row->tsi, 2);
+            $nestedData[] = number_format($row->premi, 2);
+            $nestedData[] = $row->statusnya;
+
+            // $ajukan = "<a class='flex text-theme-1 mr-3' href='javascript:;'> <i data-feather='check-square' class='w-4 h-4 mr-1'></i> Ajukan </a>";
+            // $ubah   = "<a class='flex mr-3' href='javascript:;'> <i data-feather='edit' class='w-4 h-4 mr-1'></i> Ubah </a>";
+            // $hapus  = "<a class='flex text-theme-6' href='javascript:;' data-toggle='modal' data-target='#delete-confirmation-modal'> <i data-feather='trash-2' class='w-4 h-4 mr-1'></i> Hapus </a>";
+            // $lihat  = "<a class='flex mr-3' href='javascript:;'> <i data-feather='search' class='w-4 h-4 mr-1'></i> Lihat </a>";
+            // $aktif  = "<a class='flex text-theme-1 mr-3' href='javascript:;'> <i data-feather='check-square' class='w-4 h-4 mr-1'></i> Aktifkan </a>";
+            // $invoice = "<a class='flex text-theme-1 mr-3' href='javascript:;'> <i data-feather='file-text' class='w-4 h-4 mr-1'></i> Invoice </a>";
+            // $kembali = "<a class='flex text-theme-6' href='javascript:;' data-toggle='modal' data-target='#delete-confirmation-modal'> <i data-feather='rotate-ccw' class='w-4 h-4 mr-1'></i> Kembalikan </a>";
+
+            // $aksi = "<div class='flex'>";
+
+            // switch ($row->id_status) {
+            //         // TERTUNDA
+            //     case 0:
+            //         $aksi .= $ubah . $ajukan . $hapus;
+            //         break;
+
+            //         // DIAJUKAN
+            //     case 1:
+            //         $aksi .= $lihat;
+            //         break;
+
+            //         // VERIFIKASI
+            //     case 2:
+            //         $aksi .= $lihat;
+            //         break;
+
+            //         // DISETUJUI
+            //     case 3:
+            //         $aksi .= $lihat . $aktif . $kembali;
+            //         break;
+
+            //         // AKTIF
+            //     case 4:
+            //         $aksi .= $lihat . $invoice . $kembali;
+            //         break;
+
+            //         // DIBAYAR
+            //     case 5:
+            //         $aksi .= $lihat;
+            //         break;
+
+            //         // DITOLAK
+            //     case 6:
+            //         $aksi .= $lihat;
+            //         break;
+            // }
+
+            // $aksi .= `</div>`;
+
+            // $nestedData[] = $aksi;
+            $nestedData[] = $row->id_status;
+
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => intval($query[1]),
+            "recordsFiltered" => intval($query[2]),
+            "data"            => $data,
+            // "sql"             => $query[3]
+        ], 200);
     }
 }

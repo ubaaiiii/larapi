@@ -22,15 +22,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // Auth
-    Route::get('/logout', [AuthController::class, 'logout']);
+    Route::get('/logout', 'API\AuthController@logout');
 
     // data select
-    Route::get('/selectkodepos', [DataController::class, 'selectKodepos']);
-    Route::get('/selectinsured', [DataController::class, 'selectInsured']);
-    Route::get('/selectokupasi', [DataController::class, 'selectOkupasi']);
+    Route::get('/selectkodepos', 'API\DataController@selectKodepos');
+    Route::get('/selectinsured', 'API\DataController@selectInsured');
+    Route::get('/selectokupasi', 'API\DataController@selectOkupasi');
 
     // data table
-    Route::post('/datatransaksi', [DataController::class, 'dataTransaksi']);
+    Route::post('/datatransaksi', 'API\DataController@dataTransaksi');
 });
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', 'API\AuthController@login');

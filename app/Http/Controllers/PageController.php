@@ -59,13 +59,14 @@ class PageController extends Controller
         return view('laporan', $data);
     }
 
-    function inquiry()
+    function inquiry($search = null)
     {
         $data = [
             'cabang'    => Cabang::all(),
             'level'     => Master::where('mstype', 'level')->get(),
             'provinsi'  => KodePos::select('provinsi')->distinct()->get(),
             'search'    => 'hidden',
+            'qsearch'   => $search
         ];
         return view('inquiry', $data);
     }

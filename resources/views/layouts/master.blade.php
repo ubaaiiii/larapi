@@ -11,12 +11,13 @@
     <meta name="keywords"
         content="admin template, Rubick Admin Template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="LEFT4CODE">
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/css/tom-select.css" rel="stylesheet">
+    {{-- <link href="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/css/tom-select.css" rel="stylesheet"> --}}
     <link href="public/vendor/select2/select2.min.css" rel="stylesheet" />
     <title>@yield('title') | BDS General</title>
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="public/dist/css/app.css" />
     <!-- END: CSS Assets-->
+    <script src="public/vendor/jquery/jquery-3.6.0.min.js"></script>
     @yield('header')
 </head>
 <!-- END: Head -->
@@ -32,11 +33,10 @@
     </div>
     @include('layouts.footer')
 
-    <script src="public/vendor/jquery/jquery-3.6.0.min.js"></script>
     <script src="public/dist/js/app.js"></script>
 
     {{-- script vendor --}}
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script> --}}
     <script src="public/vendor/select2/select2.min.js"></script>
 
     {{-- script yang biasa diload saat awal awal --}}
