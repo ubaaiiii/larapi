@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\api\DataController;
 use App\Models\Cabang;
 use App\Models\KodePos;
+use App\Models\KodeTrans;
 use App\Models\Laporan;
 use App\Models\Master;
+use App\Models\Okupasi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,22 +30,27 @@ class PageController extends Controller
         return view('profile', $data);
     }
 
-    function pengajuan($noapp = null)
+    function pengajuan($transid = null)
     {
         $data = [
             'cabang'    => Cabang::all(),
+            'okupasi'   => Okupasi::all(),
             'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Master::where('mstype', 'instype')->get(),
             'act'       => 'add',
+            'price'     => KodeTrans::where('visible',true)->orderBy('kodetrans_index','ASC')->get(),
         ];
         // dd($data['cabang']);
-        if (!empty($noapp)) {
-            $data['act'] = 'edit';
+        if (!empty($transid)) {
+            $dataController     = new DataController;
+            $data['act']        = 'edit';
+            $data['data']       = $dataController->dataPengajuan($transid);
+            $data['pricing']    = $dataController->dataPricing($transid);
         }
         return view('pengajuan', $data);
     }
 
-    function laporan($noapp = null)
+    function laporan($transid = null)
     {
         $data = [
             'cabang'    => Cabang::all(),
@@ -53,7 +61,7 @@ class PageController extends Controller
             'act'       => 'add',
         ];
 
-        if (!empty($noapp)) {
+        if (!empty($transid)) {
             $data['act'] = 'edit';
         }
         return view('laporan', $data);

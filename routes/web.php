@@ -55,5 +55,5 @@ Route::group(['middleware' => 'auth'], function () {
 
     // pengajuan
     Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan');
-    Route::get('pengajuan/{noapp}', [PageController::class, 'pengajuan'])->name('pengajuan');
+    Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
 });

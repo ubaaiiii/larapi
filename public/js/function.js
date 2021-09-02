@@ -1,7 +1,7 @@
-$(document).ready(function () {
+$(document).ready(function() {
     $(".dark-mode-switcher").removeAttr("style");
 
-    $(window).scroll(function () {
+    $(window).scroll(function() {
         if (
             $(window).scrollTop() + $(window).height() + 5 >=
             $(document).height()
@@ -12,11 +12,11 @@ $(document).ready(function () {
         }
     });
 
-    $("select").on("select2:open", function () {
+    $("select").on("select2:open", function() {
         // uppercase select2 search
         $(".select2-search__field").css("text-transform", "uppercase");
     });
-    $("select").keyup(function () {
+    $("select").keyup(function() {
         console.log("change");
     });
 
@@ -31,9 +31,11 @@ $(document).ready(function () {
         placeholder: "0",
     });
 
-    $(".tsi").keyup(function () {
+    $(".date-range").inputmask("99/99/9999 - 99/99/9999");
+
+    $(".tsi").keyup(function() {
         var sum = 0;
-        $(".tsi").each(function () {
+        $(".tsi").each(function() {
             if ($(this).val() == "") {
                 sum += 0;
             } else {

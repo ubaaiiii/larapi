@@ -4,7 +4,7 @@
 @section('menu', 'Inquiry')
 
 @section('header')
-    <link href="public/vendor/datatables/datatables.min.css" rel="stylesheet">
+    <link href="{{ url('public/vendor/datatables/datatables.min.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -86,9 +86,9 @@
             </div>
         </div>
         <!-- BEGIN: Data List -->
-        <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+        <div class="intro-y col-span-12 overflow-auto lg:overflow-auto">
 
-            <table id="tb-inquiry" class="hover table mt-2">
+            <table id="tb-inquiry" class="hover table mt-2 table-report table-report--tabulator">
                 <thead>
                     <tr>
                         <th class="whitespace-nowrap">No. App</th>
@@ -140,10 +140,10 @@
 @endsection
 
 @section('script')
-    <script src="public/vendor/datatables/datatables.min.js"></script>
-    <script src="public/vendor/datatables/vfs_fonts.js"></script>
-    <script src="public/vendor/datatables/pdfmake.min.js"></script>
-    {{-- <script src="public/vendor/datatables/jquery.dataTables.min.js"></script> --}}
+    <script src="{{ url('public/vendor/datatables/datatables.min.js') }}"></script>
+    <script src="{{ url('public/vendor/datatables/vfs_fonts.js') }}"></script>
+    <script src="{{ url('public/vendor/datatables/pdfmake.min.js') }}"></script>
+    {{-- <script src="{{ url('public/vendor/datatables/jquery.dataTables.min.js') }}"></script> --}}
     <script>
         function reloadTable() {
             $('#tb-inquiry').DataTable().ajax.reload();
@@ -159,12 +159,7 @@
                 "select": "single",
                 "processing": true,
                 "serverSide": true,
-                "pagingType": "full_numbers",
                 "bLengthChange": true,
-                "bFilter": false,
-                buttons: [
-                    'copy'
-                ],
                 "aoColumns": [{
                         "bSortable": true,
                         "className": "border-b",
@@ -323,6 +318,10 @@
                     }
                     // console.log(page);
                     tablenya.page(page).draw('page');
+                });
+
+                $('#tb-inquiry > tbody > tr').each(function() {
+                    $(this).addClass('dark:hover:bg-dark-2');
                 });
             });
 

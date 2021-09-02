@@ -5,8 +5,8 @@
 @section('content')
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
-            Formulir Pengajuan
-            @if ($act !== 'view')
+            Formulir Pengajuan @if (!empty($data->tertanggung))<b><u>{{ 'a/n ' . $data->tertanggung }}@endif</u></b>
+            @if ($act !== 'view' && $act !== 'edit')
                 <button class="btn btn-sm btn-primary">Simpan</button>
             @endif
         </h2>
@@ -22,30 +22,31 @@
                 </div>
                 <div id="horizontal-form" class="p-5">
                     <div class="preview">
-                        @if ($act == 'view')
+                        @if ($act == 'view' || $act == 'edit')
                             <div class="form-inline mt-5">
                                 <label for="noapp" class="form-label sm:w-20">Nomor Aplikasi</label>
                                 <input type="text" id="noapp" class="form-control" required name="noapp"
-                                    value="BDS{{ date('my') }}00001" disabled>
+                                    value="@if (!empty($data->transid)){{ $data->transid }}@endif" disabled>
                             </div>
                         @endif
                         <div class="form-inline mt-5">
                             <label for="type-insurance" class="ml-3 form-label sm:w-20">Tipe Asuransi</label>
                             <select id="type-insurance" name="type-insurance" required style="width:100%">
                                 @foreach ($instype as $val)
-                                    <option value="{{ $val->msid }}" selected>{{ $val->msdesc }}</option>
+                                    <option value="{{ $val->msid }}" @if (!empty($data->id_instype) && $val->msid == $data->id_instype) selected @endif>{{ $val->msdesc }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-inline mt-1 extended-clause" style="display:none">
                             <label class="form-label sm:w-20"></label>
-                            <label>Termasuk: RSMDCC, TSFWD, Others</label>
+                            <label>Sudah Termasuk: RSMDCC, TSFWD, Others</label>
                         </div>
                         <div class="form-inline mt-5">
                             <label for="cabang" class="ml-3 form-label sm:w-20">Cabang</label>
                             <select id="cabang" name="cabang" required style="width:100%">
                                 @foreach ($cabang as $val)
-                                    <option value="{{ $val->id }}" @if ($val->id === Auth::user()->cabang) selected="true" @endif>
+                                    <option value="{{ $val->id }}" @if (empty($data->id_cabang)) @if ($val->id === Auth::user()->cabang) selected="true" @endif @else @if ($val->id === $data->id_cabang) selected="true" @endif @endif>
                                         {{ $val->nama_cabang }}
                                     </option>
                                 @endforeach
@@ -53,100 +54,64 @@
                         </div>
                         <div class="form-inline mt-5">
                             <label for="cabang-address" class="form-label sm:w-20">Alamat Cabang</label>
-                            <textarea id="cabang-address" class="form-control"></textarea>
+                            <textarea id="cabang-address" class="form-control">@if (!empty($data->alamat_cabang)){{ $data->alamat_cabang }}@endif</textarea>
                         </div>
-                        {{-- <div class="extended-clause">
-                            <div class="form-inline ml-3 mt-5">
-                                <label for="extend-clause" class="form-label sm:w-20">Extended Clause</label>
-                                <div class="input-group w-full">
-                                    <div id="rsmdcc" class="input-group-text @if (Auth::user()->level != 'adm') w-full @endif">
-                                        <input id="extend-clause-1" class="form-check-input" type="checkbox"
-                                            name="extend-clause">
-                                        <label class="form-check-label" for="extend-clause-1">RSMDCC </label>
-                                    </div>
-                                    @if (Auth::user()->level == 'adm')
-                                        <input type="text" class="allow-decimal form-control" placeholder="Rate"
-                                            aria-label="Rate" aria-describedby="rsmdcc" style="text-align:right;">
-                                    @endif
-
-                                </div>
-                            </div>
-                            <div class="form-inline ml-3 mt-1">
-                                <label for="extend-clause" class="form-label sm:w-20"></label>
-                                <div class="input-group w-full">
-                                    <div id="tsfwd" class="input-group-text @if (Auth::user()->level != 'adm') w-full @endif">
-                                        <input id="extend-clause-2" class="form-check-input" type="checkbox"
-                                            name="extend-clause">
-                                        <label class="form-check-label" for="extend-clause-2">TSFWD </label>
-                                    </div>
-                                    @if (Auth::user()->level == 'adm')
-                                        <input type="text" class="allow-decimal form-control" placeholder="Rate"
-                                            aria-label="Rate" aria-describedby="tsfwd" style="text-align:right;">
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="form-inline ml-3 mt-1">
-                                <label for="extend-clause" class="form-label sm:w-20"></label>
-                                <div class="input-group w-full">
-                                    <div id="others" class="input-group-text @if (Auth::user()->level != 'adm') w-full @endif">
-                                        <input id="extend-clause-3" class="form-check-input" type="checkbox"
-                                            name="extend-clause">
-                                        <label class="form-check-label" for="extend-clause-3">Others </label>
-                                    </div>
-                                    @if (Auth::user()->level == 'adm')
-                                        <input type="text" class="allow-decimal form-control" placeholder="Rate"
-                                            aria-label="Rate" aria-describedby="others" style="text-align:right;">
-                                    @endif
-                                </div>
-                            </div>
-                        </div> --}}
                         <div class="form-inline mt-5">
                             <label for="insured" class="ml form-label sm:w-20">Tertanggung (QQ)</label>
                             <select id="insured" style="width:100%;text-transform: uppercase;" class="select2"
                                 name="insured" required>
                             </select>
                         </div>
+                        @if (!empty($data->id_insured))
+                            <script>
+                                var newOption = new Option('{{ $data->tertanggung }}', {{ $data->id_insured }}, false, false);
+                                $('#insured').append(newOption).trigger('change');
+                            </script>
+                        @endif
                         <div class="form-inline mt-5">
                             <label for="npwp" class="form-label sm:w-20">NPWP</label>
-                            <input type="text" id="npwp" class="form-control" required name="npwp">
+                            <input type="text" id="npwp" class="form-control" required name="npwp"
+                                @if (!empty($data->npwp)) value="{{ $data->npwp }}" disabled @endif>
                         </div>
                         <div class="form-inline mt-5">
                             <label for="nopolis-lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
                             <div class="input-group w-full">
                                 <input type="text" class="form-control" placeholder="Nomor Polis Lama" name="nopolis-lama"
-                                    id="nopolis-lama">
+                                    id="nopolis-lama" value="@if (!empty($data->policy_parent)){{ $data->policy_parent }}@endif">
                                 <div id="nopolis-lama" class="input-group-text">Jika Renewal.</div>
                             </div>
                         </div>
                         <div class="form-inline mt-5">
                             <label for="range-periode" class="form-label sm:w-20">Periode</label>
-                            <input id="range-periode" data-daterange="true"
-                                class="datepicker form-control w-full block mx-auto">
+                            <input id="range-periode" class="date-range form-control w-full block mx-auto"
+                                value="@if (!empty($data->periode_start)) {{ date_format(date_create($data->periode_start), 'd/m/Y') . ' - ' . date_format(date_create($data->periode_end), 'd/m/Y') }} @endif">
                         </div>
-                        {{-- @if (Auth::user()->level !== 'ao')
-                            <div class="form-inline mt-5">
-                                <label for="editor" class="ml-3 form-label sm:w-20">Klausa</label>
-                                <div class="w-full">
-                                    <div data-simple-toolbar="true" class="editor">
-                                        <p>Contoh Klausa</p>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif --}}
                         <div class="form-inline mt-5">
                             <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
                             <select id="okupasi" style="width:100%" name="okupasi" required>
+                                @foreach ($okupasi as $val)
+                                    <option value="{{ $val->id }}" @if (!empty($data->id_okupasi) && $val->id === $data->id_okupasi) selected="true" @endif>
+                                        {{ $val->kode_okupasi . ' - ' . $val->nama_okupasi . ' (' . $val->rate . ' ‰)' }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="form-inline mt-5">
                             <label for="lokasi" class="form-label sm:w-20">Lokasi Okupasi</label>
-                            <textarea id="lokasi" class="form-control"></textarea>
+                            <textarea id="lokasi" class="form-control">@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="kecamatan" class="ml-3 form-label sm:w-20">Kode Pos</label>
-                            <select id="kecamatan" style="width:100%" name="kecamatan" required>
+                            <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
+                            <select id="kodepos" style="width:100%" name="kodepos" required>
                             </select>
                         </div>
+                        @if (!empty($data->id_kodepos))
+                            <script>
+                                var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
+                                    {{ $data->id_kodepos }}, false, false);
+                                $('#kodepos').append(newOption).trigger('change');
+                            </script>
+                        @endif
                         <div class="sm:ml-20 sm:pl-5 mt-5">
 
                         </div>
@@ -178,75 +143,31 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <div class="input-group">
-                                    <div id="group-b" class="input-group-text">B</div> <input style="text-align:right;"
-                                        type="text" class="form-control allow-decimal tsi currency" placeholder="Bangunan"
-                                        aria-label="Bangunan" aria-describedby="group-b">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[0]" class="form-control" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="input-group">
-                                    <div id="group-s" class="input-group-text">M</div> <input style="text-align:right;"
-                                        type="text" class="form-control allow-decimal tsi currency" placeholder="Mesin"
-                                        aria-label="Mesin" aria-describedby="group-s">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[2]" class="form-control" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="input-group">
-                                    <div id="group-s" class="input-group-text">K</div> <input style="text-align:right;"
-                                        type="text" class="form-control allow-decimal tsi currency"
-                                        placeholder="Ketersediaan" aria-label="Ketersediaan" aria-describedby="group-s">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[3]" class="form-control" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="input-group">
-                                    <div id="group-pk" class="input-group-text">PK</div> <input style="text-align:right;"
-                                        type="text" class="form-control allow-decimal tsi currency"
-                                        placeholder="Peralatan Kantor" aria-label="Peralatan Kantor"
-                                        aria-describedby="group-pk">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[5]" class="form-control" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="input-group">
-                                    <div id="group-ip" class="input-group-text">I/P</div> <input style="text-align:right;"
-                                        type="text" class="form-control allow-decimal tsi currency"
-                                        placeholder="Isi / Perabotan" aria-label="Isi / Perabotan"
-                                        aria-describedby="group-ip">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[6]" class="form-control" value=""></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="input-group">
-                                    <div id="group-l" class="input-group-text">L</div> <input style="text-align:right;"
-                                        type="text" class="form-control allow-decimal tsi currency" placeholder="Lain-Lain"
-                                        aria-label="Lain-Lain" aria-describedby="group-l">
-                                </div>
-                            </td>
-                            <td><input name="InterestRemarks[4]" class="form-control" value=""></td>
-                        </tr>
+                        @foreach ($price as $row)
+                            <tr>
+                                <td>
+                                    <div class="input-group">
+                                        <div class="input-group-text">{{ $row->kodetrans_formula }}</div>
+                                        <input style="text-align:right;" type="text"
+                                            class="form-control allow-decimal tsi currency"
+                                            placeholder="{{ $row->kodetrans_nama }}"
+                                            aria-label="{{ $row->kodetrans_nama }}"
+                                            name="kodetrans-value[{{ $row->kodetrans_id }}]"
+                                            value="@if (!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
+                                    </div>
+                                </td>
+                                <td><input name="kodetrans-remarks[{{ $row->kodetrans_id }}]" class="form-control"
+                                        value=" @if (!empty($pricing[$row->kodetrans_id]->deskripsi)){{ $pricing[$row->kodetrans_id]->deskripsi }}@endif"></td>
+                            </tr>
+                        @endforeach
                         <tr>
                             <td colspan="2">
                                 <div class="input-group">
-                                    <div id="group-t" class="input-group-text">Total</div> <input style="text-align:right;"
-                                        id="tsi" name="tsi" type="text" class="currency form-control allow-decimal"
+                                    <div id="group-t" class="input-group-text">Total</div>
+                                    <input style="text-align:right;"
+                                        id="tsi" name="kodetrans-value[1]" type="text" class="currency form-control allow-decimal"
                                         placeholder="Total Nilai Pertanggungan" aria-label="Total Nilai Pertanggungan"
-                                        aria-describedby="group-t" disabled>
+                                        aria-describedby="group-t" readonly value="@if(!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
                                 </div>
                             </td>
                         </tr>
@@ -492,13 +413,16 @@
                 cekType();
             });
 
-            $("#kecamatan").select2({
+            $("#kodepos").select2({
                 minimumInputLength: 3,
                 allowClear: true,
                 placeholder: "Masukkan Nama Kecamatan / Kelurahan / Kode Pos",
                 ajax: {
                     dataType: "json",
-                    url: "api/selectkodepos",
+                    url: "{{ url('api/selectkodepos') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
                     data: function(params) {
                         return {
                             search: params.term,
@@ -512,26 +436,29 @@
                 },
             });
 
-            $("#okupasi").select2({
-                minimumInputLength: 3,
-                allowClear: true,
-                placeholder: "Pilih Okupasi",
-                ajax: {
-                    dataType: "json",
-                    url: "api/selectokupasi",
-                    data: function(params) {
-                        return {
-                            search: params.term,
-                            instype: $('#type-insurance').val()
-                        };
-                    },
-                    processResults: function(data, page) {
-                        return {
-                            results: data,
-                        };
-                    },
-                },
-            });
+            // $("#okupasi").select2({
+            //     minimumInputLength: 3,
+            //     allowClear: true,
+            //     placeholder: "Pilih Okupasi",
+            //     ajax: {
+            //         dataType: "json",
+            //         url: "{{ url('api/selectokupasi') }}",
+            //         headers: {
+            //             'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+            //         },
+            //         data: function(params) {
+            //             return {
+            //                 search: params.term,
+            //                 instype: $('#type-insurance').val()
+            //             };
+            //         },
+            //         processResults: function(data, page) {
+            //             return {
+            //                 results: data,
+            //             };
+            //         },
+            //     },
+            // });
 
             $("#insured").select2({
                 minimumInputLength: 3,
@@ -540,7 +467,10 @@
                 placeholder: "Masukkan Nama Tertanggung",
                 ajax: {
                     dataType: "json",
-                    url: "api/selectinsured",
+                    url: "{{ url('api/selectinsured') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
                     data: function(params) {
                         return {
                             search: params.term,
@@ -569,6 +499,16 @@
                     $('#insured-address').val(data.alamat);
                     $('#insured-address').attr('disabled', true);
                 }
+            });
+
+            $('#range-periode').daterangepicker({
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                opens: 'left'
+            }, function(start, end, label) {
+                // console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end
+                //     .format('YYYY-MM-DD'));
             });
         });
     </script>
