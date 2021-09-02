@@ -195,11 +195,11 @@
                     },
                     {
                         "bSortable": true,
-                        "className": "text-right"
+                        "className": "border-b text-right"
                     },
                     {
                         "bSortable": true,
-                        "className": "text-right"
+                        "className": "border-b text-right"
                     },
                     {
                         "bSortable": true,
