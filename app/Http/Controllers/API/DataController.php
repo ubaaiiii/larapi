@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Insured;
 use App\Models\KodePos;
 use App\Models\Okupasi;
+use App\Models\Pricing;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -75,6 +76,10 @@ class DataController extends Controller
             $key++;
         }
         return response()->json($list);
+    }
+
+    public function queryBuilder($table, $type, $select, $where, $joins)
+    {
     }
 
     public function generateQuery($request, $table, $columns, $select, $joins)
@@ -205,56 +210,7 @@ class DataController extends Controller
             $nestedData[] = number_format($row->premi, 2);
             $nestedData[] = $row->statusnya;
 
-            // $ajukan = "<a class='flex text-theme-1 mr-3' href='javascript:;'> <i data-feather='check-square' class='w-4 h-4 mr-1'></i> Ajukan </a>";
-            // $ubah   = "<a class='flex mr-3' href='javascript:;'> <i data-feather='edit' class='w-4 h-4 mr-1'></i> Ubah </a>";
-            // $hapus  = "<a class='flex text-theme-6' href='javascript:;' data-toggle='modal' data-target='#delete-confirmation-modal'> <i data-feather='trash-2' class='w-4 h-4 mr-1'></i> Hapus </a>";
-            // $lihat  = "<a class='flex mr-3' href='javascript:;'> <i data-feather='search' class='w-4 h-4 mr-1'></i> Lihat </a>";
-            // $aktif  = "<a class='flex text-theme-1 mr-3' href='javascript:;'> <i data-feather='check-square' class='w-4 h-4 mr-1'></i> Aktifkan </a>";
-            // $invoice = "<a class='flex text-theme-1 mr-3' href='javascript:;'> <i data-feather='file-text' class='w-4 h-4 mr-1'></i> Invoice </a>";
-            // $kembali = "<a class='flex text-theme-6' href='javascript:;' data-toggle='modal' data-target='#delete-confirmation-modal'> <i data-feather='rotate-ccw' class='w-4 h-4 mr-1'></i> Kembalikan </a>";
-
-            // $aksi = "<div class='flex'>";
-
-            // switch ($row->id_status) {
-            //         // TERTUNDA
-            //     case 0:
-            //         $aksi .= $ubah . $ajukan . $hapus;
-            //         break;
-
-            //         // DIAJUKAN
-            //     case 1:
-            //         $aksi .= $lihat;
-            //         break;
-
-            //         // VERIFIKASI
-            //     case 2:
-            //         $aksi .= $lihat;
-            //         break;
-
-            //         // DISETUJUI
-            //     case 3:
-            //         $aksi .= $lihat . $aktif . $kembali;
-            //         break;
-
-            //         // AKTIF
-            //     case 4:
-            //         $aksi .= $lihat . $invoice . $kembali;
-            //         break;
-
-            //         // DIBAYAR
-            //     case 5:
-            //         $aksi .= $lihat;
-            //         break;
-
-            //         // DITOLAK
-            //     case 6:
-            //         $aksi .= $lihat;
-            //         break;
-            // }
-
-            // $aksi .= `</div>`;
-
-            // $nestedData[] = $aksi;
+            // hidden
             $nestedData[] = $row->id_status;
 
             $data[] = $nestedData;
@@ -267,5 +223,51 @@ class DataController extends Controller
             "data"            => $data,
             // "sql"             => $query[3]
         ], 200);
+    }
+
+    public function dataPengajuan($transid)
+    {
+        $select = [
+            'transid',
+            'id_instype',
+            'id_cabang',
+            'alamat_cabang',
+            'id_insured',
+            'insured.kode as tertanggung',
+            'insured.npwp',
+            'policy_parent',
+            'periode_start',
+            'periode_end',
+            'id_okupasi',
+            'location',
+            'id_kodepos',
+            'kecamatan',
+            'kelurahan',
+            'kodepos'
+        ];
+        $data = DB::table('transaksi')
+            ->leftJoin('cabang', 'id_cabang', '=', 'cabang.id')
+            ->leftJoin('insured', 'id_insured', '=', 'insured.id')
+            ->leftJoin('kodepos', 'id_kodepos', '=', 'kodepos.id')
+            ->where('transid', '=', $transid)
+            ->select($select)
+            ->first();
+
+        return $data;
+    }
+
+    public function dataPricing($transid)
+    {
+        $data = Pricing::where('id_transaksi','=',$transid)->get();
+        $new = array();
+        foreach($data as $val) {
+            $new[$val->id_kodetrans] = $val;
+        }
+        return $new;
+    }
+
+    public function dataAktifitas($transid)
+    {
+        
     }
 }
