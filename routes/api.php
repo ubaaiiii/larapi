@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // data table
     Route::post('/datatransaksi', 'API\DataController@dataTransaksi');
+    Route::post('/datadokumen/{any}', 'API\DataController@dataDokumen');
 });
 
 Route::post('/login', 'API\AuthController@login');

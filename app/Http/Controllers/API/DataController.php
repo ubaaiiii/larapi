@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
+use App\Models\Document;
 use App\Models\Insured;
 use App\Models\KodePos;
 use App\Models\Okupasi;
@@ -153,7 +155,7 @@ class DataController extends Controller
 
     public function dataTransaksi(Request $request)
     {
-        // buat sorting kolomnya
+        // sorting column datatables
         $columns = [
             'transid',
             'itp.msdesc',
@@ -166,7 +168,7 @@ class DataController extends Controller
             'premi.value',
             'sts.msdesc',
         ];
-        // buat as as nya, misalkan ada field yang sama
+
         $select = [
             'transid',
             'itp.msdesc as tipeins',
@@ -258,9 +260,9 @@ class DataController extends Controller
 
     public function dataPricing($transid)
     {
-        $data = Pricing::where('id_transaksi','=',$transid)->get();
+        $data = Pricing::where('id_transaksi', '=', $transid)->get();
         $new = array();
-        foreach($data as $val) {
+        foreach ($data as $val) {
             $new[$val->id_kodetrans] = $val;
         }
         return $new;
@@ -268,6 +270,63 @@ class DataController extends Controller
 
     public function dataAktifitas($transid)
     {
-        
+        return Activity::where('id_transaksi', '=', $transid)
+            ->leftJoin('masters', function ($jn) {
+                $jn->on('id_status', '=', 'masters.msid');
+                $jn->where('masters.mstype', '=', 'status');
+            })
+            ->leftJoin('users', 'activities.created_by', '=', 'users.id')
+            ->select('activities.*', 'masters.msdesc as statusnya', 'users.username')
+            ->orderBy('activities.created_at', 'ASC')
+            ->get();
+    }
+
+    public function dataDokumen(Request $request, $transid = null)
+    {
+        // sorting column datatables
+        $columns = [
+            'nama_file',
+            'documents.created_at',
+            'username',
+            'ukuran',
+        ];
+
+        $select = [
+            'documents.*',
+            'username',
+        ];
+
+        $table = "documents";
+
+        $joins = [
+            ['users', 'documents.created_by = users.id'],
+        ];
+
+        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+        // return $query;
+
+        $data = array();
+        foreach ($query[0] as $row) {
+            $nestedData = array();
+            $nestedData[] = `<a style="cursor:pointer"
+                                class="flex items-center text-theme-6 d-id="` . $row->id . `" block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                Hapus
+                            </a>`;
+            $nestedData[] = `<i data-feather="link" class="w-4 h-4 dark:text-gray-300 mr-2"></i><a href="` . url('public/documents/' . $row->id_transaksi . '/' . $row->file) . `" target="_blank">` . $row->nama_file . '.' . strtolower($row->tipe) . `</a>`;
+            $nestedData[] = $row->created_at;
+            $nestedData[] = $row->username;
+            $nestedData[] = $row->ukuran . " KB";
+
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => intval($query[1]),
+            "recordsFiltered" => intval($query[2]),
+            "data"            => $data,
+            // "sql"             => $query[3]
+        ], 200);
     }
 }

@@ -2,6 +2,9 @@
 @section('title', 'Pengajuan')
 @section('breadcrumb', 'Pengajuan')
 @section('menu', 'Pengajuan')
+@section('header')
+    <link href="{{ url('public/vendor/datatables/datatables.min.css') }}" rel="stylesheet">
+@endsection
 @section('content')
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
@@ -164,10 +167,10 @@
                             <td colspan="2">
                                 <div class="input-group">
                                     <div id="group-t" class="input-group-text">Total</div>
-                                    <input style="text-align:right;"
-                                        id="tsi" name="kodetrans-value[1]" type="text" class="currency form-control allow-decimal"
-                                        placeholder="Total Nilai Pertanggungan" aria-label="Total Nilai Pertanggungan"
-                                        aria-describedby="group-t" readonly value="@if(!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
+                                    <input style="text-align:right;" id="tsi" name="kodetrans-value[1]" type="text"
+                                        class="currency form-control allow-decimal" placeholder="Total Nilai Pertanggungan"
+                                        aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
+                                        value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
                                 </div>
                             </td>
                         </tr>
@@ -190,8 +193,8 @@
                             </div>
                             <div class="dz-message" data-dz-message>
                                 <div class="text-lg font-medium">Tarik dokumen kesini atau klik untuk memilih dokumen.</div>
-                                <div class="text-gray-600"> Ini hanya demonstrasi. File yang terpilih <span
-                                        class="font-medium">tidak</span> benar benar diupload. </div>
+                                <div class="text-gray-600"> Dokumen yang terpilih <span class="font-medium">akan</span>
+                                    benar benar diupload. </div>
                             </div>
                         </form>
                     </div>
@@ -199,116 +202,49 @@
                 <div class="p-5" id="responsive-table">
                     <div class="preview">
                         <div class="overflow-x-auto">
-                            <table class="table">
+                            <table class="table" id="tb-dokumen">
                                 <thead>
                                     <tr>
                                         <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">#</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Nama Dokumen</th>
+                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Dokumen</th>
                                         <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tgl. Upload</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tipe Dokumen</th>
+                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Diupload Oleh</th>
                                         <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Ukuran</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    {{-- @foreach ($document as $doc)
+                                        <tr>
+                                            <td class="border-b whitespace-nowrap">
+                                                <a style="cursor:pointer"
+                                                    class="flex items-center text-theme-6 block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                    <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                    Hapus
+                                                </a>
+                                            </td>
+                                            <td class="border-b whitespace-nowrap"><i data-feather="link"
+                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i><a
+                                                    href="{{ asset('public/documents/' . $doc->id_transaksi . '/' . $doc->file) }}"
+                                                    target="_blank">{{ $doc->nama_file . '.' . strtolower($doc->tipe) }}</a>
+                                            </td>
+                                            <td class="border-b whitespace-nowrap">{{ $doc->created_at }}</td>
+                                            <td class="border-b whitespace-nowrap">{{ $doc->username }}</td>
+                                            <td class="border-b whitespace-nowrap text-right">{{ $doc->ukuran }} KB</td>
+                                        </tr>
+                                    @endforeach --}}
+                                    {{-- <tr>
                                         <td class="border-b whitespace-nowrap">
-                                            <div class="dropdown"> <button
-                                                    class="btn btn-primary mr-1 mb-2 dropdown-toggle btn-sm"> <i
-                                                        data-feather="align-left" class="w-5 h-5"></i> </button>
-                                                <div class="dropdown-menu w-40">
-                                                    <div class="dropdown-menu__content box dark:bg-dark-1">
-                                                        <div
-                                                            class="px-4 py-2 border-b border-gray-200 dark:border-dark-5 font-medium">
-                                                            Aksi</div>
-                                                        <div class="p-2">
-                                                            <a href=""
-                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                                                <i data-feather="printer"
-                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                                                                Lihat
-                                                            </a>
-                                                            <a href=""
-                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                                                <i data-feather="external-link"
-                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                                                                Hapus
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <a style="cursor:pointer"
+                                                class="flex items-center text-theme-6 block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                                <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                                Hapus
+                                            </a>
                                         </td>
                                         <td class="border-b whitespace-nowrap">Surat Pernyataan Kepemilikan</td>
                                         <td class="border-b whitespace-nowrap">2021-08-23</td>
                                         <td class="border-b whitespace-nowrap">PDF</td>
                                         <td class="border-b whitespace-nowrap">120 KB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border-b whitespace-nowrap">
-                                            <div class="dropdown"> <button
-                                                    class="btn btn-primary mr-1 mb-2 dropdown-toggle btn-sm"> <i
-                                                        data-feather="align-left" class="w-5 h-5"></i> </button>
-                                                <div class="dropdown-menu w-40">
-                                                    <div class="dropdown-menu__content box dark:bg-dark-1">
-                                                        <div
-                                                            class="px-4 py-2 border-b border-gray-200 dark:border-dark-5 font-medium">
-                                                            Aksi</div>
-                                                        <div class="p-2">
-                                                            <a href=""
-                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                                                <i data-feather="printer"
-                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                                                                Lihat
-                                                            </a>
-                                                            <a href=""
-                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                                                <i data-feather="external-link"
-                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                                                                Hapus
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="border-b whitespace-nowrap">NPWP</td>
-                                        <td class="border-b whitespace-nowrap">2021-08-23</td>
-                                        <td class="border-b whitespace-nowrap">PDF</td>
-                                        <td class="border-b whitespace-nowrap">120 KB</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border-b whitespace-nowrap">
-                                            <div class="dropdown"> <button
-                                                    class="btn btn-primary mr-1 mb-2 dropdown-toggle btn-sm"> <i
-                                                        data-feather="align-left" class="w-5 h-5"></i> </button>
-                                                <div class="dropdown-menu w-40">
-                                                    <div class="dropdown-menu__content box dark:bg-dark-1">
-                                                        <div
-                                                            class="px-4 py-2 border-b border-gray-200 dark:border-dark-5 font-medium">
-                                                            Aksi</div>
-                                                        <div class="p-2">
-                                                            <a href=""
-                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                                                <i data-feather="external-link"
-                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                                                                Lihat
-                                                            </a>
-                                                            <a href=""
-                                                                class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                                                <i data-feather="trash"
-                                                                    class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                                                                Hapus
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="border-b whitespace-nowrap">Kartu Tanda Penduduk</td>
-                                        <td class="border-b whitespace-nowrap">2021-08-23</td>
-                                        <td class="border-b whitespace-nowrap">PDF</td>
-                                        <td class="border-b whitespace-nowrap">120 KB</td>
-                                    </tr>
+                                    </tr> --}}
                                 </tbody>
                             </table>
                         </div>
@@ -317,7 +253,7 @@
             </div>
 
         </div>
-        @if ($act !== '')
+        @if ($act !== 'add')
             <div class="intro-y col-span-12 lg:col-span-6">
                 <div class="intro-y box">
                     <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
@@ -328,7 +264,7 @@
                     <div class="p-5" id="responsive-table">
                         <div class="preview">
                             <div class="overflow-x-auto">
-                                <table class="table">
+                                <table class="table dt-table">
                                     <thead>
                                         <tr>
                                             <th class="border-b-2 dark:border-dark-5">#</th>
@@ -339,52 +275,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php
+                                        $i = 1;
+                                        foreach($activity as $actv) {
+                                        ?>
                                         <tr>
-                                            <td class="border-b">1</td>
-                                            <td class="border-b">Tertunda</td>
-                                            <td class="border-b whitespace-nowrap">2021-08-23 07:00</td>
-                                            <td class="border-b whitespace-nowrap">Rizqi Ubaidillah</td>
-                                            <td class="border-b">Pengajuan pertama kali dibuat</td>
+                                            <td class="border-b">{{ $i++ }}</td>
+                                            <td class="border-b">{{ $actv->statusnya }}</td>
+                                            <td class="border-b whitespace-nowrap">{{ $actv->created_at }}</td>
+                                            <td class="border-b whitespace-nowrap">{{ $actv->username }}</td>
+                                            <td class="border-b">{{ $actv->deskripsi }}</td>
                                         </tr>
-                                        <tr>
-                                            <td class="border-b">2</td>
-                                            <td class="border-b">Diajukan</td>
-                                            <td class="border-b">2021-08-23 08:00</td>
-                                            <td class="border-b">Rizqi Ubaidillah</td>
-                                            <td class="border-b">Mengajukan ke broker</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border-b">3</td>
-                                            <td class="border-b">Verifikasi</td>
-                                            <td class="border-b">2021-08-23 09:00</td>
-                                            <td class="border-b">BROKER</td>
-                                            <td class="border-b">Kelengkapan dokumen dan detail formulir
-                                                sudah dicek</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border-b">4</td>
-                                            <td class="border-b">Disetujui</td>
-                                            <td class="border-b">2021-08-23 10:00</td>
-                                            <td class="border-b">ASURANSI</td>
-                                            <td class="border-b">Asuransi menyatakan setuju terhadap
-                                                pengajuan ini</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border-b">5</td>
-                                            <td class="border-b">Aktif</td>
-                                            <td class="border-b">2021-08-23 11:00</td>
-                                            <td class="border-b">CHECKER</td>
-                                            <td class="border-b">Pengajuan diaktifkan oleh checker cabang
-                                                JAKARTA PLUIT</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border-b">6</td>
-                                            <td class="border-b">Dibayar</td>
-                                            <td class="border-b">2021-08-23 12:00</td>
-                                            <td class="border-b">BROKER</td>
-                                            <td class="border-b">Pengajuan telah dibayar oleh PT. Bank KB
-                                                Bukopin, Tbk. pada tanggal tersebut.</td>
-                                        </tr>
+                                        <?php
+                                            }
+                                        ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -398,6 +302,9 @@
 @endsection
 
 @section('script')
+    <script src="{{ url('public/vendor/datatables/datatables.min.js') }}"></script>
+    <script src="{{ url('public/vendor/datatables/vfs_fonts.js') }}"></script>
+    <script src="{{ url('public/vendor/datatables/pdfmake.min.js') }}"></script>
     <script>
         function cekType() {
             if ($("#type-insurance").val() === "PAR") {
@@ -407,6 +314,29 @@
             }
         }
         $(document).ready(function() {
+            $('.dt-table').DataTable();
+            $('#tb-dokumen').DataTable({
+                "ajax": {
+                    @if (!empty($data))
+                        url: "{{ url('api/datadokumen') . '/' . $data->transid }}",
+                    @else
+                        url: "{{ url('api/datadokumen') }}",
+                    @endif
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    type: "POST",
+                    data: function(d) {
+                        d._token = '{{ csrf_token() }}';
+                    },
+                    // success: function(d) {
+                    //     console.log('sql:', d);
+                    // },
+                    error: function(d) {
+                        console.log('error:', d.responseText);
+                    },
+                },
+            });
             cekType();
             $('select').select2();
             $('#type-insurance').change(function() {

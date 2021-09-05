@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-    <h2 class="intro-y text-lg font-medium mt-5">
+    <h2 class="intro-y text-lg font-medium mt-5" id="text-inquiry">
         Inquiry
     </h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
@@ -338,6 +338,7 @@
                     selected += " | ";
                 });
                 navigator.clipboard.writeText(selected);
+                $('#text-inquiry').click();
             });
 
             $('#tb-inquiry').on('click', 'tbody > tr', function() {

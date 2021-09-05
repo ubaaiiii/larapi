@@ -38,7 +38,7 @@ class PageController extends Controller
             'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Master::where('mstype', 'instype')->get(),
             'act'       => 'add',
-            'price'     => KodeTrans::where('visible',true)->orderBy('kodetrans_index','ASC')->get(),
+            'price'     => KodeTrans::where('visible', true)->orderBy('kodetrans_index', 'ASC')->get(),
         ];
         // dd($data['cabang']);
         if (!empty($transid)) {
@@ -46,6 +46,9 @@ class PageController extends Controller
             $data['act']        = 'edit';
             $data['data']       = $dataController->dataPengajuan($transid);
             $data['pricing']    = $dataController->dataPricing($transid);
+            $data['activity']   = $dataController->dataAktifitas($transid);
+            $data['document']   = $dataController->dataDokumen($transid);
+            // dd($data['document']);
         }
         return view('pengajuan', $data);
     }
