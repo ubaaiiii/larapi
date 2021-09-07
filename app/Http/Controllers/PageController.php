@@ -9,6 +9,7 @@ use App\Models\KodeTrans;
 use App\Models\Laporan;
 use App\Models\Master;
 use App\Models\Okupasi;
+use App\Models\Sequential;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,10 @@ class PageController extends Controller
             'instype'   => Master::where('mstype', 'instype')->get(),
             'act'       => 'add',
             'price'     => KodeTrans::where('visible', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'transid'   => Sequential::where('seqdesc','transid')->first(),
         ];
+        // echo $data['transid']->seqno;
+        // die;
         // dd($data['cabang']);
         if (!empty($transid)) {
             $dataController     = new DataController;
@@ -47,8 +51,9 @@ class PageController extends Controller
             $data['data']       = $dataController->dataPengajuan($transid);
             $data['pricing']    = $dataController->dataPricing($transid);
             $data['activity']   = $dataController->dataAktifitas($transid);
-            $data['document']   = $dataController->dataDokumen($transid);
             // dd($data['document']);
+        } else {
+            Sequential::where('seqdesc','transid')->update(['seqno'=> $data['transid']->seqno+1]);
         }
         return view('pengajuan', $data);
     }

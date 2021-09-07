@@ -12,6 +12,7 @@ use App\Models\Pricing;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DataController extends Controller
@@ -87,8 +88,6 @@ class DataController extends Controller
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
         DB::enableQueryLog();
-
-        $table = DB::table($table);
 
         if (!empty($joins)) {
             foreach ($joins as $join) {
@@ -184,7 +183,34 @@ class DataController extends Controller
             'cbg.msdesc as cabang',
         ];
 
-        $table = "transaksi";
+        $table = DB::table("transaksi");
+
+        $user = Auth::user();
+        switch ($user->level) {
+            case 'ao':
+                $table->where('transaksi.created_by', $user->id);
+                break;
+            
+            case 'checker':
+                $table->where('transaksi.id_cabang', $user->id_cabang);
+                break;
+
+            case 'insurance':
+                $table->where('transaksi.id_asuransi', $user->id_cabang);
+                break;
+
+            case 'broker':
+                // wherenya broker
+                break;  
+
+            case 'adm':
+                // wherenya administrator
+                break;  
+            
+            default:
+                return redirect()->route('logout');
+                break;
+        }
 
         $joins = [
             ['insured', 'id_insured = insured.id'],
@@ -281,7 +307,7 @@ class DataController extends Controller
             ->get();
     }
 
-    public function dataDokumen(Request $request, $transid = null)
+    public function dataDokumen(Request $request)
     {
         // sorting column datatables
         $columns = [
@@ -296,7 +322,8 @@ class DataController extends Controller
             'username',
         ];
 
-        $table = "documents";
+        $table = DB::table("documents");
+        $table->where('id_transaksi',$request->transid);
 
         $joins = [
             ['users', 'documents.created_by = users.id'],
@@ -308,12 +335,12 @@ class DataController extends Controller
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
-            $nestedData[] = `<a style="cursor:pointer"
-                                class="flex items-center text-theme-6 d-id="` . $row->id . `" block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+            $nestedData[] = "<a style='cursor:pointer'
+                                class='flex items-center text-theme-6 d-id='" . $row->id . "' block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md'>
+                                <i data-feather='trash-2' class='w-4 h-4 dark:text-gray-300 mr-2'></i>
                                 Hapus
-                            </a>`;
-            $nestedData[] = `<i data-feather="link" class="w-4 h-4 dark:text-gray-300 mr-2"></i><a href="` . url('public/documents/' . $row->id_transaksi . '/' . $row->file) . `" target="_blank">` . $row->nama_file . '.' . strtolower($row->tipe) . `</a>`;
+                            </a>";
+            $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url('public/documents/' . $row->id_transaksi . '/' . $row->file) . "' target='_blank'>" . $row->nama_file . '.' . strtolower($row->tipe) . "</a>";
             $nestedData[] = $row->created_at;
             $nestedData[] = $row->username;
             $nestedData[] = $row->ukuran . " KB";

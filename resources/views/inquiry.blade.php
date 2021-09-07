@@ -3,10 +3,6 @@
 @section('breadcrumb', 'Inquiry')
 @section('menu', 'Inquiry')
 
-@section('header')
-    <link href="{{ url('public/vendor/datatables/datatables.min.css') }}" rel="stylesheet">
-@endsection
-
 @section('content')
     <h2 class="intro-y text-lg font-medium mt-5" id="text-inquiry">
         Inquiry
@@ -35,32 +31,38 @@
                             </a>
                         </div>
                         <div class="p-2">
-                            <a class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
+                            <a id="ps-lihat"
+                                class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                 style="cursor:pointer">
                                 <i data-feather="search" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Lihat
                             </a>
-                            <a class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                            <a id="ps-ubah"
+                                class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                 style="cursor:pointer">
                                 <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Ubah
                             </a>
-                            <a class="flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                            <a id="ps-ajukan"
+                                class="flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                 style="cursor:pointer">
                                 <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Ajukan
                             </a>
-                            <a class="flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
+                            <a id="ps-aktifkan"
+                                class="flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                 style="cursor:pointer">
                                 <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Aktifkan
                             </a>
-                            <a class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                            <a id="ps-hapus"
+                                class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                 style="cursor:pointer">
                                 <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Hapus
                             </a>
-                            <a class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3 st-4"
+                            <a id="ps-kembalikan"
+                                class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3 st-4"
                                 style="cursor:pointer">
                                 <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Kembalikan
@@ -140,10 +142,6 @@
 @endsection
 
 @section('script')
-    <script src="{{ url('public/vendor/datatables/datatables.min.js') }}"></script>
-    <script src="{{ url('public/vendor/datatables/vfs_fonts.js') }}"></script>
-    <script src="{{ url('public/vendor/datatables/pdfmake.min.js') }}"></script>
-    {{-- <script src="{{ url('public/vendor/datatables/jquery.dataTables.min.js') }}"></script> --}}
     <script>
         function reloadTable() {
             $('#tb-inquiry').DataTable().ajax.reload();
@@ -155,7 +153,7 @@
 
         $(document).ready(function() {
             var tablenya = $('#tb-inquiry').DataTable({
-                "dom": "tir",
+                "dom": "Bti",
                 "select": "single",
                 "processing": true,
                 "serverSide": true,
@@ -236,88 +234,12 @@
             });
 
             tablenya.on('draw', function() {
-                var info = tablenya.page.info(),
-                    halaman = $('ul.pagination');
-                halaman.html("");
+                paginatioon(tablenya,$('ul.pagination'));
 
-                var _pagefirstt = (info.page == 0) ? "disabled" : "",
-                    _pagefirst = (info.page == 0) ? "style='display:none;'" : "",
-                    _pagemin3 = (info.page - 3 <= 0 || ((info.page + 1) - (info.page - 3)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pagemin2 = (info.page - 2 <= 0 || ((info.page + 1) - (info.page - 2)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pagemin1 = (info.page - 1 <= 0 || ((info.page + 1) - (info.page - 1)) > 2) ?
-                    "style='display:none;'" : "",
-                    _page = (info.page <= 0 || ((info.page + 1) - (info.page)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pageplus2 = (info.page + 2 > info.pages || ((info.page + 2) - (info.page + 1)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pageplus3 = (info.page + 3 > info.pages || ((info.page + 3) - (info.page + 1)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pageplus4 = (info.page + 4 > info.pages || ((info.page + 4) - (info.page + 1)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pageplus5 = (info.page + 5 > info.pages || ((info.page + 5) - (info.page + 1)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pagelast = (info.page + 1 == info.pages || ((info.page + 2) - (info.page + 1)) > 2) ?
-                    "style='display:none;'" : "",
-                    _pagelastt = (info.page + 1 == info.pages || ((info.page + 2) - (info.page + 1)) > 2) ?
-                    "disabled" : "";
-
-                var pageAwal = `<li>
-                                    <button class="pagination__link gotoPage" ` + _pagefirstt + ` d-page="first"> <i class="w-4 h-4"
-                                            data-feather="chevrons-left"></i> </button>
-                                </li>
-                                <li>
-                                    <button class="pagination__link gotoPage" ` + _pagefirstt + ` d-page="previous"> <i class="w-4 h-4"
-                                            data-feather="chevron-left"></i> </button>
-                                </li>`,
-                    pageAkhir = `<li>
-                                    <button class="pagination__link gotoPage" ` + _pagelastt + ` d-page="next"> <i class="w-4 h-4"
-                                            data-feather="chevron-right"></i> </button>
-                                </li>
-                                <li>
-                                    <button class="pagination__link gotoPage" ` + _pagelastt + ` d-page="last"> <i class="w-4 h-4"
-                                            data-feather="chevrons-right"></i> </button>
-                                </li>`;
-
-                halaman.html(pageAwal + `<li> <button class="pagination__link" disabled style="display:none;">...</button> </li>
-                <li> <button class="pagination__link" disabled ` + _pagefirst + `>...</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page - 4) + `" ` + _pagemin3 +
-                    `>` + (info.page - 3) + `</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page - 3) + `" ` + _pagemin2 +
-                    `>` + (info.page - 2) + `</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page - 2) + `" ` + _pagemin1 +
-                    `>` + (info.page - 1) + `</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page - 1) + `" ` + _page + `>` +
-                    (info.page) + `</button> </li>
-                <li> <button class="pagination__link pagination__link--active" d-page="` + (info.page) + `">` + (
-                        info.page + 1) + `</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page + 1) + `" ` + _pageplus2 +
-                    `>` +
-                    (info.page + 2) + `</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page + 2) + `" ` + _pageplus3 +
-                    `>` +
-                    (info.page + 3) + `</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page + 3) + `" ` + _pageplus4 +
-                    `>` +
-                    (info.page + 4) + `</button> </li>
-                <li> <button class="pagination__link gotoPage" d-page="` + (info.page + 4) + `" ` + _pageplus5 +
-                    `>` +
-                    (info.page + 5) + `</button> </li>
-                <li> <button class="pagination__link" disabled ` + _pagelast + `>...</button> </li>` + pageAkhir);
-
-                $('#showing').html("");
-                // console.log('halaman: ' + (info.page + 1) + " dari " + info.pages);
-                // console.log('info: ', info);
                 feather.replace();
 
                 $('.gotoPage').click(function() {
-                    var page = $(this).attr('d-page');
-                    if (!isNaN(page)) {
-                        page = parseInt(page);
-                    }
-                    // console.log(page);
-                    tablenya.page(page).draw('page');
+                    gotoPage($(this),tablenya);
                 });
 
                 $('#tb-inquiry > tbody > tr').each(function() {
@@ -352,6 +274,12 @@
                 var statusnya = tablenya.row(this).data()[10];
                 $('.ps-st').css('display', 'none');
                 $('.st-' + statusnya).css('display', 'block');
+            });
+
+            $('#ps-lihat').click(function(e) {
+                e.preventDefault();
+                var selected = tablenya.row({ selected: true }).data();
+                window.open("{{ url('pengajuan') }}/"+selected[0]);
             });
         });
     </script>

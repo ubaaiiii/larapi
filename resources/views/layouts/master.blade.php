@@ -17,6 +17,7 @@
     <!-- BEGIN: CSS Assets-->
     <link rel="stylesheet" href="{{ url('public/dist/css/app.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/daterangepicker/daterangepicker.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/datatables/datatables.min.css') }}" />
     <!-- END: CSS Assets-->
     <script src="{{ url('public/vendor/jquery/jquery-3.6.0.min.js') }}"></script>
     @yield('header')
@@ -42,6 +43,7 @@
     <script src="{{ url('public/js/jquery.inputmask.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/daterangepicker.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url('public/vendor/datatables/datatables.min.js') }}"></script>
 
     {{-- script yang biasa diload saat awal awal --}}
     <script src="{{ url('public/js/function.js') }}"></script>

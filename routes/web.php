@@ -47,13 +47,13 @@ Route::get('mode/{value}', [AuthController::class, 'DarkMode']);
 Route::post('register', [AuthController::class, 'register']);
 Route::group(['middleware' => 'auth'], function () {
 
-    Route::get('home', [PageController::class, 'dashboard'])->name('home');
-    Route::get('profile', [PageController::class, 'profile'])->name('profile');
-    Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
-    Route::get('laporan', [PageController::class, 'laporan'])->name('laporan');
-    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('home', [PageController::class, 'dashboard'])->name('home');
+Route::get('profile', [PageController::class, 'profile'])->name('profile');
+Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
+Route::get('laporan', [PageController::class, 'laporan'])->name('laporan');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
-    // pengajuan
-    Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan');
-    Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+// pengajuan
+Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan');
+Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
 });

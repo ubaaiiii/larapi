@@ -2,9 +2,6 @@
 @section('title', 'Pengajuan')
 @section('breadcrumb', 'Pengajuan')
 @section('menu', 'Pengajuan')
-@section('header')
-    <link href="{{ url('public/vendor/datatables/datatables.min.css') }}" rel="stylesheet">
-@endsection
 @section('content')
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
@@ -27,9 +24,16 @@
                     <div class="preview">
                         @if ($act == 'view' || $act == 'edit')
                             <div class="form-inline mt-5">
-                                <label for="noapp" class="form-label sm:w-20">Nomor Aplikasi</label>
-                                <input type="text" id="noapp" class="form-control" required name="noapp"
-                                    value="@if (!empty($data->transid)){{ $data->transid }}@endif" disabled>
+                                <label for="transid" class="form-label sm:w-20">Nomor Transaksi</label>
+                                <input type="text" id="transid" class="form-control" required name="transid"
+                                    value="@if (!empty($data->transid)){{ $data->transid }}@endif" readonly>
+                            </div>
+                        @else
+                            <div class="form-inline mt-5">
+                                <label for="transid" class="form-label sm:w-20">Nomor Transaksi</label>
+                                <input type="text" id="transid" class="form-control" required name="transid"
+                                    value="{{ $transid->seqlead . date($transid->seqformat) . str_pad($transid->seqno, $transid->seqlen, '0', STR_PAD_LEFT) }}"
+                                    readonly>
                             </div>
                         @endif
                         <div class="form-inline mt-5">
@@ -178,42 +182,45 @@
                 </table>
             </div>
         </div>
-        <div class="intro-y col-span-12 lg:col-span-6">
-            <div class="intro-y box">
-                <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
-                    <h2 class="font-medium text-base mr-auto">
-                        Dokumen
-                    </h2>
-                </div>
-                <div id="multiple-file-upload" class="p-5">
-                    <div class="preview">
-                        <form action="/file-upload" class="dropzone">
-                            <div class="fallback">
-                                <input name="file" type="file" multiple />
-                            </div>
-                            <div class="dz-message" data-dz-message>
-                                <div class="text-lg font-medium">Tarik dokumen kesini atau klik untuk memilih dokumen.</div>
-                                <div class="text-gray-600"> Dokumen yang terpilih <span class="font-medium">akan</span>
-                                    benar benar diupload. </div>
-                            </div>
-                        </form>
+        @if ($act !== 'add')
+            <div class="intro-y col-span-12 lg:col-span-6">
+                <div class="intro-y box">
+                    <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
+                        <h2 class="font-medium text-base mr-auto">
+                            Dokumen
+                        </h2>
                     </div>
-                </div>
-                <div class="p-5" id="responsive-table">
-                    <div class="preview">
-                        <div class="overflow-x-auto">
-                            <table class="table" id="tb-dokumen">
-                                <thead>
-                                    <tr>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">#</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Dokumen</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tgl. Upload</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Diupload Oleh</th>
-                                        <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Ukuran</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- @foreach ($document as $doc)
+                    <div id="multiple-file-upload" class="p-5">
+                        <div class="preview">
+                            <form action="/file-upload" class="dropzone">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                                <div class="dz-message" data-dz-message>
+                                    <div class="text-lg font-medium">Tarik dokumen kesini atau klik untuk memilih dokumen.
+                                    </div>
+                                    <div class="text-gray-600"> Dokumen yang terpilih <span
+                                            class="font-medium">akan</span>
+                                        benar benar diupload. </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="p-5" id="responsive-table">
+                        <div class="preview">
+                            <div class="overflow-x-auto">
+                                <table class="table" id="tb-dokumen">
+                                    <thead>
+                                        <tr>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">#</th>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Dokumen</th>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Tgl. Upload</th>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Diupload Oleh</th>
+                                            <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">Ukuran</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{-- @foreach ($document as $doc)
                                         <tr>
                                             <td class="border-b whitespace-nowrap">
                                                 <a style="cursor:pointer"
@@ -232,7 +239,7 @@
                                             <td class="border-b whitespace-nowrap text-right">{{ $doc->ukuran }} KB</td>
                                         </tr>
                                     @endforeach --}}
-                                    {{-- <tr>
+                                        {{-- <tr>
                                         <td class="border-b whitespace-nowrap">
                                             <a style="cursor:pointer"
                                                 class="flex items-center text-theme-6 block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
@@ -245,15 +252,14 @@
                                         <td class="border-b whitespace-nowrap">PDF</td>
                                         <td class="border-b whitespace-nowrap">120 KB</td>
                                     </tr> --}}
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
-        @if ($act !== 'add')
+            </div>
             <div class="intro-y col-span-12 lg:col-span-6">
                 <div class="intro-y box">
                     <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
@@ -302,9 +308,6 @@
 @endsection
 
 @section('script')
-    <script src="{{ url('public/vendor/datatables/datatables.min.js') }}"></script>
-    <script src="{{ url('public/vendor/datatables/vfs_fonts.js') }}"></script>
-    <script src="{{ url('public/vendor/datatables/pdfmake.min.js') }}"></script>
     <script>
         function cekType() {
             if ($("#type-insurance").val() === "PAR") {
@@ -315,28 +318,34 @@
         }
         $(document).ready(function() {
             $('.dt-table').DataTable();
-            $('#tb-dokumen').DataTable({
-                "ajax": {
-                    @if (!empty($data))
-                        url: "{{ url('api/datadokumen') . '/' . $data->transid }}",
-                    @else
+            @if ($act !== 'add')
+                $('#tb-dokumen').DataTable({
+                    lengthMenu: [[5, 25, 50, -1], [5, 25, 50, "All"]],
+                    "ajax": {
                         url: "{{ url('api/datadokumen') }}",
-                    @endif
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        headers: {
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        },
+                        type: "POST",
+                        data: function(d) {
+                            d.transid = '{{ $data->transid }}';
+                            d._token = '{{ csrf_token() }}';
+                        },
+                        // success: function(d) {
+                        //     console.log('sql:', d);
+                        // },
+                        error: function(d) {
+                            console.log('error:', d.responseText);
+                        },
                     },
-                    type: "POST",
-                    data: function(d) {
-                        d._token = '{{ csrf_token() }}';
-                    },
-                    // success: function(d) {
-                    //     console.log('sql:', d);
-                    // },
-                    error: function(d) {
-                        console.log('error:', d.responseText);
-                    },
-                },
-            });
+                }).on('draw',function(){
+                    paginatioon($('#tb-dokumen').DataTable(),$('#tb-dokumen_paginate > ul.pagination'));
+                    $('.gotoPage').click(function() {
+                        gotoPage($(this),tablenya);
+                    });
+                    feather.replace();
+                });
+            @endif
             cekType();
             $('select').select2();
             $('#type-insurance').change(function() {
