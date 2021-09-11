@@ -13,6 +13,8 @@ use App\Models\Sequential;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PageController extends Controller
 {
@@ -40,7 +42,7 @@ class PageController extends Controller
             'instype'   => Master::where('mstype', 'instype')->get(),
             'act'       => 'add',
             'price'     => KodeTrans::where('visible', true)->orderBy('kodetrans_index', 'ASC')->get(),
-            'transid'   => Sequential::where('seqdesc','transid')->first(),
+            'transid'   => Sequential::where('seqdesc', 'transid')->first(),
         ];
         // echo $data['transid']->seqno;
         // die;
@@ -53,20 +55,57 @@ class PageController extends Controller
             $data['activity']   = $dataController->dataAktifitas($transid);
             // dd($data['document']);
         } else {
-            Sequential::where('seqdesc','transid')->update(['seqno'=> $data['transid']->seqno+1]);
+            Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);
         }
         return view('pengajuan', $data);
     }
 
     function laporan($transid = null)
     {
+        // Permission::insert([
+        //     [
+        //         "name"  => "ajukan pengajuan",
+        //         "guard_name" => "web"
+        //     ],
+        //     [
+        //         "name"  => "aktifkan pengajuan",
+        //         "guard_name" => "web"
+        //     ],
+        //     [
+        //         "name"  => "edit pengajuan",
+        //         "guard_name" => "web"
+        //     ],
+        //     [
+        //         "name"  => "delete pengajuan",
+        //         "guard_name" => "web"
+        //     ],
+        //     [
+        //         "name"  => "approve pengajuan",
+        //         "guard_name" => "web"
+        //     ],
+        // ]);
+
+        // $role = Role::findById(5);
+        // $role->givePermissionTo([
+        //     'create pengajuan',
+        //     'edit pengajuan',
+        //     'delete pengajuan',
+        //     'approve pengajuan',
+        //     'rollback pengajuan',
+        //     'proses pengajuan',
+        //     'ajukan pengajuan',
+        //     'aktifkan pengajuan',
+        // ]);
+
+        // $user = User::find(5);
+        // $user->assignRole('checker');
+
         $data = [
             'cabang'    => Cabang::all(),
             'asuransi'  => Master::where('mstype', 'insurance')->get(),
             'laporan'   => Laporan::where('laplevel', Auth::user()->level)->get(),
             'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Master::where('mstype', 'instype')->get(),
-            'act'       => 'add',
         ];
 
         if (!empty($transid)) {
@@ -85,5 +124,17 @@ class PageController extends Controller
             'qsearch'   => $search
         ];
         return view('inquiry', $data);
+    }
+
+    function user($search = null)
+    {
+        $data = [
+            'cabang'    => Cabang::all(),
+            'level'     => Master::where('mstype', 'level')->get(),
+            'provinsi'  => KodePos::select('provinsi')->distinct()->get(),
+            'search'    => 'hidden',
+            'qsearch'   => $search
+        ];
+        return view('user', $data);
     }
 }

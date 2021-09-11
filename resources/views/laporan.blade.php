@@ -25,7 +25,7 @@
                     <select id="cabang" name="cabang" required style="width:100%">
                         <option value="ALL" selected>Semua Cabang</option>
                         @foreach ($cabang as $val)
-                            <option value="{{ $val->msid }}" @if ($val->msid === Auth::user()->cabang) selected="true" @endif>{{ $val->msdesc }}
+                            <option value="{{ $val->id }}" @if ($val->id === Auth::user()->cabang) selected="true" @endif>{{ $val->nama_cabang }}
                             </option>
                         @endforeach
                     </select>

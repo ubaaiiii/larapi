@@ -49,11 +49,17 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::get('home', [PageController::class, 'dashboard'])->name('home');
 Route::get('profile', [PageController::class, 'profile'])->name('profile');
-Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
-Route::get('laporan', [PageController::class, 'laporan'])->name('laporan');
+Route::get('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
+// inquiry
+Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
+Route::get('inquiry/{any}', [PageController::class, 'inquiry'])->name('inquiry');
+
 // pengajuan
-Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan');
+Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:ao|adm');
 Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+
+// master
+Route::get('user', [PageController::class, 'user'])->name('user')->middleware('role:adm|broker');
 });

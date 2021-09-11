@@ -78,8 +78,8 @@
                                             <select id="cabang" data-search="true" class="tom-select w-full" name="cabang"
                                                 required @if (Auth::user()->level !== 'broker') disabled @endif>
                                                 @foreach ($cabang as $cab)
-                                                    <option value="{{ $cab->msid }}" @if ($cab->msid === Auth::user()->cabang) selected="true" @endif>
-                                                        {{ $cab->msdesc }}</option>
+                                                    <option value="{{ $cab->id }}" @if ($cab->id === Auth::user()->cabang) selected="true" @endif>
+                                                        {{ $cab->nama_cabang }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

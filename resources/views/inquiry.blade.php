@@ -23,13 +23,13 @@
                     Proses</button>
                 <div class="dropdown-menu w-56">
                     <div class="dropdown-menu__content box dark:bg-dark-1">
-                        <div class="p-2 border-b border-gray-200 dark:border-dark-5">
+                        {{-- <div class="p-2 border-b border-gray-200 dark:border-dark-5">
                             <a id="copy-row"
                                 class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                 style="cursor:pointer">
                                 <i data-feather="copy" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i> Salin
                             </a>
-                        </div>
+                        </div> --}}
                         <div class="p-2">
                             <a id="ps-lihat"
                                 class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
@@ -68,9 +68,9 @@
                                 Kembalikan
                             </a>
                         </div>
-                        <div class="p-2 border-t border-gray-200 dark:border-dark-5">
+                        <div class="p-2 border-t border-gray-200 dark:border-dark-5  ps-st st-4">
                             <a id=""
-                                class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
+                                class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                 style="cursor:pointer">
                                 <i data-feather="file-text" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Invoice

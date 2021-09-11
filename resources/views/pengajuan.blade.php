@@ -317,6 +317,11 @@
             }
         }
         $(document).ready(function() {
+            var npwp_frmt = new Inputmask("99.999.999.9-999.999");
+            npwp_frmt.mask($('#npwp'));
+
+
+
             $('.dt-table').DataTable();
             @if ($act !== 'add')
                 $('#tb-dokumen').DataTable({
@@ -339,7 +344,8 @@
                         },
                     },
                 }).on('draw',function(){
-                    paginatioon($('#tb-dokumen').DataTable(),$('#tb-dokumen_paginate > ul.pagination'));
+                    var tablenya = $('#tb-dokumen').DataTable();
+                    paginatioon(tablenya,$('#tb-dokumen_paginate > ul.pagination'));
                     $('.gotoPage').click(function() {
                         gotoPage($(this),tablenya);
                     });
@@ -422,6 +428,8 @@
                         };
                     },
                 },
+            }).on('select2:clearing',function(e){
+                $('#npwp').val("").attr('disabled',false);
             });
 
             $('#insured').on('select2:select', function(e) {
