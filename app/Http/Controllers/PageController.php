@@ -9,6 +9,7 @@ use App\Models\KodeTrans;
 use App\Models\Laporan;
 use App\Models\Master;
 use App\Models\Okupasi;
+use App\Models\Page;
 use App\Models\Sequential;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -62,6 +63,7 @@ class PageController extends Controller
 
     function laporan($transid = null)
     {
+        return Page::roleHasPages(Auth::user()->id,4,1)->get();
         // Permission::insert([
         //     [
         //         "name"  => "ajukan pengajuan",

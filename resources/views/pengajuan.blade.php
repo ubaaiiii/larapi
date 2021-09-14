@@ -381,30 +381,6 @@
                 },
             });
 
-            // $("#okupasi").select2({
-            //     minimumInputLength: 3,
-            //     allowClear: true,
-            //     placeholder: "Pilih Okupasi",
-            //     ajax: {
-            //         dataType: "json",
-            //         url: "{{ url('api/selectokupasi') }}",
-            //         headers: {
-            //             'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-            //         },
-            //         data: function(params) {
-            //             return {
-            //                 search: params.term,
-            //                 instype: $('#type-insurance').val()
-            //             };
-            //         },
-            //         processResults: function(data, page) {
-            //             return {
-            //                 results: data,
-            //             };
-            //         },
-            //     },
-            // });
-
             $("#insured").select2({
                 minimumInputLength: 3,
                 allowClear: true,

@@ -8,11 +8,28 @@
     <!-- END: Breadcrumb -->
     <div class="intro-x relative mr-3 sm:mr-6 <?= empty($search) ? '' : $search ?>">
         <div class="search">
-            <input type="text" class="search__input form-control border-transparent placeholder-theme-13"
-                placeholder="Search Inquiry...">
-            <i data-feather="search" class="search__icon dark:text-gray-300"></i>
+            <input id="text-search" type="text" class="search__input form-control border-transparent placeholder-theme-13"
+                placeholder="Search Inquiry..." name="search">
+            <i id="icon-search" data-feather="search" class="search__icon dark:text-gray-300"></i>
         </div>
     </div>
+    <script>
+        function redirectInquiry($q) {
+            window.location.href = "{{ url('inquiry') }}/"+$q;
+        }
+        $(document).ready(function(){
+            $('#text-search').on('keypress',function(e){
+                if(e.which == 13) {
+                    var q = $(this).val();
+                    redirectInquiry(q);
+                }
+            });
+            $('#icon-search').click(function(){
+                var q = $('#text-search').val();
+                redirectInquiry(q);
+            })
+        })
+    </script>
     <!-- BEGIN: Account Menu -->
     <div class="intro-x dropdown w-8 h-8">
         <div class="dropdown-toggle w-8 h-8 rounded-full overflow-hidden shadow-lg image-fit zoom-in" role="button"

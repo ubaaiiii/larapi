@@ -20,17 +20,23 @@
         </li>
 
         @php
-        $pages = DB::table('pages')
-            ->where('user_level', '=',Auth::user()->level)
+        $pages = DB::table('model_has_roles as mr')
+            ->join('role_has_pages as rp','rp.role_id','=','mr.role_id')
+            ->join('pages as p','p.id','=','rp.page_id')
+            ->where('mr.model_id', '=', Auth::user()->id)
+            ->where('visible','=','1')
             ->whereNull('parent_id')
-            ->orderBy('index','asc')
+            ->orderBy('index', 'asc')
             ->get();
 
         foreach ($pages as $page) {
-            $sub_pages = DB::table('pages')
-                ->where('user_level', '=', Auth::user()->level)
-                ->where('parent_id', '=', $page->id)
-                ->orderBy('index','asc')
+            $sub_pages = DB::table('model_has_roles as mr')
+                ->join('role_has_pages as rp','rp.role_id','=','mr.role_id')
+                ->join('pages as p','p.id','=','rp.page_id')
+                ->where('mr.model_id', '=', Auth::user()->id)
+                ->where('visible','=','1')
+                ->where('parent_id','=',$page->id)
+                ->orderBy('index', 'asc')
                 ->get();
 
         @endphp
