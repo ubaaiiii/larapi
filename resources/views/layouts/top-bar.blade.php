@@ -40,7 +40,7 @@
             <div class="dropdown-menu__content box bg-theme-26 dark:bg-dark-6 text-white">
                 <div class="p-4 border-b border-theme-27 dark:border-dark-3">
                     <div class="font-medium">{{ Auth::user()->name }}</div>
-                    <div class="text-xs text-theme-28 mt-0.5 dark:text-gray-600">{{ Auth::user()->level }}</div>
+                    <div class="text-xs text-theme-28 mt-0.5 dark:text-gray-600">{{ Auth::user()->getRoleNames()[0] }}</div>
                 </div>
                 <div class="p-2">
                     <a href="{{ url('profile') }}"

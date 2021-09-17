@@ -20,7 +20,7 @@ class DataController extends Controller
     function index(Request $request)
     {
         return response()->json([
-            'message'   => 'ini halaman kodepos'
+            'message'   => 'ini halaman data'
         ], 200);
     }
 
@@ -158,7 +158,7 @@ class DataController extends Controller
         $columns = [
             'transid',
             'itp.msdesc',
-            'cbg.msdesc',
+            'cabang.nama_cabang',
             'insured.kode',
             'policy_no',
             'periode_start',
@@ -180,23 +180,23 @@ class DataController extends Controller
             'id_status',
             'periode_start',
             'periode_end',
-            'cbg.msdesc as cabang',
+            'cabang.nama_cabang as cabang',
         ];
 
         $table = DB::table("transaksi");
 
-        $user = Auth::user();
-        switch ($user->level) {
+        $user = Auth::user()->getRoleNames()[0];
+        switch ($user) {
             case 'ao':
-                $table->where('transaksi.created_by', $user->id);
+                $table->where('transaksi.created_by', Auth::user()->id);
                 break;
             
             case 'checker':
-                $table->where('transaksi.id_cabang', $user->id_cabang);
+                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 break;
 
             case 'insurance':
-                $table->where('transaksi.id_asuransi', $user->id_cabang);
+                $table->where('transaksi.id_asuransi', Auth::user()->id_cabang);
                 break;
 
             case 'broker':
@@ -216,7 +216,7 @@ class DataController extends Controller
             ['insured', 'id_insured = insured.id'],
             ['masters as itp', ['id_instype = itp.msid', 'itp.mstype = instype']],
             ['masters as sts', ['id_status = sts.msid', 'sts.mstype = status']],
-            ['masters as cbg', ['id_cabang = cbg.msid', 'cbg.mstype = cabang']],
+            ['cabang', 'id_cabang = cabang.id'],
             ['transpricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
             ['transpricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
@@ -263,6 +263,7 @@ class DataController extends Controller
             'id_insured',
             'insured.kode as tertanggung',
             'insured.npwp',
+            'insured.alamat',
             'policy_parent',
             'periode_start',
             'periode_end',
@@ -344,6 +345,70 @@ class DataController extends Controller
             $nestedData[] = $row->created_at;
             $nestedData[] = $row->username;
             $nestedData[] = $row->ukuran . " KB";
+
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => intval($query[1]),
+            "recordsFiltered" => intval($query[2]),
+            "data"            => $data,
+            // "sql"             => $query[3]
+        ], 200);
+    }
+
+    public function dataUser(Request $request)
+    {
+        // sorting column datatables
+        $columns = [
+            'us.name',
+            'us.username',
+            'us.unpass',
+            'pr.username as parent',
+            'lv.msdesc as role',
+            'nama_cabang'
+        ];
+
+        $select = [
+            'us.id',
+            'us.name',
+            'us.username',
+            'us.unpass',
+            'pr.username as parent',
+            'lv.msdesc as role',
+            'nama_cabang'
+        ];
+
+        $table = DB::table("users as us");
+
+        $joins = [
+            ['model_has_roles as mr', 'mr.model_id = us.id'],
+            ['roles as r', 'mr.role_id = r.id'],
+            ['masters as lv', 'r.name = lv.msid'],
+            ['cabang as c', 'c.id = us.id_cabang'],
+            ['users as pr', 'pr.id = us.id_parent'],
+        ];
+
+        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+        // return $query;
+
+        $data = array();
+        foreach ($query[0] as $row) {
+            $nestedData = array();
+            $nestedData[] = $row->transid;
+            $nestedData[] = $row->tipeins;
+            $nestedData[] = $row->cabang;
+            $nestedData[] = $row->tertanggung;
+            $nestedData[] = $row->policy_no;
+            $nestedData[] = date_format(date_create($row->periode_start), "d-M-Y") . " s/d " . date_format(date_create($row->periode_end), "d-M-Y");
+            $nestedData[] = $row->tgl_dibuat;
+            $nestedData[] = number_format($row->tsi, 2);
+            $nestedData[] = number_format($row->premi, 2);
+            $nestedData[] = $row->statusnya;
+
+            // hidden
+            $nestedData[] = $row->id_status;
 
             $data[] = $nestedData;
         }

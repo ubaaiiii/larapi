@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\api\DataController;
+use App\Http\Controllers\API\DataController;
 use App\Models\Cabang;
 use App\Models\KodePos;
 use App\Models\KodeTrans;
@@ -34,7 +34,7 @@ class PageController extends Controller
         return view('profile', $data);
     }
 
-    function pengajuan($transid = null)
+    function pengajuan($transid = null, Request $request)
     {
         $data = [
             'cabang'    => Cabang::all(),
@@ -44,6 +44,7 @@ class PageController extends Controller
             'act'       => 'add',
             'price'     => KodeTrans::where('visible', true)->orderBy('kodetrans_index', 'ASC')->get(),
             'transid'   => Sequential::where('seqdesc', 'transid')->first(),
+            'method'    => $request->method,
         ];
         // echo $data['transid']->seqno;
         // die;
@@ -63,7 +64,7 @@ class PageController extends Controller
 
     function laporan($transid = null)
     {
-        return Page::roleHasPages(Auth::user()->id,4,1)->get();
+        // dd(Page::roleHasPages(Auth::user()->id,1,4)->get());
         // Permission::insert([
         //     [
         //         "name"  => "ajukan pengajuan",

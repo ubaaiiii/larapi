@@ -5,9 +5,17 @@
 @section('content')
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
-            Formulir Pengajuan @if (!empty($data->tertanggung))<b><u>{{ 'a/n ' . $data->tertanggung }}@endif</u></b>
-            @if ($act !== 'view' && $act !== 'edit')
+            Formulir Pengajuan @if (!empty($data->tertanggung)){!! 'a/n <b>' . $data->tertanggung . '</b><br>' !!}@endif
+            @if ($method == 'update')
                 <button class="btn btn-sm btn-primary">Simpan</button>
+                <button class="btn btn-sm btn-primary">Perpanjang</button>
+            @endif
+            @if ($method == 'view')
+                <button class="btn btn-sm btn-success">Setujui</button>
+                <button class="btn btn-sm btn-success">Ajukan</button>
+                <button class="btn btn-sm btn-success">Aktifkan</button>
+                <button class="btn btn-sm btn-warning">Kembalikan</button>
+                <button class="btn btn-sm btn-danger">Hapus</button>
             @endif
         </h2>
     </div>
@@ -76,9 +84,28 @@
                             </script>
                         @endif
                         <div class="form-inline mt-5">
-                            <label for="npwp" class="form-label sm:w-20">NPWP</label>
+                            <label for="nik" class="form-label sm:w-20">NIK Tertanggung</label>
+                            <input type="text" id="nik" class="form-control" required name="nik"
+                                @if (!empty($data->nik)) value="{{ $data->nik }}" disabled @endif>
+                        </div>
+                        <div class="form-inline mt-5">
+                            <label for="npwp" class="form-label sm:w-20">NPWP Tertanggung</label>
                             <input type="text" id="npwp" class="form-control" required name="npwp"
                                 @if (!empty($data->npwp)) value="{{ $data->npwp }}" disabled @endif>
+                        </div>
+                        <div class="form-inline mt-5">
+                            <label for="alamat" class="form-label sm:w-20">Alamat Tertanggung</label>
+                            <textarea id="alamat" class="form-control" required @if (!empty($data->alamat)) disabled @endif>@if (!empty($data->alamat)){{ $data->alamat }}@endif</textarea>
+                        </div>
+                        <div class="form-inline mt-5">
+                            <label for="nopinjaman" class="form-label sm:w-20">Nomor Pinjaman</label>
+                            <input type="text" class="form-control allow-decimal" placeholder="Nomor Pinjaman" name="nopinjaman"
+                                id="nopinjaman" value="@if (!empty($data->nopinjaman)){{ $data->nopinjaman }}@endif">
+                        </div>
+                        <div class="form-inline mt-5">
+                            <label for="plafond-kredit" class="form-label sm:w-20">Plafond Kredit</label>
+                            <input type="text" class="form-control allow-decimal currency" placeholder="Plafond Kredit" name="plafond-kredit"
+                                id="plafond-kredit" value="@if (!empty($data->plafond_kredit)){{ $data->plafond_kredit }}@endif">
                         </div>
                         <div class="form-inline mt-5">
                             <label for="nopolis-lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
@@ -89,8 +116,16 @@
                             </div>
                         </div>
                         <div class="form-inline mt-5">
-                            <label for="range-periode" class="form-label sm:w-20">Periode</label>
-                            <input id="range-periode" class="date-range form-control w-full block mx-auto"
+                            <label for="masa" class="ml-3 form-label sm:w-20">Masa Asuransi</label>
+                            <div class="input-group w-full">
+                                <input type="text" class="form-control" name="masa"
+                                    id="masa" value="@if (!empty($data->masa)){{ $data->masa }}@endif" required>
+                                <div id="masa" class="input-group-text">Bulan</div>
+                            </div>
+                        </div>
+                        <div class="form-inline mt-5">
+                            <label for="range-periode" class="form-label sm:w-20">Periode KJPP</label>
+                            <input id="range-periode" class="date-range form-control w-full block mx-auto" required
                                 value="@if (!empty($data->periode_start)) {{ date_format(date_create($data->periode_start), 'd/m/Y') . ' - ' . date_format(date_create($data->periode_end), 'd/m/Y') }} @endif">
                         </div>
                         <div class="form-inline mt-5">
@@ -105,7 +140,7 @@
                         </div>
                         <div class="form-inline mt-5">
                             <label for="lokasi" class="form-label sm:w-20">Lokasi Okupasi</label>
-                            <textarea id="lokasi" class="form-control">@if (!empty($data->location)){{ $data->location }}@endif</textarea>
+                            <textarea id="lokasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                         </div>
                         <div class="form-inline mt-5">
                             <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
@@ -121,14 +156,6 @@
                         @endif
                         <div class="sm:ml-20 sm:pl-5 mt-5">
 
-                        </div>
-                    </div>
-                    <div class="source-code hidden">
-                        <button data-target="#copy-horizontal-form" class="copy-code btn py-1 px-2 btn-outline-secondary">
-                            <i data-feather="file" class="w-4 h-4 mr-2"></i> Copy example code </button>
-                        <div class="overflow-y-auto mt-3 rounded-md">
-                            <pre id="copy-horizontal-form"
-                                class="source-preview"> <code class="text-xs p-0 rounded-md html pl-5 pt-8 pb-4 -mb-10 -mt-10"> HTMLOpenTagdiv class=&quot;form-inline&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;horizontal-form-1&quot; class=&quot;form-label sm:w-20&quot;HTMLCloseTagEmailHTMLOpenTag/labelHTMLCloseTag HTMLOpenTaginput id=&quot;horizontal-form-1&quot; type=&quot;text&quot; class=&quot;form-control&quot; placeholder=&quot;example@gmail.com&quot;HTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;form-inline mt-5&quot;HTMLCloseTag HTMLOpenTaglabel for=&quot;horizontal-form-2&quot; class=&quot;form-label sm:w-20&quot;HTMLCloseTagPasswordHTMLOpenTag/labelHTMLCloseTag HTMLOpenTaginput id=&quot;horizontal-form-2&quot; type=&quot;password&quot; class=&quot;form-control&quot; placeholder=&quot;secret&quot;HTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;form-check sm:ml-20 sm:pl-5 mt-5&quot;HTMLCloseTag HTMLOpenTaginput id=&quot;horizontal-form-3&quot; class=&quot;form-check-input&quot; type=&quot;checkbox&quot; value=&quot;&quot;HTMLCloseTag HTMLOpenTaglabel class=&quot;form-check-label&quot; for=&quot;horizontal-form-3&quot;HTMLCloseTagRemember meHTMLOpenTag/labelHTMLCloseTag HTMLOpenTag/divHTMLCloseTag HTMLOpenTagdiv class=&quot;sm:ml-20 sm:pl-5 mt-5&quot;HTMLCloseTag HTMLOpenTagbutton class=&quot;btn btn-primary&quot;HTMLCloseTagLoginHTMLOpenTag/buttonHTMLCloseTag HTMLOpenTag/divHTMLCloseTag </code> </pre>
                         </div>
                     </div>
                 </div>
@@ -199,9 +226,7 @@
                                 <div class="dz-message" data-dz-message>
                                     <div class="text-lg font-medium">Tarik dokumen kesini atau klik untuk memilih dokumen.
                                     </div>
-                                    <div class="text-gray-600"> Dokumen yang terpilih <span
-                                            class="font-medium">akan</span>
-                                        benar benar diupload. </div>
+                                    <div class="text-gray-600"> Dokumen yang terpilih akan terupload ke sistem</div>
                                 </div>
                             </form>
                         </div>
@@ -317,39 +342,41 @@
             }
         }
         $(document).ready(function() {
-            var npwp_frmt = new Inputmask("99.999.999.9-999.999");
-            npwp_frmt.mask($('#npwp'));
-
-
+            $('#npwp').inputmask("99.999.999.9-999.999");
+            $('#nik').inputmask("9999999999999999");
+            $('#masa').inputmask("decimal", { onUnMask: function(maskedValue, unmaskedValue) {
+                //do something with the value
+                return unmaskedValue;
+            }});
 
             $('.dt-table').DataTable();
             @if ($act !== 'add')
                 $('#tb-dokumen').DataTable({
-                    lengthMenu: [[5, 25, 50, -1], [5, 25, 50, "All"]],
-                    "ajax": {
-                        url: "{{ url('api/datadokumen') }}",
-                        headers: {
-                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                        },
-                        type: "POST",
-                        data: function(d) {
-                            d.transid = '{{ $data->transid }}';
-                            d._token = '{{ csrf_token() }}';
-                        },
-                        // success: function(d) {
-                        //     console.log('sql:', d);
-                        // },
-                        error: function(d) {
-                            console.log('error:', d.responseText);
-                        },
-                    },
+                lengthMenu: [[5, 25, 50, -1], [5, 25, 50, "All"]],
+                "ajax": {
+                url: "{{ url('api/datadokumen') }}",
+                headers: {
+                'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                },
+                type: "POST",
+                data: function(d) {
+                d.transid = '{{ $data->transid }}';
+                d._token = '{{ csrf_token() }}';
+                },
+                // success: function(d) {
+                // console.log('sql:', d);
+                // },
+                error: function(d) {
+                console.log('error:', d.responseText);
+                },
+                },
                 }).on('draw',function(){
-                    var tablenya = $('#tb-dokumen').DataTable();
-                    paginatioon(tablenya,$('#tb-dokumen_paginate > ul.pagination'));
-                    $('.gotoPage').click(function() {
-                        gotoPage($(this),tablenya);
-                    });
-                    feather.replace();
+                var tablenya = $('#tb-dokumen').DataTable();
+                paginatioon(tablenya,$('#tb-dokumen_paginate > ul.pagination'));
+                $('.gotoPage').click(function() {
+                gotoPage($(this),tablenya);
+                });
+                feather.replace();
                 });
             @endif
             cekType();
@@ -404,23 +431,24 @@
                         };
                     },
                 },
-            }).on('select2:clearing',function(e){
-                $('#npwp').val("").attr('disabled',false);
+            }).on('select2:clearing', function(e) {
+                $('#npwp').val("").attr('disabled', false);
+                $('#alamat').val("").attr('disabled', false);
             });
 
             $('#insured').on('select2:select', function(e) {
                 var data = e.params.data;
                 $('#npwp').val("");
-                $('#insured-address').val("");
+                $('#alamat').val("");
                 $('#npwp').attr('disabled', false);
-                $('#insured-address').attr('disabled', false);
+                $('#alamat').attr('disabled', false);
                 if (data.npwp !== undefined) {
                     $('#npwp').val(data.npwp);
                     $('#npwp').attr('disabled', true);
                 }
                 if (data.alamat !== undefined) {
-                    $('#insured-address').val(data.alamat);
-                    $('#insured-address').attr('disabled', true);
+                    $('#alamat').val(data.alamat);
+                    $('#alamat').attr('disabled', true);
                 }
             });
 
@@ -428,6 +456,8 @@
                 locale: {
                     format: 'DD/MM/YYYY'
                 },
+                startDate: moment().startOf('month'),
+                endDate: moment().startOf('month').add(32, 'month'),
                 opens: 'left'
             }, function(start, end, label) {
                 // console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end

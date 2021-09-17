@@ -138,6 +138,12 @@
             </div>
         </div>
     </div>
+
+    <form id="frm" method="POST" target="_blank">
+        @csrf
+        <input type="hidden" id="frm-method" name="method">
+        <button type="submit" style="display:none"></button>
+    </form>
     <!-- END: Delete Confirmation Modal -->
 @endsection
 
@@ -278,8 +284,18 @@
 
             $('#ps-lihat').click(function(e) {
                 e.preventDefault();
-                var selected = tablenya.row({ selected: true }).data();
-                window.open("{{ url('pengajuan') }}/"+selected[0]);
+                var transid = tablenya.row({ selected: true }).data()[0];
+                $('#frm-method').val('view');
+                $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
+                // window.open("{{ url('pengajuan') }}/"+selected[0]);
+            });
+
+            $('#ps-ubah').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[0];
+                $('#frm-method').val('update');
+                $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
+                // window.open("{{ url('pengajuan') }}/"+selected[0]);
             });
         });
     </script>

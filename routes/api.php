@@ -33,6 +33,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/datatransaksi', 'API\DataController@dataTransaksi');
     Route::post('/datadokumen', 'API\DataController@dataDokumen');
     Route::post('/datadokumen/{any}', 'API\DataController@dataDokumen');
+    Route::post('/datauser', 'API\DataController@datauser');
+    
+    // proses data
+    Route::post('/user', 'API\ProcessController@user');
+    
 });
 
 Route::post('/login', 'API\AuthController@login');

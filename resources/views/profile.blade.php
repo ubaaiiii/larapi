@@ -17,7 +17,7 @@
                     </div>
                     <div class="ml-4 mr-auto">
                         <div class="font-medium text-base">{{ Auth::user()->name }}</div>
-                        <div class="text-gray-600">{{ Auth::user()->level }}</div>
+                        <div class="text-gray-600">{{ Auth::user()->getRoleNames()[0] }}</div>
                     </div>
                 </div>
                 <div class="p-5 border-t border-gray-200 dark:border-dark-5">
@@ -44,6 +44,7 @@
                 <div class="p-5">
                     <form id="frm-data">
                         @csrf
+                        <input type="hidden" name="id" value="{{ Auth::user()->id }}">
                         <div class="flex flex-col-reverse xl:flex-row flex-col">
                             <div class="flex-1 mt-6 xl:mt-0">
                                 <div class="grid grid-cols-12 gap-x-5">
@@ -76,7 +77,7 @@
                                         <div class="mt-3">
                                             <label for="cabang" class="form-label">Cabang</label>
                                             <select id="cabang" data-search="true" class="tom-select w-full" name="cabang"
-                                                required @if (Auth::user()->level !== 'broker') disabled @endif>
+                                                required @unlessrole('adm|broker') readonly @endunlessrole>
                                                 @foreach ($cabang as $cab)
                                                     <option value="{{ $cab->id }}" @if ($cab->id === Auth::user()->cabang) selected="true" @endif>
                                                         {{ $cab->nama_cabang }}</option>
@@ -86,7 +87,7 @@
                                         <div class="mt-3">
                                             <label for="level" class="form-label">Level</label>
                                             <select id="level" data-search="true" class="tom-select w-full" name="level"
-                                                required @if (Auth::user()->level !== 'broker') disabled @endif>
+                                                required @unlessrole('adm|broker') readonly @endunlessrole>
                                                 @foreach ($level as $lvl)
                                                     <option value="{{ $lvl->msid }}" @if ($lvl->msid === Auth::user()->level) selected="true" @endif>
                                                         {{ $lvl->msdesc }}</option>
@@ -96,7 +97,7 @@
                                         <div class="mt-3">
                                             <label for="parent" class="form-label">Parent</label>
                                             <select id="parent" data-search="true" class="tom-select w-full" name="parent"
-                                                required @if (Auth::user()->level !== 'broker') disabled @endif>
+                                                required @unlessrole('adm|broker') readonly @endunlessrole>
                                                 @foreach ($parent as $prt)
                                                     <option value="{{ $prt->id }}" @if ($prt->id === Auth::user()->parent_id) selected="true" @endif>
                                                         {{ $prt->name }}</option>

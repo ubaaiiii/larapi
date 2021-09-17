@@ -58,7 +58,8 @@ Route::get('inquiry/{any}', [PageController::class, 'inquiry'])->name('inquiry')
 
 // pengajuan
 Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:ao|adm');
-Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+// Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+Route::post('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
 
 // master
 Route::get('user', [PageController::class, 'user'])->name('user')->middleware('role:adm|broker');
