@@ -142,7 +142,6 @@
     <form id="frm" method="POST" target="_blank">
         @csrf
         <input type="hidden" id="frm-method" name="method">
-        <button type="submit" style="display:none"></button>
     </form>
     <!-- END: Delete Confirmation Modal -->
 @endsection
@@ -285,9 +284,7 @@
             $('#ps-lihat').click(function(e) {
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
-                $('#frm-method').val('view');
-                $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
-                // window.open("{{ url('pengajuan') }}/"+selected[0]);
+                window.open("{{ url('pengajuan') }}/"+transid);
             });
 
             $('#ps-ubah').click(function(e) {

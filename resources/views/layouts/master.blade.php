@@ -40,6 +40,7 @@
     {{-- script vendor --}}
     {{-- <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script> --}}
     <script src="{{ url('public/vendor/select2/select2.min.js') }}"></script>
+    <script src="{{ url('public/vendor/select2/id.js') }}"></script>
     <script src="{{ url('public/js/jquery.inputmask.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/daterangepicker.min.js') }}"></script>

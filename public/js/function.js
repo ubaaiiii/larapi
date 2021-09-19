@@ -194,8 +194,6 @@ $(document).ready(function() {
         placeholder: "0",
     });
 
-    $(".date-range").inputmask("99/99/9999 - 99/99/9999");
-
     $(".tsi").keyup(function() {
         var sum = 0;
         $(".tsi").each(function() {

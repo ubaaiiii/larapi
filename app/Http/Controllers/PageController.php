@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\API\DataController;
+use App\Models\Asuransi;
 use App\Models\Cabang;
 use App\Models\KodePos;
 use App\Models\KodeTrans;
@@ -37,7 +38,8 @@ class PageController extends Controller
     function pengajuan($transid = null, Request $request)
     {
         $data = [
-            'cabang'    => Cabang::all(),
+            'cabang'    => Cabang::where('visible',1)->orderBy('nama_cabang','asc')->get(),
+            'asuransi'  => Asuransi::all(),
             'okupasi'   => Okupasi::all(),
             'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Master::where('mstype', 'instype')->get(),

@@ -45,18 +45,18 @@ class DataController extends Controller
 
     public function selectInsured(Request $request)
     {
-        $insured = Insured::select('id', 'kode', 'npwp', 'alamat');
+        $insured = Insured::select('id', 'nama_insured', 'npwp_insured', 'alamat_insured');
         if (!empty($request->search)) {
-            $insured->where('kode', 'like', '%' . $request->search . '%');
+            $insured->where('nama_insured', 'like', '%' . $request->search . '%');
         }
         $insured = $insured->get();
         $list = [];
         $key = 0;
         foreach ($insured as $row) {
             $list[$key]['id'] = $row['id'];
-            $list[$key]['text'] = $row['kode'];
-            $list[$key]['npwp'] = $row['npwp'];
-            $list[$key]['alamat'] = $row['alamat'];
+            $list[$key]['text'] = $row['nama_insured'];
+            $list[$key]['npwp_insured'] = $row['npwp_insured'];
+            $list[$key]['alamat_insured'] = $row['alamat_insured'];
             $key++;
         }
         return response()->json($list);
@@ -75,7 +75,7 @@ class DataController extends Controller
         $key = 0;
         foreach ($okupasi as $row) {
             $list[$key]['id'] = $row['kode_okupasi'];
-            $list[$key]['text'] = $row['kode_okupasi'] . " - " . $row['nama_okupasi'] . " (" . $row['rate'] . ")";
+            $list[$key]['text'] = $row['kode_okupasi'] . " - (" . $row['rate'] . ")" . $row['nama_okupasi'];
             $key++;
         }
         return response()->json($list);
@@ -120,7 +120,7 @@ class DataController extends Controller
             }
         }
 
-        if (!empty($request->order)) {
+        if (!empty($request->order) && isset($request->order)) {
             for ($i = 0; $i < count($request->order); $i++) {
                 $table->orderBy($columns[$request->order[$i]['column']], $request->order[$i]['dir']);
             }
@@ -136,14 +136,12 @@ class DataController extends Controller
 
         if (!empty($request->length)) {
             $table->take($request->length);
-        } else {
-            $table->take(10);
         }
 
         $result = $table->get();
 
         // return DB::getQueryLog();
-        return [$result, $awal, $all_record, DB::getQueryLog()];
+        return [$result, $awal, $all_record, $request->search];
         // return response()->json([
         //     "draw"              => 1,
         //     "recordsTotal"      => $awal,
@@ -159,7 +157,7 @@ class DataController extends Controller
             'transid',
             'itp.msdesc',
             'cabang.nama_cabang',
-            'insured.kode',
+            'insured.nama_insured',
             'policy_no',
             'periode_start',
             'transaksi.created_at',
@@ -171,7 +169,7 @@ class DataController extends Controller
         $select = [
             'transid',
             'itp.msdesc as tipeins',
-            'insured.kode as tertanggung',
+            'insured.nama_insured as tertanggung',
             'policy_no',
             'transaksi.created_at as tgl_dibuat',
             'tsi.value as tsi',
@@ -261,13 +259,20 @@ class DataController extends Controller
             'id_cabang',
             'alamat_cabang',
             'id_insured',
-            'insured.kode as tertanggung',
-            'insured.npwp',
-            'insured.alamat',
+            'id_status',
+            'insured.nama_insured as tertanggung',
+            'insured.npwp_insured',
+            'insured.nik_insured',
+            'insured.alamat_insured',
+            'policy_no',
             'policy_parent',
             'periode_start',
             'periode_end',
             'id_okupasi',
+            'id_asuransi',
+            'nopinjaman',
+            'plafond_kredit',
+            'masa',
             'location',
             'id_kodepos',
             'kecamatan',
@@ -310,12 +315,14 @@ class DataController extends Controller
 
     public function dataDokumen(Request $request)
     {
-        // sorting column datatables
+        // return $request->all();
+        // die;
         $columns = [
+            'documents.id',
             'nama_file',
             'documents.created_at',
             'username',
-            'ukuran',
+            'ukuran_file',
         ];
 
         $select = [
@@ -341,10 +348,10 @@ class DataController extends Controller
                                 <i data-feather='trash-2' class='w-4 h-4 dark:text-gray-300 mr-2'></i>
                                 Hapus
                             </a>";
-            $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url('public/documents/' . $row->id_transaksi . '/' . $row->file) . "' target='_blank'>" . $row->nama_file . '.' . strtolower($row->tipe) . "</a>";
+            $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url($row->lokasi_file) . "' target='_blank'>" . $row->nama_file . "</a>";
             $nestedData[] = $row->created_at;
             $nestedData[] = $row->username;
-            $nestedData[] = $row->ukuran . " KB";
+            $nestedData[] = number_format((float)$row->ukuran_file, 2, '.', '') . " MB";
 
             $data[] = $nestedData;
         }
@@ -354,7 +361,7 @@ class DataController extends Controller
             "recordsTotal"    => intval($query[1]),
             "recordsFiltered" => intval($query[2]),
             "data"            => $data,
-            // "sql"             => $query[3]
+            "sql"             => $query[3]
         ], 200);
     }
 

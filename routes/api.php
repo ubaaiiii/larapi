@@ -37,6 +37,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
     // proses data
     Route::post('/user', 'API\ProcessController@user');
+    Route::post('/dokumen', 'API\ProcessController@dokumen');
+    Route::post('/pengajuan', 'API\ProcessController@pengajuan');
     
 });
 
