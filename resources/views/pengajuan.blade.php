@@ -102,8 +102,9 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="npwp_insured" class="form-label sm:w-20">NPWP Tertanggung</label>
-                                <input type="text" id="npwp_insured" class="form-control" required
+                                <input type="text" id="npwp_insured" class="form-control masked" required
                                     @if (!empty($data->npwp_insured)) value="{{ $data->npwp_insured }}" @endif>
+                                <input type="hidden" name="npwp_insured" @if (!empty($data->npwp_insured)) value="{{ $data->npwp_insured }}" @endif>
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="alamat_insured" class="form-label sm:w-20">Alamat Tertanggung</label>
@@ -116,8 +117,9 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="plafond_kredit" class="form-label sm:w-20">Plafond Kredit</label>
-                                <input type="text" class="form-control allow-decimal currency" placeholder="Plafond Kredit"
+                                <input type="text" class="form-control allow-decimal currency masked" placeholder="Plafond Kredit"
                                     id="plafond_kredit" value="@if (!empty($data->plafond_kredit)){{ $data->plafond_kredit }}@endif">
+                                <input type="hidden" name="plafond_kredit" @if (!empty($data->plafond_kredit)) value="{{ $data->plafond_kredit }}" @endif>
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
@@ -211,11 +213,12 @@
                                         <div class="input-group">
                                             <div class="input-group-text">{{ $row->kodetrans_formula }}</div>
                                             <input style="text-align:right;" type="text"
-                                                class="form-control allow-decimal tsi currency"
+                                                class="form-control allow-decimal tsi currency masked"
                                                 placeholder="{{ $row->kodetrans_nama }}"
                                                 aria-label="{{ $row->kodetrans_nama }}"
-                                                name="kodetrans-value[{{ $row->kodetrans_id }}]"
+                                                id="kodetrans-value[{{ $row->kodetrans_id }}]"
                                                 value="@if (!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
+                                            <input type="hidden" name="kodetrans-value[{{ $row->kodetrans_id }}]">
                                         </div>
                                     </td>
                                     <td><input name="kodetrans-remarks[{{ $row->kodetrans_id }}]" class="form-control"
@@ -226,10 +229,11 @@
                                 <td colspan="2">
                                     <div class="input-group">
                                         <div id="group-t" class="input-group-text">Total</div>
-                                        <input style="text-align:right;" id="tsi" name="kodetrans-value[1]" type="text"
-                                            class="currency form-control allow-decimal" placeholder="Total Nilai Pertanggungan"
+                                        <input style="text-align:right;" id="kodetrans-value[1]" type="text"
+                                            class="currency form-control allow-decimal masked total-si" placeholder="Total Nilai Pertanggungan"
                                             aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
                                             value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
+                                        <input type="hidden" name="kodetrans-value[1]">
                                     </div>
                                 </td>
                             </tr>
@@ -320,16 +324,10 @@
             $('#tb-dokumen').DataTable().ajax.reload();
         }
         $(document).ready(function() {
-            $('#npwp_insured').inputmask("99.999.999.9-999.999", { onUnMask: function(maskedValue, unmaskedValue) {
-                //do something with the value
-                return unmaskedValue;
-            }});
+            $('#npwp_insured').inputmask("99.999.999.9-999.999");
             $('#nik_insured').inputmask("9999999999999999");
             $('.date-range').inputmask("99/99/9999");
-            $('#masa').inputmask("decimal", { onUnMask: function(maskedValue, unmaskedValue) {
-                //do something with the value
-                return unmaskedValue;
-            }});
+            $('#masa').inputmask("decimal");
 
             $('.dt-table').DataTable();
             @if ($act !== 'add')
@@ -440,7 +438,6 @@
                 
             @endif
             function cekType() {
-                console.log('kepanggil');
                 if ($("#type_insurance").val() === "PAR") {
                     $('.extended-clause').removeAttr('style');
                 } else {
@@ -454,7 +451,7 @@
                         dataType: "json",
                         url: "{{ url('api/selectokupasi') }}",
                         headers: {
-                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                            'Authorization': "Bearer {{ Auth::user()->api_token }}",
                         },
                         data: function(params) {
                             return {
@@ -592,8 +589,6 @@
             $('#btn-add').click(function(){
                 var btnHtml = $(this).html(),
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
-                    npwp = $('#npwp_insured').inputmask('unmaskedvalue'),
-                    plafond = $('#plafond_kredit').inputmask('unmaskedvalue'),
                     nama_insured = $('#insured option:selected').text(),
                     nama_cabang = $('#cabang option:selected').text();
                 $(this).attr('disabled',true).html(loading);
@@ -601,7 +596,7 @@
                 $.ajax({
                     url: "{{ url('api/pengajuan') }}",
                     method: "POST",
-                    data: $('#frm-data-nasabah, #frm-pertanggungan').serialize() + "&method=create&_token={{ csrf_token() }}&npwp_insured="+npwp+"&plafond_kredit="+plafond+"&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
+                    data: $('#frm-data-nasabah, #frm-pertanggungan').serialize() + "&method=create&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },

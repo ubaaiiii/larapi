@@ -159,7 +159,7 @@ class ProcessController extends Controller
 
     public function pengajuan(Request $request)
     {
-        // return $request->all();
+        return $request->all();
         switch ($request->method) {
             case 'create':
                 $request->validate([

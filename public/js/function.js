@@ -203,6 +203,11 @@ $(document).ready(function() {
                 sum += parseFloat($(this).inputmask("unmaskedvalue"));
             }
         });
-        $("#tsi").val(sum);
+        $(".total-si").val(sum).trigger('change');
+    });
+    $(".masked").change(function() {
+        $("[name='" + $(this).attr("id") + "']").val(
+            $(this).inputmask("unmaskedvalue")
+        );
     });
 });
