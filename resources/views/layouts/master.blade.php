@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="{{ url('public/dist/css/app.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/daterangepicker/daterangepicker.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/datatables/datatables.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/fontawesome/all.css') }}" />
     <!-- END: CSS Assets-->
     <script src="{{ url('public/vendor/jquery/jquery-3.6.0.min.js') }}"></script>
     @yield('header')

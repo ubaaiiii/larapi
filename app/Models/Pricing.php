@@ -9,4 +9,5 @@ class Pricing extends Model
 {
     use HasFactory;
     protected $table = "transpricing";
+    protected $guarded = [];
 }

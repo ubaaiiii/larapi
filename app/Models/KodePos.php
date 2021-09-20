@@ -9,6 +9,7 @@ class KodePos extends Model
 {
     use HasFactory;
     protected $table = "kodepos";
+    protected $guarded = [];
 
     public function scopeCariKecamatan($query, $value)
     {

@@ -45,7 +45,7 @@ class DataController extends Controller
 
     public function selectInsured(Request $request)
     {
-        $insured = Insured::select('id', 'nama_insured', 'npwp_insured', 'alamat_insured');
+        $insured = Insured::select('id', 'nama_insured', 'npwp_insured', 'nik_insured', 'alamat_insured');
         if (!empty($request->search)) {
             $insured->where('nama_insured', 'like', '%' . $request->search . '%');
         }
@@ -56,6 +56,7 @@ class DataController extends Controller
             $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['nama_insured'];
             $list[$key]['npwp_insured'] = $row['npwp_insured'];
+            $list[$key]['nik_insured'] = $row['nik_insured'];
             $list[$key]['alamat_insured'] = $row['alamat_insured'];
             $key++;
         }
@@ -64,25 +65,22 @@ class DataController extends Controller
 
     public function selectOkupasi(Request $request)
     {
-        $okupasi = Okupasi::select('kode_okupasi', 'nama_okupasi', 'rate')->where('instype', 'like', '%' . $request->instype . '%');
+        $okupasi = Okupasi::select('id','kode_okupasi', 'nama_okupasi', 'rate')
+            ->where('instype',$request->instype);
         if (!empty($request->search)) {
-            $okupasi->where('kode_okupasi', 'like', '%' . $request->search . '%')
-                ->orWhere('nama_okupasi', 'like', '%' . $request->search . '%')
-                ->orWhere('rate', 'like', '%' . $request->search . '%');
+            $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
+                ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%');
         }
         $okupasi = $okupasi->get();
+
         $list = [];
         $key = 0;
         foreach ($okupasi as $row) {
-            $list[$key]['id'] = $row['kode_okupasi'];
+            $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['kode_okupasi'] . " - (" . $row['rate'] . ")" . $row['nama_okupasi'];
             $key++;
         }
         return response()->json($list);
-    }
-
-    public function queryBuilder($table, $type, $select, $where, $joins)
-    {
     }
 
     public function generateQuery($request, $table, $columns, $select, $joins)
@@ -300,17 +298,61 @@ class DataController extends Controller
         return $new;
     }
 
-    public function dataAktifitas($transid)
+    public function dataAktifitas(Request $request)
     {
-        return Activity::where('id_transaksi', '=', $transid)
-            ->leftJoin('masters', function ($jn) {
-                $jn->on('id_status', '=', 'masters.msid');
-                $jn->where('masters.mstype', '=', 'status');
-            })
-            ->leftJoin('users', 'activities.created_by', '=', 'users.id')
-            ->select('activities.*', 'masters.msdesc as statusnya', 'users.username')
-            ->orderBy('activities.created_at', 'ASC')
-            ->get();
+        // return Activity::where('id_transaksi', '=', $transid)
+        //     ->leftJoin('masters', function ($jn) {
+        //         $jn->on('id_status', '=', 'masters.msid');
+        //         $jn->where('masters.mstype', '=', 'status');
+        //     })
+        //     ->leftJoin('users', 'activities.created_by', '=', 'users.id')
+        //     ->select('activities.*', 'masters.msdesc as statusnya', 'users.username')
+        //     ->orderBy('activities.created_at', 'ASC')
+        //     ->get();
+
+        $columns = [
+            'activities.created_at',
+            'masters.msdesc',
+            'username',
+            'deskripsi',
+        ];
+
+        $select = [
+            'activities.*',
+            'masters.msdesc as statusnya',
+            'users.username'
+        ];
+
+        $table = DB::table("activities");
+        $table->where('id_transaksi', $request->transid);
+
+        $joins = [
+            ['masters', ['activities.id_status = masters.msid','masters.mstype = status']],
+            ['users', 'activities.created_by = users.id'],
+        ];
+
+        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+        // return $query;
+
+        $data = array();
+        $i = 1;
+        foreach ($query[0] as $row) {
+            $nestedData = array();
+            $nestedData[] = $row->created_at;
+            $nestedData[] = $row->statusnya;
+            $nestedData[] = $row->username;
+            $nestedData[] = $row->deskripsi;
+
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => intval($query[1]),
+            "recordsFiltered" => intval($query[2]),
+            "data"            => $data,
+            "sql"             => $query[3]
+        ], 200);
     }
 
     public function dataDokumen(Request $request)

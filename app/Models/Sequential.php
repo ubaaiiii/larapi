@@ -9,4 +9,5 @@ class Sequential extends Model
 {
     use HasFactory;
     protected $table = "sequential";
+    protected $guarded = [];
 }

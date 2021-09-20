@@ -9,4 +9,5 @@ class KodeTrans extends Model
 {
     use HasFactory;
     protected $table = "kodetrans";
+    protected $guarded = [];
 }

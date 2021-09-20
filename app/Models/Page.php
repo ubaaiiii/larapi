@@ -9,4 +9,5 @@ use Illuminate\Support\Facades\DB;
 class Page extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 }

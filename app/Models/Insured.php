@@ -9,4 +9,5 @@ class Insured extends Model
 {
     use HasFactory;
     protected $table = "insured";
+    protected $guarded = [];
 }

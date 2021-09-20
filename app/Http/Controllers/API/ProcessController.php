@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\User;
 use App\Models\Activity;
+use App\Models\Cabang;
+use App\Models\Insured;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -156,74 +159,253 @@ class ProcessController extends Controller
 
     public function pengajuan(Request $request)
     {
+        // return $request->all();
         switch ($request->method) {
             case 'create':
                 $request->validate([
-                    'name'          => 'required|string|max:60',
-                    'username'      => 'required|unique:users|alpha_dash|max:16',
-                    'email'         => 'required|email',
-                    'notelp'        => 'required|regex:/(0)[0-9]{9}/',
-                    'password'      => 'required|alpha_dash',
-                    'id_cabang'     => 'required|numeric',
-                    'id_parent'     => 'required|numeric',
-                    'level'         => 'required|string',
+                    'transid'           => 'required|string|max:14',
+                    'type_insurance'    => 'required|string',
+                    'cabang'            => 'required',
+                    'alamat_cabang'     => 'required|string',
+                    'insured'           => 'required',
+                    'nik_insured'       => 'integer',
+                    'npwp_insured'      => 'required|string',
+                    'alamat_insured'    => 'required|string',
+                    'nopinjaman'        => 'required|numeric',
+                    'plafond_kredit'    => 'required',
+                    'policy_no'         => 'alpha_dash',
+                    'nopolis_lama'      => 'alpha_dash',
+                    'masa'              => 'required|numeric',
+                    'periode_start'     => 'required|string',
+                    'periode_end'       => 'required|string',
+                    'okupasi'           => 'required|numeric',
+                    'lokasi_okupasi'    => 'required|string',
+                    'kodepos'           => 'required|numeric',
                 ]);
 
-                $user = User::create([
-                    'name'          => $request->name,
-                    'username'      => $request->username,
-                    'email'         => $request->email,
-                    'notelp'        => $request->notelp,
-                    'password'      => Hash::make($request->password),
-                    'unpass'        => $request->password,
-                    'id_cabang'     => $request->id_cabang,
-                    'id_parent'     => $request->id_parent,
-                    'created_by'    => Auth::user()->id,
-                    'created_at'    => date('Y-m-d h:m:s'),
+                $date_start = explode("/",$request->periode_start);
+                $date_end   = explode("/",$request->periode_end);
+
+                if (!is_numeric($request->insured)) {
+                    $request->insured = null;
+                }
+                if (!is_numeric($request->cabang)) {
+                    $request->cabang = null;
+                }
+
+                $insured = Insured::updateOrCreate(
+                    ['id' => $request->insured],
+                    [
+                        'nik_insured'       => $request->nik_insured,
+                        'nama_insured'      => strtoupper($request->nama_insured),
+                        'npwp_insured'      => $request->npwp_insured,
+                        'alamat_insured'    => $request->alamat_insured,
+                        'created_by'         => Auth::user()->id,
+                    ]
+                );
+
+                if ($insured->wasRecentlyCreated){
+                    $detail = "Pembuatan Tertanggung Baru:<br>
+                               - Nama: $request->nama_insured";
+                    if (!empty($request->nik_insured)) {
+                        $detail .= "<br>- NIK: $request->nik_insured";
+                    }
+                    if (!empty($request->npwp_insured)) {
+                        $detail .= "<br>- NPWP: $request->npwp_insured";
+                    }
+                    if (!empty($request->alamat_insured)) {
+                        $detail .= "<br>- Alamat: $request->alamat_insured";
+                    }
+                    $this->aktifitas($request->transid,'7',$detail);
+                } else {
+                    $tertanggung = Insured::find($request->insured);
+                    $detail = "Perubahan Tertanggung a/n $tertanggung->nama_insured:";
+                    $update = false;
+                    if (!empty($request->nik_insured) && $request->nik_insured !== $tertanggung->nik_insured) {
+                        $update = true;
+                        $detail .= "<br>- NIK: $tertanggung->nik_insured menjadi $request->nik_insured";
+                    }
+                    if (!empty($request->npwp_insured) && $request->npwp_insured !== $tertanggung->npwp_insured) {
+                        $update = true;
+                        $detail .= "<br>- NPWP: $tertanggung->npwp_insured menjadi $request->npwp_insured";
+                    }
+                    if (!empty($request->alamat_insured) && $request->alamat_insured !== $tertanggung->alamat_insured) {
+                        $update = true;
+                        $detail .= "<br>- Alamat: $tertanggung->alamat_insured menjadi $request->alamat_insured";
+                    }
+                    if ($update){
+                        $this->aktifitas($request->transid,'7',$detail);
+                    }
+                }
+
+                $cabang = Cabang::updateOrCreate(
+                    ['id' => $request->cabang],
+                    [
+                        'nama_cabang'   => strtoupper($request->nama_cabang),
+                        'alamat_cabang' => $request->alamat_cabang,
+                        'created_by'    => Auth::user()->id,
+                    ]
+                );
+
+                if ($cabang->wasRecentlyCreated) {
+                    $detail = "Pembuatan Cabang Baru:<br>
+                               - Cabang: $request->nama_cabang";
+                    if (!empty($request->alamat_cabang)) {
+                        $detail .= "<br>- Alamat Cabang: $request->alamat_cabang";
+                    }
+                    $this->aktifitas($request->transid, '7', $detail);
+                } else {
+                    $cbg = Cabang::find($request->cabang);
+                    $detail = "Perubahan Cabang $cbg->nama_cabang:";
+                    $update = false;
+                    if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
+                        $update = true;
+                        $detail .= "<br>- Alamat Cabang: $cbg->alamat_cabang menjadi $request->alamat_cabang";
+                    }
+                    if ($update) {
+                        $this->aktifitas($request->transid, '7', $detail);
+                    }
+                }
+
+                $save = Transaksi::create([
+                    'transid'           => $request->transid,
+                    'id_instype'        => $request->type_insurance,
+                    'id_insured'        => $insured->id,
+                    'id_cabang'         => $cabang->id,
+                    'nopinjaman'        => $request->nopinjaman,
+                    'plafond_kredit'    => $request->plafond_kredit,
+                    'policy_no'         => $request->policy_no,
+                    'policy_parent'     => $request->nopolis_lama,
+                    'masa'              => $request->masa,
+                    'id_status'         => '0',
+                    'periode_start'     => $date_start[2]."/". $date_start[1]."/". $date_start[0],
+                    'periode_end'       => $date_end[2] . "/" . $date_end[1] . "/" . $date_end[0],
+                    'id_okupasi'        => $request->okupasi,
+                    'location'          => $request->lokasi_okupasi,
+                    'id_kodepos'        => $request->kodepos,
+                    'created_by'        => Auth::user()->id,
                 ]);
 
-                $user->assignRole($request->level);
-
-                // $student = Student::where('id', $student->id)->first();
+                $this->aktifitas($request->transid,'0','Pembuatan data pengajuan');
 
                 return response()->json([
-                    'message'   => 'User ' . $request->name . ' Berhasil Dibuat',
-                    'data'      => $user,
+                    'message'   => 'Pengajuan ' . $request->name . ' Berhasil Dibuat',
+                    'data'      => $save,
                 ], 200);
                 break;
 
             case 'update':
-                $user = User::find($request->id);
-
                 $request->validate([
-                    'name'          => 'required|string|max:60',
-                    'username'      => 'required|unique:users|alpha_dash|max:16',
-                    'email'         => 'required|email',
-                    'notelp'        => 'required|regex:/(0)[0-9]{9}/',
-                    'password'      => 'required|alpha_dash',
-                    'id_cabang'     => 'required|numeric',
-                    'id_parent'     => 'required|numeric',
+                    'transid'           => 'required|string|max:14',
+                    'type_insurance'    => 'required|string',
+                    'cabang'            => 'required|integer',
+                    'alamat_cabang'     => 'required|string',
+                    'insured'           => 'required|integer',
+                    'nik_insured'       => 'integer',
+                    'npwp_insured'      => 'required|string',
+                    'alamat_insured'    => 'required|string',
+                    'nopinjaman'        => 'required|integer',
+                    'plafond_kredit'    => 'required|integer',
+                    'policy_no'         => 'alpha_dash',
+                    'nopolis_lama'      => 'alpha_dash',
+                    'masa'              => 'required|integer',
+                    'periode_start'     => 'required|string',
+                    'periode_end'       => 'required|string',
+                    'okupasi'           => 'required|integer',
+                    'lokasi_okupasi'    => 'required|string',
+                    'kodepos'           => 'required|integer',
                 ]);
 
-                $user = $user->update([
-                    'name'          => $request->name,
-                    'username'      => $request->username,
-                    'email'         => $request->email,
-                    'notelp'        => $request->notelp,
-                    'password'      => Hash::make($request->password),
-                    'unpass'        => $request->password,
-                    'id_cabang'     => $request->id_cabang,
-                    'id_parent'     => $request->id_parent,
-                    'updated_at'    => date('Y-m-d h:m:s'),
+                $date_start = explode("/", $request->periode_start);
+                $date_end   = explode("/", $request->periode_end);
+
+                $insured = Insured::updateOrCreate(
+                    ['id' => $request->insured],
+                    [
+                        'nik_insured'       => $request->nik_insured,
+                        'nama_insured'      => $request->insured,
+                        'npwp_insured'      => $request->npwp_insured,
+                        'alamat_insured'    => $request->alamat_insured,
+                        'create_by'         => Auth::user()->id,
+                    ]
+                );
+
+                if ($insured->wasRecentlyCreated) {
+                    $detail = "Pembuatan Tertanggung Baru:<br>
+                               - Nama: $request->insured";
+                    if (!empty($request->nik_insured)) {
+                        $detail .= "<br>- NIK: $request->nik_insured";
+                    }
+                    if (!empty($request->npwp_insured)) {
+                        $detail .= "<br>- NPWP: $request->npwp_insured";
+                    }
+                    if (!empty($request->alamat_insured)) {
+                        $detail .= "<br>- Alamat: $request->alamat_insured";
+                    }
+                    $this->aktifitas($request->transid, '7', $detail);
+                } else {
+                    $tertanggung = Insured::find($request->insured);
+                    $detail = "Perubahan Tertanggung a/n $tertanggung->nama_insured:";
+                    if (!empty($request->nik_insured)) {
+                        $detail .= "<br>- NIK: $request->nik_insured";
+                    }
+                    if (!empty($request->npwp_insured)) {
+                        $detail .= "<br>- NPWP: $request->npwp_insured";
+                    }
+                    if (!empty($request->alamat_insured)) {
+                        $detail .= "<br>- Alamat: $request->alamat_insured";
+                    }
+                    $this->aktifitas($request->transid, '7', $detail);
+                }
+
+                $cabang = Cabang::updateOrCreate(
+                    ['id' => $request->cabang],
+                    [
+                        'nama_cabang' => $request->cabang,
+                        'alamat_cabang' => $request->alamat_cabang,
+                    ]
+                );
+
+                if ($cabang->wasRecentlyCreated) {
+                    $detail = "Pembuatan Cabang Baru:<br>
+                               - Cabang: $request->cabang";
+                    if (!empty($request->alamat_cabang)) {
+                        $detail .= "<br>- Alamat Cabang: $request->alamat_cabang";
+                    }
+                    $this->aktifitas($request->transid, '7', $detail);
+                } else {
+                    $cbg = Cabang::find($request->cabang);
+                    $detail = "Perubahan Cabang $cbg->nama_cabang:";
+                    if (!empty($request->alamat_cabang)) {
+                        $detail .= "<br>- Alamat Cabang: $request->alamat_cabang";
+                    }
+                    $this->aktifitas($request->transid, '7', $detail);
+                }
+
+                $save = Transaksi::create([
+                    'transid'           => $request->transid,
+                    'id_instype'        => $request->type_insurance,
+                    'id_insured'        => $insured->id,
+                    'id_cabang'         => $cabang->id,
+                    'nopinjaman'        => $request->nopinjaman,
+                    'plafond_kredit'    => $request->plafond_kredit,
+                    'policy_no'         => $request->policy_no,
+                    'policy_parent'     => $request->nopolis_lama,
+                    'masa'              => $request->masa,
+                    'id_status'         => '0',
+                    'periode_start'     => $date_start[2] . "/" . $date_start[1] . "/" . $date_start[0],
+                    'periode_end'       => $date_end[2] . "/" . $date_end[1] . "/" . $date_end[0],
+                    'id_okupasi'        => $request->okupasi,
+                    'location'          => $request->lokasi_okupasi,
+                    'id_kodepos'        => $request->kodepos,
+                    'created_by'        => Auth::user()->id,
                 ]);
 
-                $user->syncRoles($request->level);
-
-                // $student = Student::where('id', $student->id)->first();
+                $this->aktifitas($request->transid, '0', 'Pembuatan data pengajuan');
 
                 return response()->json([
-                    'message'   => 'User ' . $request->name . ' Berhasil Diubah',
-                    'data'      => $user,
+                    'message'   => 'Pengajuan ' . $request->name . ' Berhasil Dibuat',
+                    'data'      => $save,
                 ], 200);
                 break;
 
@@ -255,7 +437,7 @@ class ProcessController extends Controller
             'id_transaksi'  => $transid,
             'id_status'     => $status,
             'deskripsi'     => $deskripsi,
-            'create_by'     => Auth::user()->id
+            'created_by'     => Auth::user()->id
         ]);
     }
 }

@@ -56,7 +56,6 @@ class PageController extends Controller
             $data['act']        = 'edit';
             $data['data']       = $dataController->dataPengajuan($transid);
             $data['pricing']    = $dataController->dataPricing($transid);
-            $data['activity']   = $dataController->dataAktifitas($transid);
             // dd($data['document']);
         } else {
             Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);

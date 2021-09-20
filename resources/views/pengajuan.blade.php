@@ -6,16 +6,19 @@
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
             Formulir Pengajuan @if (!empty($data->tertanggung)){!! 'a/n <b>' . $data->tertanggung . '</b><br>' !!}@endif
+            @if (empty($method) && empty($data))
+                <button class="btn btn-sm btn-primary" id="btn-add">Simpan</button>
+            @endif
             @if ($method == 'update')
-                <button class="btn btn-sm btn-primary">Simpan</button>
-                <button class="btn btn-sm btn-primary">Perpanjang</button>
+                <button class="btn btn-sm btn-primary" id="btn-update">Simpan</button>
+                <button class="btn btn-sm btn-primary" id="btn-perpanjang">Perpanjang</button>
             @endif
             @if ($method == 'view')
-                <button class="btn btn-sm btn-success">Setujui</button>
-                <button class="btn btn-sm btn-success">Ajukan</button>
-                <button class="btn btn-sm btn-success">Aktifkan</button>
-                <button class="btn btn-sm btn-warning">Kembalikan</button>
-                <button class="btn btn-sm btn-danger">Hapus</button>
+                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
+                <button class="btn btn-sm btn-success btn-approve">Aktifkan</button>
+                <button class="btn btn-sm btn-warning" id="btn-rollback">Kembalikan</button>
+                <button class="btn btn-sm btn-danger" id="btn-hapus">Hapus</button>
             @endif
         </h2>
     </div>
@@ -46,17 +49,13 @@
                                 </div>
                             @endif
                             <div class="form-inline mt-5">
-                                <label for="type-insurance" class="ml-3 form-label sm:w-20">Tipe Asuransi</label>
-                                <select id="type-insurance" name="type-insurance" required style="width:100%">
+                                <label for="type_insurance" class="ml-3 form-label sm:w-20">Tipe Asuransi</label>
+                                <select id="type_insurance" name="type_insurance" required style="width:100%">
                                     @foreach ($instype as $val)
                                         <option value="{{ $val->msid }}" @if (!empty($data->id_instype) && $val->msid == $data->id_instype) selected @endif>{{ $val->msdesc }}
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
-                            <div class="form-inline mt-1 extended-clause" style="display:none">
-                                <label class="form-label sm:w-20"></label>
-                                <label>Sudah Termasuk: RSMDCC, TSFWD, Others</label>
                             </div>
                             @if (!empty($data) && $data->id_status >= 2)
                             <div class="form-inline mt-5">
@@ -103,7 +102,7 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="npwp_insured" class="form-label sm:w-20">NPWP Tertanggung</label>
-                                <input type="text" id="npwp_insured" class="form-control" required name="npwp_insured"
+                                <input type="text" id="npwp_insured" class="form-control" required
                                     @if (!empty($data->npwp_insured)) value="{{ $data->npwp_insured }}" @endif>
                             </div>
                             <div class="form-inline mt-5">
@@ -116,9 +115,9 @@
                                     id="nopinjaman" value="@if (!empty($data->nopinjaman)){{ $data->nopinjaman }}@endif">
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="plafond-kredit" class="form-label sm:w-20">Plafond Kredit</label>
-                                <input type="text" class="form-control allow-decimal currency" placeholder="Plafond Kredit" name="plafond-kredit"
-                                    id="plafond-kredit" value="@if (!empty($data->plafond_kredit)){{ $data->plafond_kredit }}@endif">
+                                <label for="plafond_kredit" class="form-label sm:w-20">Plafond Kredit</label>
+                                <input type="text" class="form-control allow-decimal currency" placeholder="Plafond Kredit"
+                                    id="plafond_kredit" value="@if (!empty($data->plafond_kredit)){{ $data->plafond_kredit }}@endif">
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
@@ -126,11 +125,11 @@
                                     id="policy_no" value="@if (!empty($data->policy_no)){{ $data->policy_no }}@endif">
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="nopolis-lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
+                                <label for="nopolis_lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
                                 <div class="input-group w-full">
-                                    <input type="text" class="form-control" placeholder="Nomor Polis Lama" name="nopolis-lama"
-                                        id="nopolis-lama" value="@if (!empty($data->policy_parent)){{ $data->policy_parent }}@endif">
-                                    <div id="nopolis-lama" class="input-group-text">Jika Renewal.</div>
+                                    <input type="text" class="form-control" placeholder="Nomor Polis Lama" name="nopolis_lama"
+                                        id="nopolis_lama" value="@if (!empty($data->policy_parent)){{ $data->policy_parent }}@endif">
+                                    <div id="nopolis_lama" class="input-group-text">Jika Renewal.</div>
                                 </div>
                             </div>
                             <div class="form-inline mt-5">
@@ -144,26 +143,30 @@
                             <div class="form-inline mt-5">
                                 <label for="masa" class="ml-3 form-label sm:w-20">Periode KJPP</label>
                                 <div class="input-group w-full">
-                                    <input id="periode-start" name="periode-start" class="date-range form-control w-full block mx-auto text-center" required
+                                    <input id="periode_start" name="periode_start" class="date-range form-control w-full block mx-auto text-center" required
                                     value="@if (!empty($data->periode_start)){{ date_format(date_create($data->periode_start), 'd/m/Y') }}@endif">
                                     <div id="masa" class="input-group-text"> s/d </div>
-                                    <input readonly id="periode-end" name="periode-end" class="date-range form-control w-full block mx-auto text-center" required
+                                    <input readonly id="periode_end" name="periode_end" class="date-range form-control w-full block mx-auto text-center" required
                                     value="@if (!empty($data->periode_end)){{ date_format(date_create($data->periode_end), 'd/m/Y') }}@endif">
                                 </div>
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
                                 <select id="okupasi" class="w-full" name="okupasi" required>
-                                    @foreach ($okupasi as $val)
+                                    {{-- @foreach ($okupasi as $val)
                                         <option value="{{ $val->id }}" @if (!empty($data->id_okupasi) && $val->id === $data->id_okupasi) selected="true" @endif>
                                             {{ $val->kode_okupasi . ' - (' . $val->rate . ' ‰) ' . $val->nama_okupasi }}
                                         </option>
-                                    @endforeach
+                                    @endforeach --}}
                                 </select>
                             </div>
+                            <div class="form-inline mt-1 extended-clause" style="display:none">
+                                <label class="form-label sm:w-20"></label>
+                                <label>Sudah Termasuk: RSMDCC, TSFWD, Others</label>
+                            </div>
                             <div class="form-inline mt-5">
-                                <label for="lokasi" class="form-label sm:w-20">Lokasi Okupasi</label>
-                                <textarea id="lokasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
+                                <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
+                                <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
@@ -290,32 +293,16 @@
                     <div class="p-5" id="responsive-table">
                         <div class="preview">
                             <div class="overflow-x-auto">
-                                <table class="table dt-table">
+                                <table class="table" id="tb-aktifitas">
                                     <thead>
                                         <tr>
-                                            <th class="border-b-2 dark:border-dark-5">#</th>
-                                            <th class="border-b-2 dark:border-dark-5">Status</th>
                                             <th class="border-b-2 dark:border-dark-5">Tanggal</th>
+                                            <th class="border-b-2 dark:border-dark-5">Status</th>
                                             <th class="border-b-2 dark:border-dark-5">User</th>
                                             <th class="border-b-2 dark:border-dark-5">Keterangan</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <?php
-                                        $i = 1;
-                                        foreach($activity as $actv) {
-                                        ?>
-                                        <tr>
-                                            <td class="border-b">{{ $i++ }}</td>
-                                            <td class="border-b">{{ $actv->statusnya }}</td>
-                                            <td class="border-b whitespace-nowrap">{{ $actv->created_at }}</td>
-                                            <td class="border-b whitespace-nowrap">{{ $actv->username }}</td>
-                                            <td class="border-b">{{ $actv->deskripsi }}</td>
-                                        </tr>
-                                        <?php
-                                            }
-                                        ?>
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -329,13 +316,6 @@
 
 @section('script')
     <script>
-        function cekType() {
-            if ($("#type-insurance").val() === "PAR") {
-                $('.extended-clause').removeAttr('style');
-            } else {
-                $('.extended-clause').css('display', 'none');
-            }
-        }
         function reloadTable() {
             $('#tb-dokumen').DataTable().ajax.reload();
         }
@@ -353,7 +333,7 @@
 
             $('.dt-table').DataTable();
             @if ($act !== 'add')
-                var tablenya = $('#tb-dokumen').DataTable({
+                var tableDokumen = $('#tb-dokumen').DataTable({
                     "lengthMenu": [[5, 10, 25, 50], [5, 10, 25, 50]],
                     "serverSide":true,
                     "ajax": {
@@ -400,25 +380,123 @@
                         $("#tb-dokumen_filter label input").unbind();
                         $("#tb-dokumen_filter label input").bind('keyup', function(e) {
                             if(e.keyCode == 13) {
-                                tablenya.search( this.value ).draw();
+                                tableDokumen.search( this.value ).draw();
                             }
                         }); 
                     }
                 }).on('draw',function(){
-                    paginatioon(tablenya,$('#tb-dokumen_paginate > ul.pagination'));
+                    paginatioon(tableDokumen,$('#tb-dokumen_paginate > ul.pagination'));
                     $('.gotoPage').click(function() {
-                        gotoPage($(this),tablenya);
+                        gotoPage($(this),tableDokumen);
                     });
                     $("[name='tb-dokumen_length']").change(function(){
-                        tablenya.ajax.reload();
+                        tableDokumen.ajax.reload();
                     });
                     
                     feather.replace();
                 });
+
+                var tableAktifitas = $('#tb-aktifitas').DataTable({
+                    "lengthMenu": [[5, 10, 25, 50], [5, 10, 25, 50]],
+                    "serverSide":true,
+                    "ajax": {
+                        url: "{{ url('api/dataaktifitas') }}",
+                        headers: {
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        },
+                        type: "POST",
+                        data: function(d) {
+                            d.search = $("#tb-aktifitas_filter label input").val();
+                            d.transid = '{{ $data->transid }}';
+                            d._token = '{{ csrf_token() }}';
+                            // d.length = $("[name='tb-aktifitas_length']").val();
+                        },
+                        // success: function(d) {
+                        //     console.log('sql:', d);
+                        // },
+                        error: function(d) {
+                            console.log('error:', d.responseText);
+                        },
+                    },
+                    "initComplete": function(settings, json) {
+                        $("#tb-aktifitas_filter label input").unbind();
+                        $("#tb-aktifitas_filter label input").bind('keyup', function(e) {
+                            if(e.keyCode == 13) {
+                                tableAktifitas.search( this.value ).draw();
+                            }
+                        });
+                    }
+                }).on('draw',function(){
+                    paginatioon(tableAktifitas,$('#tb-aktifitas_paginate > ul.pagination'));
+                    $('.gotoPage').click(function() {
+                        gotoPage($(this),tableAktifitas);
+                    });
+                    $("[name='tb-aktifitas_length']").change(function(){
+                        tableAktifitas.ajax.reload();
+                    });
+                    
+                    feather.replace();
+                });
+                
             @endif
+            function cekType() {
+                console.log('kepanggil');
+                if ($("#type_insurance").val() === "PAR") {
+                    $('.extended-clause').removeAttr('style');
+                } else {
+                    $('.extended-clause').css('display', 'none');
+                }
+
+                // $('#okupasi option').remove();
+                $("#okupasi").select2({
+                    placeholder: "Pilih Okupasi",
+                    ajax: {
+                        dataType: "json",
+                        url: "{{ url('api/selectokupasi') }}",
+                        headers: {
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        },
+                        data: function(params) {
+                            return {
+                                search: params.term,
+                                instype: $("#type_insurance").val(),
+                            };
+                        },
+                        processResults: function(data, page) {
+                            // console.log('data', data);
+                            return {
+                                results: data,
+                            };
+                        },
+                    },
+                });
+                // $("#okupasi").select2({
+                //     language: "id",
+                //     placeholder: "Pilih Okupasi",
+                //     ajax: {
+                //         dataType: "json",
+                //         url: "{{ url('api/selectokupasi') }}",
+                //         headers: {
+                //             'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                //         },
+                //         data: function(params) {
+                //             return {
+                //                 "_token": "{{ csrf_token() }}",
+                //                 "search": params.term,
+                //                 "instype": $("#type_insurance").val(),
+                //             };
+                //         },
+                //         processResults: function(data, page) {
+                //             return {
+                //                 results: data,
+                //             };
+                //         },
+                //     },
+                // });
+            }
             cekType();
             $('select').select2();
-            $('#type-insurance').change(function() {
+            $('#type_insurance').change(function() {
                 cekType();
             });
 
@@ -469,8 +547,6 @@
                         };
                     },
                 },
-            }).on('select2:clearing', function(e) {
-                // do something
             });
 
             $('#insured').on('select2:select', function(e) {
@@ -496,22 +572,47 @@
                     format: 'DD/MM/YYYY'
                 },
             }, function(start, end, label) {
-                $('#periode-end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
+                $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
             });
 
             $('#masa').keyup(function(){
-                var tgl   = $('#periode-start').val(),
+                var tgl   = $('#periode_start').val(),
                     pecah = tgl.split("/"),
                     tgl_moment = pecah[2]+pecah[1]+pecah[0];
                 // console.log(tgl_moment);
                 // console.log(moment(tgl_moment).add($('#masa').val(), 'month'));
-                $('#periode-end').data('daterangepicker').setStartDate(moment(tgl_moment).add($('#masa').val(), 'month'));
+                $('#periode_end').data('daterangepicker').setStartDate(moment(tgl_moment).add($('#masa').val(), 'month'));
             })
 
             @if (empty($method) && !empty($data))
                 $("#frm-data-nasabah :input").prop('disabled', true);
                 $("#frm-pertanggungan :input").prop('disabled', true);
             @endif
+
+            $('#btn-add').click(function(){
+                var btnHtml = $(this).html(),
+                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
+                    npwp = $('#npwp_insured').inputmask('unmaskedvalue'),
+                    plafond = $('#plafond_kredit').inputmask('unmaskedvalue'),
+                    nama_insured = $('#insured option:selected').text(),
+                    nama_cabang = $('#cabang option:selected').text();
+                $(this).attr('disabled',true).html(loading);
+
+                $.ajax({
+                    url: "{{ url('api/pengajuan') }}",
+                    method: "POST",
+                    data: $('#frm-data-nasabah, #frm-pertanggungan').serialize() + "&method=create&_token={{ csrf_token() }}&npwp_insured="+npwp+"&plafond_kredit="+plafond+"&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    success: function(d) {
+                        console.log('success: ',d);
+                    },
+                    error: function(d) {
+                        console.log('error: ', d);
+                    }
+                })
+            });
         });
     </script>
 @endsection
