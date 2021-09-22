@@ -287,11 +287,17 @@
                 window.open("{{ url('pengajuan') }}/"+transid);
             });
 
+            $('#ps-ajukan').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[0];
+                $('#frm-method').val('approve');
+                $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
+            });
+
             $('#ps-ubah').click(function(e) {
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('update');
-                $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
                 // window.open("{{ url('pengajuan') }}/"+selected[0]);
             });
         });

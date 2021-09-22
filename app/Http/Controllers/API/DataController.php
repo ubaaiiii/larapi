@@ -62,22 +62,23 @@ class DataController extends Controller
         }
         return response()->json($list);
     }
-
+    
     public function selectOkupasi(Request $request)
     {
         $okupasi = Okupasi::select('id','kode_okupasi', 'nama_okupasi', 'rate')
-            ->where('instype',$request->instype);
+        ->where('instype',$request->instype);
         if (!empty($request->search)) {
             $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
-                ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%');
+            ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%');
         }
-        $okupasi = $okupasi->get();
-
+        $okupasi = $okupasi->orderBy('kode_okupasi')->get();
+        
         $list = [];
         $key = 0;
         foreach ($okupasi as $row) {
             $list[$key]['id'] = $row['id'];
-            $list[$key]['text'] = $row['kode_okupasi'] . " - (" . $row['rate'] . ")" . $row['nama_okupasi'];
+            $list[$key]['text'] = $row['kode_okupasi'] . " - (" . $row['rate'] . " ‰) " . $row['nama_okupasi'];
+            $list[$key]['rate'] = $row['rate'];
             $key++;
         }
         return response()->json($list);
@@ -165,18 +166,15 @@ class DataController extends Controller
         ];
 
         $select = [
-            'transid',
+            'transaksi.*',
             'itp.msdesc as tipeins',
             'insured.nama_insured as tertanggung',
-            'policy_no',
             'transaksi.created_at as tgl_dibuat',
             'tsi.value as tsi',
             'premi.value as premi',
             'sts.msdesc as statusnya',
-            'id_status',
-            'periode_start',
-            'periode_end',
             'cabang.nama_cabang as cabang',
+            'cabang.alamat_cabang',
         ];
 
         $table = DB::table("transaksi");
@@ -252,27 +250,15 @@ class DataController extends Controller
     public function dataPengajuan($transid)
     {
         $select = [
-            'transid',
-            'id_instype',
-            'id_cabang',
+            'transaksi.*',
             'alamat_cabang',
-            'id_insured',
-            'id_status',
             'insured.nama_insured as tertanggung',
             'insured.npwp_insured',
             'insured.nik_insured',
             'insured.alamat_insured',
-            'policy_no',
-            'policy_parent',
-            'periode_start',
-            'periode_end',
-            'id_okupasi',
-            'id_asuransi',
-            'nopinjaman',
-            'plafond_kredit',
-            'masa',
-            'location',
-            'id_kodepos',
+            'okupasi.kode_okupasi',
+            'okupasi.nama_okupasi',
+            'okupasi.rate',
             'kecamatan',
             'kelurahan',
             'kodepos'
@@ -281,6 +267,7 @@ class DataController extends Controller
             ->leftJoin('cabang', 'id_cabang', '=', 'cabang.id')
             ->leftJoin('insured', 'id_insured', '=', 'insured.id')
             ->leftJoin('kodepos', 'id_kodepos', '=', 'kodepos.id')
+            ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
             ->where('transid', '=', $transid)
             ->select($select)
             ->first();

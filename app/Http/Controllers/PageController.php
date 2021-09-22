@@ -44,7 +44,8 @@ class PageController extends Controller
             'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Master::where('mstype', 'instype')->get(),
             'act'       => 'add',
-            'price'     => KodeTrans::where('visible', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'price'     => KodeTrans::where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'hitung'    => KodeTrans::where('hitung', true)->get(),
             'transid'   => Sequential::where('seqdesc', 'transid')->first(),
             'method'    => $request->method,
         ];
@@ -107,7 +108,7 @@ class PageController extends Controller
         $data = [
             'cabang'    => Cabang::all(),
             'asuransi'  => Master::where('mstype', 'insurance')->get(),
-            'laporan'   => Laporan::where('laplevel', Auth::user()->level)->get(),
+            'laporan'   => Laporan::where('laplevel', Auth::user()->getRoleNames()[0])->get(),
             'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Master::where('mstype', 'instype')->get(),
         ];

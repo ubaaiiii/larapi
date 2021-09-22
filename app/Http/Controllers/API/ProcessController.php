@@ -159,7 +159,15 @@ class ProcessController extends Controller
 
     public function pengajuan(Request $request)
     {
-        return $request->all();
+        // $cbg = Cabang::find($request->cabang);
+        // $data['update'] = false;
+        // if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
+        //     $data['request alamat'] = $request->alamat_cabang;
+        //     $data['database alamat'] = $cbg->alamat_cabang;
+        //     $data['update'] = true;
+        // }
+        // return $data;
+        $update = null;
         switch ($request->method) {
             case 'create':
                 $request->validate([
@@ -181,6 +189,9 @@ class ProcessController extends Controller
                     'okupasi'           => 'required|numeric',
                     'lokasi_okupasi'    => 'required|string',
                     'kodepos'           => 'required|numeric',
+                    'catatan'           => 'string|nullable',
+                    'kodetrans-value'   => 'required|array|min:1|nullable',
+                    'kodetrans-remarks' => 'array|nullable',
                 ]);
 
                 $date_start = explode("/",$request->periode_start);
@@ -188,9 +199,6 @@ class ProcessController extends Controller
 
                 if (!is_numeric($request->insured)) {
                     $request->insured = null;
-                }
-                if (!is_numeric($request->cabang)) {
-                    $request->cabang = null;
                 }
 
                 $insured = Insured::updateOrCreate(
@@ -206,7 +214,7 @@ class ProcessController extends Controller
 
                 if ($insured->wasRecentlyCreated){
                     $detail = "Pembuatan Tertanggung Baru:<br>
-                               - Nama: $request->nama_insured";
+                               - Nama: ". strtoupper($request->nama_insured);
                     if (!empty($request->nik_insured)) {
                         $detail .= "<br>- NIK: $request->nik_insured";
                     }
@@ -219,21 +227,22 @@ class ProcessController extends Controller
                     $this->aktifitas($request->transid,'7',$detail);
                 } else {
                     $tertanggung = Insured::find($request->insured);
-                    $detail = "Perubahan Tertanggung a/n $tertanggung->nama_insured:";
-                    $update = false;
+                    $detail = "Perubahan Tertanggung a/n ". strtoupper($tertanggung->nama_insured) . ":";
+                    $update['insured'] = false;
                     if (!empty($request->nik_insured) && $request->nik_insured !== $tertanggung->nik_insured) {
-                        $update = true;
+                        $update['insured'] = true;
                         $detail .= "<br>- NIK: $tertanggung->nik_insured menjadi $request->nik_insured";
                     }
                     if (!empty($request->npwp_insured) && $request->npwp_insured !== $tertanggung->npwp_insured) {
-                        $update = true;
+                        $update['insured'] = true;
                         $detail .= "<br>- NPWP: $tertanggung->npwp_insured menjadi $request->npwp_insured";
                     }
                     if (!empty($request->alamat_insured) && $request->alamat_insured !== $tertanggung->alamat_insured) {
-                        $update = true;
+                        $update['insured'] = true;
                         $detail .= "<br>- Alamat: $tertanggung->alamat_insured menjadi $request->alamat_insured";
                     }
-                    if ($update){
+                    if ($update['insured']){
+                        $update['insured-detail'] = $detail;
                         $this->aktifitas($request->transid,'7',$detail);
                     }
                 }
@@ -241,30 +250,21 @@ class ProcessController extends Controller
                 $cabang = Cabang::updateOrCreate(
                     ['id' => $request->cabang],
                     [
-                        'nama_cabang'   => strtoupper($request->nama_cabang),
                         'alamat_cabang' => $request->alamat_cabang,
                         'created_by'    => Auth::user()->id,
                     ]
                 );
 
-                if ($cabang->wasRecentlyCreated) {
-                    $detail = "Pembuatan Cabang Baru:<br>
-                               - Cabang: $request->nama_cabang";
-                    if (!empty($request->alamat_cabang)) {
-                        $detail .= "<br>- Alamat Cabang: $request->alamat_cabang";
-                    }
+                $cbg = Cabang::find($request->cabang);
+                $detail = "Perubahan Cabang ".strtoupper($cbg->nama_cabang).":";
+                $update['cabang'] = false;
+                if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
+                    $update['cabang'] = true;
+                    $detail .= "<br>- Alamat Cabang: $cbg->alamat_cabang menjadi $request->alamat_cabang";
+                }
+                if ($update['cabang']) {
+                    $update['cabang-detail'] = $detail;
                     $this->aktifitas($request->transid, '7', $detail);
-                } else {
-                    $cbg = Cabang::find($request->cabang);
-                    $detail = "Perubahan Cabang $cbg->nama_cabang:";
-                    $update = false;
-                    if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
-                        $update = true;
-                        $detail .= "<br>- Alamat Cabang: $cbg->alamat_cabang menjadi $request->alamat_cabang";
-                    }
-                    if ($update) {
-                        $this->aktifitas($request->transid, '7', $detail);
-                    }
                 }
 
                 $save = Transaksi::create([
@@ -283,6 +283,7 @@ class ProcessController extends Controller
                     'id_okupasi'        => $request->okupasi,
                     'location'          => $request->lokasi_okupasi,
                     'id_kodepos'        => $request->kodepos,
+                    'catatan'           => $request->catatan,
                     'created_by'        => Auth::user()->id,
                 ]);
 
@@ -291,6 +292,7 @@ class ProcessController extends Controller
                 return response()->json([
                     'message'   => 'Pengajuan ' . $request->name . ' Berhasil Dibuat',
                     'data'      => $save,
+                    'update'    => $update
                 ], 200);
                 break;
 
@@ -410,19 +412,59 @@ class ProcessController extends Controller
                 break;
 
             case 'delete':
-                $user = User::find($request->id);
+                $data = Transaksi::find($request->transid);
+                $data->delete();
 
-                $user->syncRoles('ao');
-                $user->removeRole('ao');
+                if (!empty($request->catatan)) {
+                    $catatan = "";
+                }
 
-                $user->delete();
+                $this->aktifitas($request->transid, '8', 'Penghapusan data '.$request->transid);
 
                 return response()->json([
-                    'message'   => 'User ' . $request->name . ' Berhasil Dihapus',
-                    'data'      => $user,
+                    'message'   => 'Transaksi '.$request->transid.' berhasil dihapus',
+                    'data'      => $data,
                 ], 200);
                 break;
-            
+
+            case 'approve':
+                $role = Auth::user()->getRoleNames()[0];
+                switch ($role) {
+                    case 'ao':
+                        $status = 1;
+                        $string = "ajukan";
+                        break;
+                    case 'broker':
+                        $status = 2;
+                        $string = "verifikasi";
+                        break;
+                    case 'insurance':
+                        $status = 3;
+                        $string = "setujui";
+                        break;
+                    case 'checker':
+                        $status = 4;
+                        $string = "aktifkan";
+                        break;
+                    
+                    default:
+                        return redirect()->route('logout');
+                        break;
+                }
+
+                $data = Transaksi::where('transid',$request->transid)->update([
+                    'id_status' => $status,
+                ]);
+                
+                $this->aktifitas($request->transid, $status, 'Approval by '. $role);
+                
+                return response()->json([
+                    'message'   => 'Debitur '. $request->nama_insured ." berhasil di".$string,
+                    'data'      => $data,
+                ], 200);
+
+                break;
+
             default:
                 return response()->json([
                     'message'   => 'Method Not Found',

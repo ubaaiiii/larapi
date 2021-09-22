@@ -13,10 +13,18 @@
                 <button class="btn btn-sm btn-primary" id="btn-update">Simpan</button>
                 <button class="btn btn-sm btn-primary" id="btn-perpanjang">Perpanjang</button>
             @endif
-            @if ($method == 'view')
-                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+            @if ($method == 'approve')
+                @role('ao')
                 <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
+                @endrole
+                @role('broker|insurance')
+                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                @endrole
+                @role('checker')
                 <button class="btn btn-sm btn-success btn-approve">Aktifkan</button>
+                @endrole
+            @endif
+            @if ($method == 'view')
                 <button class="btn btn-sm btn-warning" id="btn-rollback">Kembalikan</button>
                 <button class="btn btn-sm btn-danger" id="btn-hapus">Hapus</button>
             @endif
@@ -154,7 +162,7 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
-                                <select id="okupasi" class="w-full" name="okupasi" required>
+                                <select id="okupasi" style="width:100%" name="okupasi" required>
                                     {{-- @foreach ($okupasi as $val)
                                         <option value="{{ $val->id }}" @if (!empty($data->id_okupasi) && $val->id === $data->id_okupasi) selected="true" @endif>
                                             {{ $val->kode_okupasi . ' - (' . $val->rate . ' ‰) ' . $val->nama_okupasi }}
@@ -170,6 +178,13 @@
                                 <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
                                 <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                             </div>
+                            @if (!empty($data->okupasi))
+                                <script>
+                                    var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
+                                        {{ $data->id_kodepos }}, false, false);
+                                    $('#kodepos').append(newOption).trigger('change');
+                                </script>
+                            @endif
                             <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
                                 <select id="kodepos" style="width:100%" name="kodepos" required>
@@ -211,11 +226,12 @@
                                 <tr>
                                     <td>
                                         <div class="input-group">
-                                            <div class="input-group-text">{{ $row->kodetrans_formula }}</div>
+                                            <div class="input-group-text">{{ $row->kodetrans_kode }}</div>
                                             <input style="text-align:right;" type="text"
                                                 class="form-control allow-decimal tsi currency masked"
                                                 placeholder="{{ $row->kodetrans_nama }}"
                                                 aria-label="{{ $row->kodetrans_nama }}"
+                                                d-input="{{ $row->kodetrans_input }}"
                                                 id="kodetrans-value[{{ $row->kodetrans_id }}]"
                                                 value="@if (!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
                                             <input type="hidden" name="kodetrans-value[{{ $row->kodetrans_id }}]">
@@ -229,7 +245,7 @@
                                 <td colspan="2">
                                     <div class="input-group">
                                         <div id="group-t" class="input-group-text">Total</div>
-                                        <input style="text-align:right;" id="kodetrans-value[1]" type="text"
+                                        <input style="text-align:right;" id="kodetrans-value[1]" type="text" d-input="TSI"
                                             class="currency form-control allow-decimal masked total-si" placeholder="Total Nilai Pertanggungan"
                                             aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
                                             value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
@@ -237,9 +253,37 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="input-group">
+                                        <div id="group-t" class="input-group-text">Premium</div>
+                                        <input style="text-align:right;" id="kodetrans-value[2]" type="text" d-input="PREMI"
+                                            class="currency form-control allow-decimal masked total-si" placeholder="Premium"
+                                            aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
+                                            value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
+                                        <input type="hidden" name="kodetrans-value[2]">
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </form>
+            </div>
+            <div class="intro-y box mt-5">
+                <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200 dark:border-dark-5">
+                    <h2 class="font-medium text-base mr-auto">
+                        Catatan
+                    </h2>
+                </div>
+                <div id="horizontal-form" class="p-5">
+                    <form id="frm-data-nasabah">
+                        <div class="preview">
+                            <div class="form-inline">
+                                <textarea id="catatan" name="catatan" class="form-control" required @if (!empty($data->catatan)) @endif>@if (!empty($data->catatan)){{ $data->catatan }}@endif</textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
         @if ($act !== 'add')
@@ -320,10 +364,23 @@
 
 @section('script')
     <script>
+        var RATE = "";
         function reloadTable() {
             $('#tb-dokumen').DataTable().ajax.reload();
         }
+
+        function hitung() {
+            var OKUPASI = $('#okupasi').val(),
+                TSI = $('[d-input="TSI"]').val();
+
+            var @php foreach ($hitung as $row)
+                
+            @endphp
+
+            console.log(tsi);
+        }
         $(document).ready(function() {
+            $('select').select2();
             $('#npwp_insured').inputmask("99.999.999.9-999.999");
             $('#nik_insured').inputmask("9999999999999999");
             $('.date-range').inputmask("99/99/9999");
@@ -437,6 +494,29 @@
                 });
                 
             @endif
+            $("#okupasi").select2({
+                language: "id",
+                allowClear: true,
+                placeholder: "Pilih Okupasi",
+                ajax: {
+                    dataType: "json",
+                    url: "{{ url('api/selectokupasi') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            instype: $("#type_insurance").val(),
+                        };
+                    },
+                    processResults: function(data, page) {
+                        return {
+                            results: data,
+                        };
+                    },
+                },
+            });
             function cekType() {
                 if ($("#type_insurance").val() === "PAR") {
                     $('.extended-clause').removeAttr('style');
@@ -444,14 +524,18 @@
                     $('.extended-clause').css('display', 'none');
                 }
 
-                // $('#okupasi option').remove();
+                $("#okupasi").val("").trigger('change');
+                $("#okupasi option").remove();
+                $("#okupasi").select2("destroy");
                 $("#okupasi").select2({
+                    language: "id",
+                    allowClear: true,
                     placeholder: "Pilih Okupasi",
                     ajax: {
                         dataType: "json",
                         url: "{{ url('api/selectokupasi') }}",
                         headers: {
-                            'Authorization': "Bearer {{ Auth::user()->api_token }}",
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                         },
                         data: function(params) {
                             return {
@@ -460,39 +544,14 @@
                             };
                         },
                         processResults: function(data, page) {
-                            // console.log('data', data);
                             return {
                                 results: data,
                             };
                         },
                     },
                 });
-                // $("#okupasi").select2({
-                //     language: "id",
-                //     placeholder: "Pilih Okupasi",
-                //     ajax: {
-                //         dataType: "json",
-                //         url: "{{ url('api/selectokupasi') }}",
-                //         headers: {
-                //             'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                //         },
-                //         data: function(params) {
-                //             return {
-                //                 "_token": "{{ csrf_token() }}",
-                //                 "search": params.term,
-                //                 "instype": $("#type_insurance").val(),
-                //             };
-                //         },
-                //         processResults: function(data, page) {
-                //             return {
-                //                 results: data,
-                //             };
-                //         },
-                //     },
-                // });
             }
             cekType();
-            $('select').select2();
             $('#type_insurance').change(function() {
                 cekType();
             });
@@ -500,7 +559,6 @@
             $("#kodepos").select2({
                 language: "id",
                 minimumInputLength: 3,
-                allowClear: true,
                 placeholder: "Masukkan Nama Kecamatan / Kelurahan / Kode Pos",
                 ajax: {
                     dataType: "json",
@@ -522,6 +580,7 @@
             });
 
             $("#insured").select2({
+                language: "id",
                 minimumInputLength: 3,
                 allowClear: true,
                 tags: true,
@@ -546,16 +605,21 @@
                 },
             });
 
+            $('#okupasi').on('select2:select', function(e) {
+                var data = e.params.data;
+                RATE = data.rate;
+            });
+
             $('#insured').on('select2:select', function(e) {
                 var data = e.params.data;
-                $('#npwp_insured').val("");
-                $('#nik_insured').val("");
+                $('#npwp_insured').val("").trigger('change');
+                $('#nik_insured').val("").trigger('change');
                 $('#alamat').val("");
                 if (data.npwp_insured !== undefined) {
-                    $('#npwp_insured').val(data.npwp_insured);
+                    $('#npwp_insured').val(data.npwp_insured).trigger('change');
                 }
                 if (data.nik_insured !== undefined) {
-                    $('#nik_insured').val(data.nik_insured);
+                    $('#nik_insured').val(data.nik_insured).trigger('change');
                 }
                 if (data.alamat_insured !== undefined) {
                     $('#alamat_insured').val(data.alamat_insured);
@@ -606,8 +670,32 @@
                     error: function(d) {
                         console.log('error: ', d);
                     }
-                })
+                });
             });
+
+            $('.btn-approve').click(function(){
+                var btnHtml = $(this).html(),
+                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...";
+                $(this).attr('disabled',true).html(loading);
+
+                $.ajax({
+                    url: "{{ url('api/pengajuan') }}",
+                    method: "POST",
+                    data: $('#frm-data-nasabah, #frm-pertanggungan').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    success: function(d) {
+                        console.log('success: ',d);
+                    },
+                    error: function(d) {
+                        console.log('error: ', d);
+                    }
+                });
+            });
+
+            $('#kodetrans-value[2]');
+
         });
     </script>
 @endsection
