@@ -210,4 +210,5 @@ $(document).ready(function() {
             $(this).inputmask("unmaskedvalue")
         );
     });
+    $(".date-range").inputmask("99/99/9999 - 99/99/9999");
 });

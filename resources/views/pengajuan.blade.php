@@ -151,14 +151,9 @@
                                 </div>
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="masa" class="ml-3 form-label sm:w-20">Periode KJPP</label>
-                                <div class="input-group w-full">
-                                    <input id="periode_start" name="periode_start" class="date-range form-control w-full block mx-auto text-center" required
-                                    value="@if (!empty($data->periode_start)){{ date_format(date_create($data->periode_start), 'd/m/Y') }}@endif">
-                                    <div id="masa" class="input-group-text"> s/d </div>
-                                    <input readonly id="periode_end" name="periode_end" class="date-range form-control w-full block mx-auto text-center" required
-                                    value="@if (!empty($data->periode_end)){{ date_format(date_create($data->periode_end), 'd/m/Y') }}@endif">
-                                </div>
+                                <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
+                                <input id="range-periode" class="date-range form-control w-full block mx-auto" required
+                                value="@if (!empty($data->periode_start)) {{ date_format(date_create($data->periode_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->periode_end), 'd/m/Y') }} @endif">
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
@@ -371,11 +366,12 @@
 
         function hitung() {
             var OKUPASI = $('#okupasi').val(),
-                TSI = $('[d-input="TSI"]').val();
+                TSI = $('[d-input="TSI"]').inputmask('unmaskedvalue');
 
-            var @php foreach ($hitung as $row)
-                
-            @endphp
+            @foreach ($hitung as $row)
+                var {!! $row->kodetrans_input !!} = {!! $row->kodetrans_formula !!};
+                console.log('{!! $row->kodetrans_input !!}: ',{!! $row->kodetrans_input !!});
+            @endforeach
 
             console.log(tsi);
         }
@@ -383,7 +379,7 @@
             $('select').select2();
             $('#npwp_insured').inputmask("99.999.999.9-999.999");
             $('#nik_insured').inputmask("9999999999999999");
-            $('.date-range').inputmask("99/99/9999");
+            $('.date-range').inputmask("99/99/9999 s/d 99/99/9999");
             $('#masa').inputmask("decimal");
 
             $('.dt-table').DataTable();
@@ -608,6 +604,7 @@
             $('#okupasi').on('select2:select', function(e) {
                 var data = e.params.data;
                 RATE = data.rate;
+                hitung();
             });
 
             $('#insured').on('select2:select', function(e) {
@@ -627,23 +624,19 @@
             });
 
             $('.date-range').daterangepicker({
-                singleDatePicker:true,
                 autoApply: true,
+                showDropdowns: true,
                 locale: {
                     format: 'DD/MM/YYYY'
                 },
             }, function(start, end, label) {
-                $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
+                $('#masa').val(moment.duration(moment.diff(start)).asDays());
+                // $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
             });
 
             $('#masa').keyup(function(){
-                var tgl   = $('#periode_start').val(),
-                    pecah = tgl.split("/"),
-                    tgl_moment = pecah[2]+pecah[1]+pecah[0];
-                // console.log(tgl_moment);
-                // console.log(moment(tgl_moment).add($('#masa').val(), 'month'));
-                $('#periode_end').data('daterangepicker').setStartDate(moment(tgl_moment).add($('#masa').val(), 'month'));
-            })
+                $('#range-periode').data('daterangepicker').setEndDate($('#range-periode').data('daterangepicker').startDate.add($('#masa').val(), 'day'));
+            });
 
             @if (empty($method) && !empty($data))
                 $("#frm-data-nasabah :input").prop('disabled', true);

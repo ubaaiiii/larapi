@@ -45,7 +45,7 @@ class PageController extends Controller
             'instype'   => Master::where('mstype', 'instype')->get(),
             'act'       => 'add',
             'price'     => KodeTrans::where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
-            'hitung'    => KodeTrans::where('hitung', true)->get(),
+            'hitung'    => KodeTrans::where('hitung', true)->whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
             'transid'   => Sequential::where('seqdesc', 'transid')->first(),
             'method'    => $request->method,
         ];
