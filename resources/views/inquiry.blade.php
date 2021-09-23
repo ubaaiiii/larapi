@@ -293,12 +293,12 @@
                 $('#frm-method').val('approve');
                 $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
             });
-
+            
             $('#ps-ubah').click(function(e) {
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('update');
-                // window.open("{{ url('pengajuan') }}/"+selected[0]);
+                $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
             });
         });
     </script>

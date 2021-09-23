@@ -190,6 +190,16 @@ $(document).ready(function() {
         digits: 2,
         radixPoint: ".",
         digitsOptional: false,
+        placeholder: "0",
+    });
+
+    $(".decimal").inputmask("decimal", {
+        alias: "numeric",
+        groupSeparator: ",",
+        autoGroup: true,
+        digits: 0,
+        radixPoint: ".",
+        digitsOptional: false,
         allowMinus: false,
         placeholder: "0",
     });
@@ -205,7 +215,7 @@ $(document).ready(function() {
         });
         $(".total-si").val(sum).trigger('change');
     });
-    $(".masked").change(function() {
+    $(".masked").keyup(function() {
         $("[name='" + $(this).attr("id") + "']").val(
             $(this).inputmask("unmaskedvalue")
         );

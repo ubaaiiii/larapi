@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\API\DataController;
 use App\Models\Asuransi;
 use App\Models\Cabang;
+use App\Models\Instype;
 use App\Models\KodePos;
 use App\Models\KodeTrans;
 use App\Models\Laporan;
@@ -42,16 +43,18 @@ class PageController extends Controller
             'asuransi'  => Asuransi::all(),
             'okupasi'   => Okupasi::all(),
             'level'     => Master::where('mstype', 'level')->get(),
-            'instype'   => Master::where('mstype', 'instype')->get(),
+            'instype'   => Instype::all(),
             'act'       => 'add',
             'price'     => KodeTrans::where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
-            'hitung'    => KodeTrans::where('hitung', true)->whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'formula'   => KodeTrans::whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'value'     => KodeTrans::whereNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'hitung'    => KodeTrans::where('hitung', true)->orderBy('kodetrans_index', 'ASC')->get(),
             'transid'   => Sequential::where('seqdesc', 'transid')->first(),
             'method'    => $request->method,
         ];
         // echo $data['transid']->seqno;
         // die;
-        // dd($data['cabang']);
+        // dd($data['hitung']);
         if (!empty($transid)) {
             $dataController     = new DataController;
             $data['act']        = 'edit';

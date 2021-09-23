@@ -60,7 +60,7 @@
                                 <label for="type_insurance" class="ml-3 form-label sm:w-20">Tipe Asuransi</label>
                                 <select id="type_insurance" name="type_insurance" required style="width:100%">
                                     @foreach ($instype as $val)
-                                        <option value="{{ $val->msid }}" @if (!empty($data->id_instype) && $val->msid == $data->id_instype) selected @endif>{{ $val->msdesc }}
+                                        <option d-brokerage="{{ $val->brokerage_percent }}" value="{{ $val->id }}" @if (!empty($data->id_instype) && $val->id == $data->id_instype) selected @endif>{{ $val->instype_name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -143,17 +143,17 @@
                                 </div>
                             </div>
                             <div class="form-inline mt-5">
+                                <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
+                                <input id="range-periode" class="form-control w-full block mx-auto" required
+                                value="@if (!empty($data->periode_start)) {{ date_format(date_create($data->periode_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->periode_end), 'd/m/Y') }} @endif">
+                            </div>
+                            <div class="form-inline mt-5">
                                 <label for="masa" class="ml-3 form-label sm:w-20">Masa Asuransi</label>
                                 <div class="input-group w-full">
                                     <input type="text" class="form-control" name="masa"
                                         id="masa" value="@if (!empty($data->masa)){{ $data->masa }}@endif" required>
-                                    <div id="masa" class="input-group-text">Bulan</div>
+                                    <div id="masa" class="input-group-text">Hari</div>
                                 </div>
-                            </div>
-                            <div class="form-inline mt-5">
-                                <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
-                                <input id="range-periode" class="date-range form-control w-full block mx-auto" required
-                                value="@if (!empty($data->periode_start)) {{ date_format(date_create($data->periode_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->periode_end), 'd/m/Y') }} @endif">
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
@@ -248,32 +248,58 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <div class="input-group">
-                                        <div id="group-t" class="input-group-text">Premium</div>
-                                        <input style="text-align:right;" id="kodetrans-value[2]" type="text" d-input="PREMI"
-                                            class="currency form-control allow-decimal masked total-si" placeholder="Premium"
-                                            aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
-                                            value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
-                                        <input type="hidden" name="kodetrans-value[2]">
-                                    </div>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
-                </form>
+                
             </div>
             <div class="intro-y box mt-5">
-                <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200 dark:border-dark-5">
-                    <h2 class="font-medium text-base mr-auto">
-                        Catatan
-                    </h2>
+                <div class="intro-y box p-5">
+                    <div class="input-group">
+                        <div id="group-t" class="input-group-text">Premium</div>
+                        <input style="text-align:right;" id="kodetrans-value[2]" type="text" d-input="PREMI"
+                            class="currency form-control allow-decimal masked" placeholder="Premium"
+                            aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
+                            value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
+                        <input type="hidden" name="kodetrans-value[2]">
+                    </div>
+                    <div class="sm:grid grid-cols-2 gap-2">
+                        <div class="mt-2">
+                            <label for="kodetrans-value[10]" class="form-label">Biaya Materai</label>
+                            <input id="kodetrans-value[10]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai">
+                            <input type="hidden" name="kodetrans-value[10]">
+                        </div>
+                        <div class="mt-2">
+                            <label for="kodetrans-value[13]" class="form-label">Biaya Admin</label>
+                            <input id="kodetrans-value[13]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin">
+                            <input type="hidden" name="kodetrans-value[13]">
+                        </div>
+                    </div>
                 </div>
+            </div>
+            @role('adm|broker|insurance')
+            <div class="intro-y box mt-5">
+                <div class="intro-y box p-5">
+                    <div>
+                        <div class="sm:grid grid-cols-2 gap-2">
+                            @foreach ($hitung as $row)
+                            <div class="mt-2">
+                                <label for="kodetrans-value[{{ $row->kodetrans_id }}]" class="form-label">{{ $row->kodetrans_nama }}</label>
+                                <input id="kodetrans-value[{{ $row->kodetrans_id }}]" d-input="{{ $row->kodetrans_input }}" {!! $row->kodetrans_attribute !!} onChange="hitung()" type="text" class="@if(strpos($row->kodetrans_nama, '%') !== false) decimal @else currency @endif allow-decimal masked form-control" placeholder="{{ $row->kodetrans_nama }}" aria-describedby="{{ $row->kodetrans_nama }}">
+                                <input type="hidden" name="kodetrans-value[{{ $row->kodetrans_id }}]">
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            @endrole
+            <div class="intro-y box mt-5">
                 <div id="horizontal-form" class="p-5">
                     <form id="frm-data-nasabah">
                         <div class="preview">
-                            <div class="form-inline">
+                            Catatan
+                            <div class="form-inline mt-2">
                                 <textarea id="catatan" name="catatan" class="form-control" required @if (!empty($data->catatan)) @endif>@if (!empty($data->catatan)){{ $data->catatan }}@endif</textarea>
                             </div>
                         </div>
@@ -359,27 +385,43 @@
 
 @section('script')
     <script>
-        var RATE = "";
+        var RATE = null;
         function reloadTable() {
             $('#tb-dokumen').DataTable().ajax.reload();
         }
 
         function hitung() {
-            var OKUPASI = $('#okupasi').val(),
-                TSI = $('[d-input="TSI"]').inputmask('unmaskedvalue');
-
-            @foreach ($hitung as $row)
+            var OKUPASI = $('#okupasi').val();
+            
+            @foreach ($value as $row)
+            var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans-value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans-value[{!! $row->kodetrans_id !!}]"]').val());
+            @endforeach
+            
+            if (RATE == null || OKUPASI == null || TSI == null) {
+                return false;
+            }
+            
+            @foreach ($formula as $row)
                 var {!! $row->kodetrans_input !!} = {!! $row->kodetrans_formula !!};
-                console.log('{!! $row->kodetrans_input !!}: ',{!! $row->kodetrans_input !!});
             @endforeach
 
-            console.log(tsi);
+            @foreach ($formula as $row)
+                $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }}).trigger('change');
+            @endforeach
+
+            // @foreach ($formula as $row)
+            // console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+            // @endforeach
+            console.log('Premium: ',TSI*RATE/1000);
+            console.log("Admin", ADMIN);
+            console.log("Materai", MATERAI);
+            console.log("Biaya Lain", LAIN);
         }
         $(document).ready(function() {
             $('select').select2();
             $('#npwp_insured').inputmask("99.999.999.9-999.999");
             $('#nik_insured').inputmask("9999999999999999");
-            $('.date-range').inputmask("99/99/9999 s/d 99/99/9999");
+            $('#range-periode').inputmask("99/99/9999 s/d 99/99/9999");
             $('#masa').inputmask("decimal");
 
             $('.dt-table').DataTable();
@@ -520,6 +562,8 @@
                     $('.extended-clause').css('display', 'none');
                 }
 
+                $('[d-input="BROKERPERC"]').val($('#type_insurance option:selected').attr('d-brokerage'));
+
                 $("#okupasi").val("").trigger('change');
                 $("#okupasi option").remove();
                 $("#okupasi").select2("destroy");
@@ -603,7 +647,7 @@
 
             $('#okupasi').on('select2:select', function(e) {
                 var data = e.params.data;
-                RATE = data.rate;
+                RATE = parseFloat(data.rate);
                 hitung();
             });
 
@@ -623,19 +667,30 @@
                 }
             });
 
-            $('.date-range').daterangepicker({
+            var startDate = "",
+                endDate = "";
+
+            $('#range-periode').daterangepicker({
                 autoApply: true,
                 showDropdowns: true,
                 locale: {
                     format: 'DD/MM/YYYY'
                 },
             }, function(start, end, label) {
-                $('#masa').val(moment.duration(moment.diff(start)).asDays());
+                console.log('start: ',start);
+                console.log('end: ',end);
+                startDate = start
+                endDate = end;
+                $('#masa').val(Math.round(moment.duration(end.diff(start)).asDays()));
                 // $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
             });
 
             $('#masa').keyup(function(){
-                $('#range-periode').data('daterangepicker').setEndDate($('#range-periode').data('daterangepicker').startDate.add($('#masa').val(), 'day'));
+                endDate = startDate.add($(this).val(), 'day').format('DD/MM/YYYY');
+                startDate = startDate.subtract($(this).val(), 'day');
+                $('#range-periode').data('daterangepicker').setStartDate(startDate);
+                $('#range-periode').data('daterangepicker').setEndDate(endDate);
+                // $('#range-periode').daterangepicker({ startDate: startDate.format(), endDate: '03/06/2005' });
             });
 
             @if (empty($method) && !empty($data))
