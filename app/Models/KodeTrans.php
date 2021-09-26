@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class KodeTrans extends Model
 {
     use HasFactory;
-    protected $table = "kodetrans";
+    protected $table = "transaksi_kode";
     protected $guarded = [];
 }

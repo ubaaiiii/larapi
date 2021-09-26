@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Pricing extends Model
 {
     use HasFactory;
-    protected $table = "transpricing";
+    protected $table = "transaksi_pricing";
     protected $guarded = [];
 }

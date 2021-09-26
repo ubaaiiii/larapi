@@ -179,9 +179,6 @@ $(document).ready(function() {
         // uppercase select2 search
         $(".select2-search__field").css("text-transform", "uppercase");
     });
-    $("select").keyup(function() {
-        console.log("change");
-    });
 
     $(".currency").inputmask("decimal", {
         alias: "numeric",
@@ -215,6 +212,7 @@ $(document).ready(function() {
         });
         $(".total-si").val(sum).trigger('change');
     });
+
     $(".masked").keyup(function() {
         $("[name='" + $(this).attr("id") + "']").val(
             $(this).inputmask("unmaskedvalue")

@@ -38,7 +38,43 @@
                     <h2 class="font-medium text-base mr-auto">
                         Data Nasabah
                     </h2>
+                    <a href="javascript:;" data-toggle="modal" data-target="#superlarge-modal-size-preview" class="btn btn-primary mr-1 mb-2">Klausula</a>
                 </div>
+                <div id="superlarge-modal-size-preview" class="modal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-body p-10">
+                                <div class="p-5" id="balloon-editor">
+                                    <div class="preview">
+                                        <div data-editor="balloon" class="editor">
+                                            <p>Content of the editor.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    // editor
+                    //     .create($('#balloon-editor'), options)
+                    //     .then((editor) => {
+                    //         if (cash(el).closest(".editor").data("editor") == "document") {
+                    //             cash(el)
+                    //                 .closest(".editor")
+                    //                 .find(".document-editor__toolbar")
+                    //                 .append(editor.ui.view.toolbar.element);
+                    //         }
+
+                    //         if (cash(el).attr("name")) {
+                    //             window[cash(el).attr("name")] = editor;
+                    //         }
+                    //     })
+                    //     .catch((error) => {
+                    //         console.error(error.stack);
+                    //     });
+                </script>
+
                 <div id="horizontal-form" class="p-5">
                     <form id="frm-data-nasabah">
                         <div class="preview">
@@ -70,7 +106,7 @@
                                 <label for="asuransi" class="ml-3 form-label sm:w-20">Asuransi</label>
                                 <select id="asuransi" name="asuransi" required style="width:100%">
                                     @foreach ($asuransi as $val)
-                                        <option value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
+                                        <option @if(!$val->aktif) disabled @endif value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
                                             {{ $val->nama_asuransi }}
                                         </option>
                                     @endforeach
@@ -173,22 +209,15 @@
                                 <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
                                 <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                             </div>
-                            @if (!empty($data->okupasi))
-                                <script>
-                                    var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
-                                        {{ $data->id_kodepos }}, false, false);
-                                    $('#kodepos').append(newOption).trigger('change');
-                                </script>
-                            @endif
                             <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
                                 <select id="kodepos" style="width:100%" name="kodepos" required>
                                 </select>
                             </div>
                             @if (!empty($data->id_kodepos))
-                                <script>
-                                    var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
-                                        {{ $data->id_kodepos }}, false, false);
+                            <script>
+                                var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
+                                {{ $data->id_kodepos }}, false, false);
                                     $('#kodepos').append(newOption).trigger('change');
                                 </script>
                             @endif
@@ -396,8 +425,10 @@
             @foreach ($value as $row)
             var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans-value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans-value[{!! $row->kodetrans_id !!}]"]').val());
             @endforeach
-            
             if (RATE == null || OKUPASI == null || TSI == null) {
+                console.log('Rate: ',RATE);
+                console.log('Okupasi: ',OKUPASI);
+                console.log('TSI: ',TSI);
                 return false;
             }
             
@@ -406,12 +437,12 @@
             @endforeach
 
             @foreach ($formula as $row)
-                $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }}).trigger('change');
+                $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }});
             @endforeach
 
-            // @foreach ($formula as $row)
-            // console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
-            // @endforeach
+            @foreach ($formula as $row)
+            console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+            @endforeach
             console.log('Premium: ',TSI*RATE/1000);
             console.log("Admin", ADMIN);
             console.log("Materai", MATERAI);
@@ -553,7 +584,7 @@
                             results: data,
                         };
                     },
-                },
+                }
             });
             function cekType() {
                 if ($("#type_insurance").val() === "PAR") {
@@ -590,6 +621,11 @@
                         },
                     },
                 });
+                @if (!empty($data->id_okupasi))
+                    var newOption = new Option("{{ $data->kode_okupasi . ' - (' . $data->rate . ' ‰) ' . $data->nama_okupasi }}",
+                    {{ $data->id_okupasi }}, false, false);
+                    $('#okupasi').append(newOption).trigger('change');
+                @endif
             }
             cekType();
             $('#type_insurance').change(function() {
@@ -667,8 +703,8 @@
                 }
             });
 
-            var startDate = "",
-                endDate = "";
+            var startDate = moment($('#range-periode').val().substring(0,10), "YYYYMMDD"),
+                endDate = moment($('#range-periode').val().substring(15), "YYYYMMDD");
 
             $('#range-periode').daterangepicker({
                 autoApply: true,
@@ -694,8 +730,8 @@
             });
 
             @if (empty($method) && !empty($data))
-                $("#frm-data-nasabah :input").prop('disabled', true);
-                $("#frm-pertanggungan :input").prop('disabled', true);
+                $(":input").prop('disabled', true);
+                // $("#frm-pertanggungan :input").prop('disabled', true);
             @endif
 
             $('#btn-add').click(function(){
@@ -742,8 +778,11 @@
                 });
             });
 
-            $('#kodetrans-value[2]');
-
+            // $('#kodetrans-value[2]');
+            RATE = parseFloat($("#okupasi option:selected").text().slice($("#okupasi option:selected").text().indexOf("(") + 1, $("#okupasi option:selected").text().lastIndexOf("‰")));
+            hitung();
+            // $(':input').change();
+            // $(':input').keyup();
         });
     </script>
 @endsection
