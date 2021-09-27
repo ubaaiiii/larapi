@@ -11,4 +11,6 @@ class Transaksi extends Model
     use HasFactory, SoftDeletes;
     protected $table = "transaksi";
     protected $guarded = [];
+    public $primaryKey = 'transid';
+    public $incrementing = false;
 }

@@ -50,7 +50,7 @@
                             </div>
                             <div class="modal-body">
                                 <div class="p-5" id="editor">
-                                    <p>Content of the editor.</p>
+                                    <p>@if(!empty($data->klausula)){!! $data->klausula !!}@endif</p>
                                 </div>
                             </div>
                         </div>
@@ -149,7 +149,7 @@
                                 <label for="cabang" class="ml-3 form-label sm:w-20">Cabang</label>
                                 <select id="cabang" name="cabang" required style="width:100%">
                                     @foreach ($cabang as $val)
-                                        <option value="{{ $val->id }}" @if (empty($data->id_cabang)) @if ($val->id === Auth::user()->id_cabang) selected="true" @endif @else @if ($val->id === $data->id_cabang) selected="true" @endif @endif>
+                                        <option alamat="{{ $val->alamat_cabang }}" value="{{ $val->id }}" @if (empty($data->id_cabang)) @if ($val->id === Auth::user()->id_cabang) selected="true" @endif @else @if ($val->id === $data->id_cabang) selected="true" @endif @endif>
                                             {{ $val->nama_cabang }}
                                         </option>
                                     @endforeach
@@ -218,8 +218,7 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="masa" class="form-label sm:w-20">Periode Polis</label>
-                                <input id="periode-polis" class="form-control w-full block mx-auto range-periode" required
-                                value="@if(!empty($data->polis_start)){{ date_format(date_create($data->polis_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->polis_end), 'd/m/Y') }}@endif">
+                                <input id="periode-polis" class="form-control w-full block mx-auto range-periode" required>
                                 <input type="hidden" name="polis_start" value="@if(!empty($data->polis_start)){{ $data->polis_start }}@endif">
                                 <input type="hidden" name="polis_end" value="@if(!empty($data->polis_end)){{ $data->polis_end }}@endif">
                             </div>
@@ -233,8 +232,7 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
-                                <input id="periode-kjpp" class="form-control w-full block mx-auto range-periode" required
-                                value="@if (!empty($data->kjpp_start)) {{ date_format(date_create($data->kjpp_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->kjpp_end), 'd/m/Y') }} @endif">
+                                <input id="periode-kjpp" class="form-control w-full block mx-auto range-periode" required>
                                 <input type="hidden" name="kjpp_start" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
                                 <input type="hidden" name="kjpp_end" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
                             </div>
@@ -254,9 +252,9 @@
                                 </select>
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="nojaminan" class="form-label sm:w-20">Nomor Jenis Jaminan</label>
-                                <input type="text" class="form-control allow-decimal" placeholder="Nomor Jenis Jaminan" name="nojaminan"
-                                    id="nojaminan" value="@if (!empty($data->nojaminan)){{ $data->nojaminan }}@endif">
+                                <label for="no_jaminan" class="form-label sm:w-20">Nomor Jenis Jaminan</label>
+                                <input type="text" class="form-control allow-decimal" placeholder="Nomor Jenis Jaminan" name="no_jaminan"
+                                    id="no_jaminan" value="@if (!empty($data->no_jaminan)){{ $data->no_jaminan }}@endif">
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
@@ -760,6 +758,10 @@
                 }
             });
 
+            $('#cabang').on('select2:select', function() {
+                $('#alamat_cabang').val($('#cabang option:selected').attr('alamat'));
+            });
+
             var startPolis = moment($('#periode-polis').val().substring(0,10), "YYYYMMDD"),
                 endPolis = moment($('#periode-polis').val().substring(15), "YYYYMMDD"),
                 startKJPP = moment($('#periode-kjpp').val().substring(0,10), "YYYYMMDD"),
@@ -768,6 +770,10 @@
             $('#periode-kjpp').daterangepicker({
                 autoApply: true,
                 showDropdowns: true,
+                @if(!empty($data->kjpp_start) && !empty($data->kjpp_end))
+                    startDate: "{{ date_format(date_create($data->kjpp_start), 'd/m/Y') }}",
+                    endDate: "{{ date_format(date_create($data->kjpp_end), 'd/m/Y') }}",
+                @endif
                 locale: {
                     format: 'DD/MM/YYYY'
                 },
@@ -779,6 +785,10 @@
             $('#periode-polis').daterangepicker({
                 autoApply: true,
                 showDropdowns: true,
+                @if(!empty($data->polis_start) && !empty($data->polis_end))
+                    startDate: "{{ date_format(date_create($data->polis_start), 'd/m/Y') }}",
+                    endDate: "{{ date_format(date_create($data->polis_end), 'd/m/Y') }}",
+                @endif
                 locale: {
                     format: 'DD/MM/YYYY'
                 },
@@ -808,17 +818,18 @@
                 // $("#frm-pertanggungan :input").prop('disabled', true);
             @endif
 
-            $('#btn-add').click(function(){
+            $('#btn-add, #btn-update').click(function(){
                 var btnHtml = $(this).html(),
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
                     nama_insured = $('#insured option:selected').text(),
-                    nama_cabang = $('#cabang option:selected').text();
+                    nama_cabang = $('#cabang option:selected').text(),
+                    klausula = klausulaValue;
                 $(this).attr('disabled',true).html(loading);
 
                 $.ajax({
                     url: "{{ url('api/pengajuan') }}",
                     method: "POST",
-                    data: $('.formnya').serialize() + "&method=create&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
+                    data: $('.formnya').serialize() + "&method=store&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang+"&klausula="+klausula,
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },

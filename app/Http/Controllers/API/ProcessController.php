@@ -161,7 +161,7 @@ class ProcessController extends Controller
     {
         $update = null;
         switch ($request->method) {
-            case 'create':
+            case 'store':
                 $request->validate([
                     'transid'           => 'required|string|max:14',
                     'type_insurance'    => 'required|string',
@@ -194,18 +194,20 @@ class ProcessController extends Controller
                     'kodetrans-remarks' => 'array|nullable',
                 ]);
 
-                $this->tertanggung($request);
-                $this->cabang($request);
-
-                $save = Transaksi::create([
+                $insured = $this->tertanggung($request);
+                $cabang = $this->cabang($request);
+                $data = Transaksi::find($request->transid);
+                $save = Transaksi::updateOrCreate([
                     'transid'           => $request->transid,
+                ],
+                [
                     'id_instype'        => $request->type_insurance,
                     'id_insured'        => $insured->id,
                     'id_cabang'         => $cabang->id,
                     'nopinjaman'        => $request->nopinjaman,
-                    'plafond_kredit'    => $request->plafond_kredit,
-                    'outstanding_kredit'=> $request->outstanding_kredit,
-                    'agunan_kjpp'       => $request->agunan_kjpp,
+                    'plafond_kredit'    => round($request->plafond_kredit,2),
+                    'outstanding_kredit'=> round($request->outstanding_kredit,2),
+                    'agunan_kjpp'       => round($request->agunan_kjpp,2),
                     'policy_no'         => $request->policy_no,
                     'policy_parent'     => $request->nopolis_lama,
                     'masa'              => $request->masa,
@@ -223,98 +225,27 @@ class ProcessController extends Controller
                     'created_by'        => Auth::user()->id,
                 ]);
 
-                $this->aktifitas($request->transid,'0','Pembuatan data pengajuan');
-
-                return response()->json([
-                    'message'   => 'Pengajuan ' . $request->name . ' Berhasil Dibuat',
-                    'data'      => $save,
-                    'update'    => $update
-                ], 200);
-                break;
-
-            case 'update':
-                $request->validate([
-                    'transid'           => 'required|string|max:14',
-                    'type_insurance'    => 'required|string',
-                    'cabang'            => 'required',
-                    'alamat_cabang'     => 'required|string',
-                    'nama_cabang'       => 'required|string',
-                    'nopinjaman'        => 'required|numeric',
-                    'insured'           => 'required',
-                    'nik_insured'       => 'integer',
-                    'npwp_insured'      => 'required|string',
-                    'nama_insured'      => 'required|string',
-                    'alamat_insured'    => 'required|string',
-                    'plafond_kredit'    => 'required',
-                    'outstanding_kredit' => 'required',
-                    'policy_no'         => 'alpha_dash',
-                    'nopolis_lama'      => 'alpha_dash',
-                    'polis_start'       => 'required|string',
-                    'polis_end'         => 'required|string',
-                    'masa'              => 'required|numeric',
-                    'kjpp_start'        => 'required|string',
-                    'kjpp_end'          => 'required|string',
-                    'agunan_kjpp'       => 'required',
-                    'jaminan'           => 'required|string',
-                    'no_jaminan'        => 'required',
-                    'okupasi'           => 'required|numeric',
-                    'lokasi_okupasi'    => 'required|string',
-                    'kodepos'           => 'required|numeric',
-                    'catatan'           => 'string|nullable',
-                    'kodetrans-value'   => 'required|array|min:1|nullable',
-                    'kodetrans-remarks' => 'array|nullable',
-                ]);
-
-                $cabang = Cabang::updateOrCreate(
-                    ['id' => $request->cabang],
-                    [
-                        'alamat_cabang' => $request->alamat_cabang,
-                        'created_by'    => Auth::user()->id,
-                    ]
-                );
-
-                $cbg = Cabang::find($request->cabang);
-                $detail = "Perubahan Cabang " . strtoupper($cbg->nama_cabang) . ":";
-                $update['cabang'] = false;
-                if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
-                    $update['cabang'] = true;
-                    $detail .= "<br>- Alamat Cabang: $cbg->alamat_cabang menjadi $request->alamat_cabang";
-                }
-                if ($update['cabang']) {
-                    $update['cabang-detail'] = $detail;
-                    $this->aktifitas($request->transid, '7', $detail);
+                if (!$save->wasRecentlyCreated) {
+                    $changes = $save->getChanges();
+                    // $original = $save->getRawOriginal();
+                    $text = 'Perubahan data pengajuan, sebelumnya:';
+                    foreach($changes as $key => $value) {
+                        if ($key !== "updated_at") {
+                            $text .= "<br>- ".$key." : ". $data->$key;  
+                        }
+                    }
+                    $this->aktifitas($request->transid, '7', $text);
+                } else if ($save->wasRecentlyCreated) {
+                    $this->aktifitas($request->transid, '0', 'Pembuatan data pengajuan');
+                } else {
+                    return response()->json([
+                        'message'   => 'Gagal menyimpan data',
+                        'data'      => $save,
+                    ], 500);
                 }
 
-                $save = Transaksi::create([
-                    'transid'           => $request->transid,
-                    'id_instype'        => $request->type_insurance,
-                    'id_insured'        => $insured->id,
-                    'id_cabang'         => $cabang->id,
-                    'nopinjaman'        => $request->nopinjaman,
-                    'plafond_kredit'    => $request->plafond_kredit,
-                    'outstanding_kredit' => $request->outstanding_kredit,
-                    'agunan_kjpp'       => $request->agunan_kjpp,
-                    'policy_no'         => $request->policy_no,
-                    'policy_parent'     => $request->nopolis_lama,
-                    'masa'              => $request->masa,
-                    'id_status'         => '0',
-                    'id_jaminan'        => $request->jaminan,
-                    'no_jaminan'        => $request->no_jaminan,
-                    'polis_start'       => $request->polis_start,
-                    'polis_end'         => $request->polis_end,
-                    'kjpp_start'        => $request->kjpp_start,
-                    'kjpp_end'          => $request->kjpp_end,
-                    'id_okupasi'        => $request->okupasi,
-                    'location'          => $request->lokasi_okupasi,
-                    'id_kodepos'        => $request->kodepos,
-                    'catatan'           => $request->catatan,
-                    'created_by'        => Auth::user()->id,
-                ]);
-
-                $this->aktifitas($request->transid, '0', 'Pembuatan data pengajuan');
-
                 return response()->json([
-                    'message'   => 'Pengajuan ' . $request->name . ' Berhasil Dibuat',
+                    'message'   => 'Pengajuan ' . $request->name . ' Berhasil Disimpan',
                     'data'      => $save,
                     'update'    => $update
                 ], 200);
@@ -409,6 +340,25 @@ class ProcessController extends Controller
             ]
         );
 
+        if ($save->hasChanged()) {
+            $changes = $save->getChanges();
+            // $original = $save->getRawOriginal();
+            $text = 'Perubahan data pengajuan, sebelumnya:';
+            foreach ($changes as $key => $value) {
+                if ($key !== "updated_at") {
+                    $text .= "<br>- " . $key . " : " . $data->$key;
+                }
+            }
+            $this->aktifitas($request->transid, '7', $text);
+        } else if ($save->wasRecentlyCreated) {
+            $this->aktifitas($request->transid, '0', 'Pembuatan data pengajuan');
+        } else {
+            return response()->json([
+                'message'   => 'Gagal menyimpan data',
+                'data'      => $save,
+            ], 500);
+        }
+
         if ($insured->wasRecentlyCreated) {
             $detail = "Pembuatan Tertanggung Baru:<br>
                                - Nama: " . strtoupper($request->nama_insured);
@@ -443,6 +393,8 @@ class ProcessController extends Controller
                 $this->aktifitas($request->transid, '7', $detail);
             }
         }
+
+        return $insured;
     }
 
     public function cabang($request)
@@ -470,5 +422,7 @@ class ProcessController extends Controller
             $update['cabang-detail'] = $detail;
             $this->aktifitas($request->transid, '7', $detail);
         }
+
+        return $cabang;
     }
 }
