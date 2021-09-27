@@ -65,11 +65,13 @@ class DataController extends Controller
     
     public function selectOkupasi(Request $request)
     {
+        // return $request->all();
         $okupasi = Okupasi::select('id','kode_okupasi', 'nama_okupasi', 'rate')
         ->where('instype',$request->instype);
         if (!empty($request->search)) {
             $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
-            ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%');
+            ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
+            ->orWhere('rate', 'like', '%' . $request->search . '%');
         }
         $okupasi = $okupasi->orderBy('kode_okupasi')->get();
         
@@ -154,11 +156,11 @@ class DataController extends Controller
         // sorting column datatables
         $columns = [
             'transid',
-            'itp.msdesc',
+            'instype_name',
             'cabang.nama_cabang',
             'insured.nama_insured',
             'policy_no',
-            'periode_start',
+            'polis_start',
             'transaksi.created_at',
             'tsi.value',
             'premi.value',
@@ -167,7 +169,7 @@ class DataController extends Controller
 
         $select = [
             'transaksi.*',
-            'itp.msdesc as tipeins',
+            'instype_name',
             'insured.nama_insured as tertanggung',
             'transaksi.created_at as tgl_dibuat',
             'tsi.value as tsi',
@@ -208,11 +210,11 @@ class DataController extends Controller
 
         $joins = [
             ['insured', 'id_insured = insured.id'],
-            ['masters as itp', ['id_instype = itp.msid', 'itp.mstype = instype']],
+            ['instype', 'id_instype = instype.id'],
             ['masters as sts', ['id_status = sts.msid', 'sts.mstype = status']],
             ['cabang', 'id_cabang = cabang.id'],
-            ['transpricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
-            ['transpricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+            ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+            ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
 
         $query = $this->generateQuery($request, $table, $columns, $select, $joins);
@@ -222,11 +224,11 @@ class DataController extends Controller
         foreach ($query[0] as $row) {
             $nestedData = array();
             $nestedData[] = $row->transid;
-            $nestedData[] = $row->tipeins;
+            $nestedData[] = $row->instype_name;
             $nestedData[] = $row->cabang;
             $nestedData[] = $row->tertanggung;
             $nestedData[] = $row->policy_no;
-            $nestedData[] = date_format(date_create($row->periode_start), "d-M-Y") . " s/d " . date_format(date_create($row->periode_end), "d-M-Y");
+            $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
             $nestedData[] = $row->tgl_dibuat;
             $nestedData[] = number_format($row->tsi, 2);
             $nestedData[] = number_format($row->premi, 2);
@@ -437,7 +439,7 @@ class DataController extends Controller
             $nestedData[] = $row->cabang;
             $nestedData[] = $row->tertanggung;
             $nestedData[] = $row->policy_no;
-            $nestedData[] = date_format(date_create($row->periode_start), "d-M-Y") . " s/d " . date_format(date_create($row->periode_end), "d-M-Y");
+            $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
             $nestedData[] = $row->tgl_dibuat;
             $nestedData[] = number_format($row->tsi, 2);
             $nestedData[] = number_format($row->premi, 2);

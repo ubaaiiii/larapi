@@ -42,8 +42,8 @@ class PageController extends Controller
             'cabang'    => Cabang::where('visible',1)->orderBy('nama_cabang','asc')->get(),
             'asuransi'  => Asuransi::all(),
             'okupasi'   => Okupasi::all(),
-            'level'     => Master::where('mstype', 'level')->get(),
             'instype'   => Instype::all(),
+            'jaminan'   => Master::where('mstype', 'jaminan')->get(),
             'act'       => 'add',
             'price'     => KodeTrans::where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
             'formula'   => KodeTrans::whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
@@ -69,51 +69,12 @@ class PageController extends Controller
 
     function laporan($transid = null)
     {
-        // dd(Page::roleHasPages(Auth::user()->id,1,4)->get());
-        // Permission::insert([
-        //     [
-        //         "name"  => "ajukan pengajuan",
-        //         "guard_name" => "web"
-        //     ],
-        //     [
-        //         "name"  => "aktifkan pengajuan",
-        //         "guard_name" => "web"
-        //     ],
-        //     [
-        //         "name"  => "edit pengajuan",
-        //         "guard_name" => "web"
-        //     ],
-        //     [
-        //         "name"  => "delete pengajuan",
-        //         "guard_name" => "web"
-        //     ],
-        //     [
-        //         "name"  => "approve pengajuan",
-        //         "guard_name" => "web"
-        //     ],
-        // ]);
-
-        // $role = Role::findById(5);
-        // $role->givePermissionTo([
-        //     'create pengajuan',
-        //     'edit pengajuan',
-        //     'delete pengajuan',
-        //     'approve pengajuan',
-        //     'rollback pengajuan',
-        //     'proses pengajuan',
-        //     'ajukan pengajuan',
-        //     'aktifkan pengajuan',
-        // ]);
-
-        // $user = User::find(5);
-        // $user->assignRole('checker');
-
         $data = [
             'cabang'    => Cabang::all(),
             'asuransi'  => Master::where('mstype', 'insurance')->get(),
             'laporan'   => Laporan::where('laplevel', Auth::user()->getRoleNames()[0])->get(),
             'level'     => Master::where('mstype', 'level')->get(),
-            'instype'   => Master::where('mstype', 'instype')->get(),
+            'instype'   => Instype::all(),
         ];
 
         if (!empty($transid)) {

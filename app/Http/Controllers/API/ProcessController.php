@@ -159,14 +159,6 @@ class ProcessController extends Controller
 
     public function pengajuan(Request $request)
     {
-        // $cbg = Cabang::find($request->cabang);
-        // $data['update'] = false;
-        // if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
-        //     $data['request alamat'] = $request->alamat_cabang;
-        //     $data['database alamat'] = $cbg->alamat_cabang;
-        //     $data['update'] = true;
-        // }
-        // return $data;
         $update = null;
         switch ($request->method) {
             case 'create':
@@ -175,17 +167,25 @@ class ProcessController extends Controller
                     'type_insurance'    => 'required|string',
                     'cabang'            => 'required',
                     'alamat_cabang'     => 'required|string',
+                    'nama_cabang'       => 'required|string',
+                    'nopinjaman'        => 'required|numeric',
                     'insured'           => 'required',
                     'nik_insured'       => 'integer',
                     'npwp_insured'      => 'required|string',
+                    'nama_insured'      => 'required|string',
                     'alamat_insured'    => 'required|string',
-                    'nopinjaman'        => 'required|numeric',
                     'plafond_kredit'    => 'required',
+                    'outstanding_kredit'=> 'required',
                     'policy_no'         => 'alpha_dash',
                     'nopolis_lama'      => 'alpha_dash',
+                    'polis_start'       => 'required|string',
+                    'polis_end'         => 'required|string',
                     'masa'              => 'required|numeric',
-                    'periode_start'     => 'required|string',
-                    'periode_end'       => 'required|string',
+                    'kjpp_start'        => 'required|string',
+                    'kjpp_end'          => 'required|string',
+                    'agunan_kjpp'       => 'required',
+                    'jaminan'           => 'required|string',
+                    'no_jaminan'        => 'required',
                     'okupasi'           => 'required|numeric',
                     'lokasi_okupasi'    => 'required|string',
                     'kodepos'           => 'required|numeric',
@@ -194,78 +194,8 @@ class ProcessController extends Controller
                     'kodetrans-remarks' => 'array|nullable',
                 ]);
 
-                $date_start = explode("/",$request->periode_start);
-                $date_end   = explode("/",$request->periode_end);
-
-                if (!is_numeric($request->insured)) {
-                    $request->insured = null;
-                }
-
-                $insured = Insured::updateOrCreate(
-                    ['id' => $request->insured],
-                    [
-                        'nik_insured'       => $request->nik_insured,
-                        'nama_insured'      => strtoupper($request->nama_insured),
-                        'npwp_insured'      => $request->npwp_insured,
-                        'alamat_insured'    => $request->alamat_insured,
-                        'created_by'         => Auth::user()->id,
-                    ]
-                );
-
-                if ($insured->wasRecentlyCreated){
-                    $detail = "Pembuatan Tertanggung Baru:<br>
-                               - Nama: ". strtoupper($request->nama_insured);
-                    if (!empty($request->nik_insured)) {
-                        $detail .= "<br>- NIK: $request->nik_insured";
-                    }
-                    if (!empty($request->npwp_insured)) {
-                        $detail .= "<br>- NPWP: $request->npwp_insured";
-                    }
-                    if (!empty($request->alamat_insured)) {
-                        $detail .= "<br>- Alamat: $request->alamat_insured";
-                    }
-                    $this->aktifitas($request->transid,'7',$detail);
-                } else {
-                    $tertanggung = Insured::find($request->insured);
-                    $detail = "Perubahan Tertanggung a/n ". strtoupper($tertanggung->nama_insured) . ":";
-                    $update['insured'] = false;
-                    if (!empty($request->nik_insured) && $request->nik_insured !== $tertanggung->nik_insured) {
-                        $update['insured'] = true;
-                        $detail .= "<br>- NIK: $tertanggung->nik_insured menjadi $request->nik_insured";
-                    }
-                    if (!empty($request->npwp_insured) && $request->npwp_insured !== $tertanggung->npwp_insured) {
-                        $update['insured'] = true;
-                        $detail .= "<br>- NPWP: $tertanggung->npwp_insured menjadi $request->npwp_insured";
-                    }
-                    if (!empty($request->alamat_insured) && $request->alamat_insured !== $tertanggung->alamat_insured) {
-                        $update['insured'] = true;
-                        $detail .= "<br>- Alamat: $tertanggung->alamat_insured menjadi $request->alamat_insured";
-                    }
-                    if ($update['insured']){
-                        $update['insured-detail'] = $detail;
-                        $this->aktifitas($request->transid,'7',$detail);
-                    }
-                }
-
-                $cabang = Cabang::updateOrCreate(
-                    ['id' => $request->cabang],
-                    [
-                        'alamat_cabang' => $request->alamat_cabang,
-                        'created_by'    => Auth::user()->id,
-                    ]
-                );
-
-                $cbg = Cabang::find($request->cabang);
-                $detail = "Perubahan Cabang ".strtoupper($cbg->nama_cabang).":";
-                $update['cabang'] = false;
-                if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
-                    $update['cabang'] = true;
-                    $detail .= "<br>- Alamat Cabang: $cbg->alamat_cabang menjadi $request->alamat_cabang";
-                }
-                if ($update['cabang']) {
-                    $update['cabang-detail'] = $detail;
-                    $this->aktifitas($request->transid, '7', $detail);
-                }
+                $this->tertanggung($request);
+                $this->cabang($request);
 
                 $save = Transaksi::create([
                     'transid'           => $request->transid,
@@ -274,12 +204,18 @@ class ProcessController extends Controller
                     'id_cabang'         => $cabang->id,
                     'nopinjaman'        => $request->nopinjaman,
                     'plafond_kredit'    => $request->plafond_kredit,
+                    'outstanding_kredit'=> $request->outstanding_kredit,
+                    'agunan_kjpp'       => $request->agunan_kjpp,
                     'policy_no'         => $request->policy_no,
                     'policy_parent'     => $request->nopolis_lama,
                     'masa'              => $request->masa,
                     'id_status'         => '0',
-                    'periode_start'     => $date_start[2]."/". $date_start[1]."/". $date_start[0],
-                    'periode_end'       => $date_end[2] . "/" . $date_end[1] . "/" . $date_end[0],
+                    'id_jaminan'        => $request->jaminan,
+                    'no_jaminan'        => $request->no_jaminan,
+                    'polis_start'       => $request->polis_start,
+                    'polis_end'         => $request->polis_end,
+                    'kjpp_start'        => $request->kjpp_start,
+                    'kjpp_end'          => $request->kjpp_end,
                     'id_okupasi'        => $request->okupasi,
                     'location'          => $request->lokasi_okupasi,
                     'id_kodepos'        => $request->kodepos,
@@ -300,87 +236,52 @@ class ProcessController extends Controller
                 $request->validate([
                     'transid'           => 'required|string|max:14',
                     'type_insurance'    => 'required|string',
-                    'cabang'            => 'required|integer',
+                    'cabang'            => 'required',
                     'alamat_cabang'     => 'required|string',
-                    'insured'           => 'required|integer',
+                    'nama_cabang'       => 'required|string',
+                    'nopinjaman'        => 'required|numeric',
+                    'insured'           => 'required',
                     'nik_insured'       => 'integer',
                     'npwp_insured'      => 'required|string',
+                    'nama_insured'      => 'required|string',
                     'alamat_insured'    => 'required|string',
-                    'nopinjaman'        => 'required|integer',
-                    'plafond_kredit'    => 'required|integer',
+                    'plafond_kredit'    => 'required',
+                    'outstanding_kredit' => 'required',
                     'policy_no'         => 'alpha_dash',
                     'nopolis_lama'      => 'alpha_dash',
-                    'masa'              => 'required|integer',
-                    'periode_start'     => 'required|string',
-                    'periode_end'       => 'required|string',
-                    'okupasi'           => 'required|integer',
+                    'polis_start'       => 'required|string',
+                    'polis_end'         => 'required|string',
+                    'masa'              => 'required|numeric',
+                    'kjpp_start'        => 'required|string',
+                    'kjpp_end'          => 'required|string',
+                    'agunan_kjpp'       => 'required',
+                    'jaminan'           => 'required|string',
+                    'no_jaminan'        => 'required',
+                    'okupasi'           => 'required|numeric',
                     'lokasi_okupasi'    => 'required|string',
-                    'kodepos'           => 'required|integer',
+                    'kodepos'           => 'required|numeric',
+                    'catatan'           => 'string|nullable',
+                    'kodetrans-value'   => 'required|array|min:1|nullable',
+                    'kodetrans-remarks' => 'array|nullable',
                 ]);
-
-                $date_start = explode("/", $request->periode_start);
-                $date_end   = explode("/", $request->periode_end);
-
-                $insured = Insured::updateOrCreate(
-                    ['id' => $request->insured],
-                    [
-                        'nik_insured'       => $request->nik_insured,
-                        'nama_insured'      => $request->insured,
-                        'npwp_insured'      => $request->npwp_insured,
-                        'alamat_insured'    => $request->alamat_insured,
-                        'create_by'         => Auth::user()->id,
-                    ]
-                );
-
-                if ($insured->wasRecentlyCreated) {
-                    $detail = "Pembuatan Tertanggung Baru:<br>
-                               - Nama: $request->insured";
-                    if (!empty($request->nik_insured)) {
-                        $detail .= "<br>- NIK: $request->nik_insured";
-                    }
-                    if (!empty($request->npwp_insured)) {
-                        $detail .= "<br>- NPWP: $request->npwp_insured";
-                    }
-                    if (!empty($request->alamat_insured)) {
-                        $detail .= "<br>- Alamat: $request->alamat_insured";
-                    }
-                    $this->aktifitas($request->transid, '7', $detail);
-                } else {
-                    $tertanggung = Insured::find($request->insured);
-                    $detail = "Perubahan Tertanggung a/n $tertanggung->nama_insured:";
-                    if (!empty($request->nik_insured)) {
-                        $detail .= "<br>- NIK: $request->nik_insured";
-                    }
-                    if (!empty($request->npwp_insured)) {
-                        $detail .= "<br>- NPWP: $request->npwp_insured";
-                    }
-                    if (!empty($request->alamat_insured)) {
-                        $detail .= "<br>- Alamat: $request->alamat_insured";
-                    }
-                    $this->aktifitas($request->transid, '7', $detail);
-                }
 
                 $cabang = Cabang::updateOrCreate(
                     ['id' => $request->cabang],
                     [
-                        'nama_cabang' => $request->cabang,
                         'alamat_cabang' => $request->alamat_cabang,
+                        'created_by'    => Auth::user()->id,
                     ]
                 );
 
-                if ($cabang->wasRecentlyCreated) {
-                    $detail = "Pembuatan Cabang Baru:<br>
-                               - Cabang: $request->cabang";
-                    if (!empty($request->alamat_cabang)) {
-                        $detail .= "<br>- Alamat Cabang: $request->alamat_cabang";
-                    }
-                    $this->aktifitas($request->transid, '7', $detail);
-                } else {
-                    $cbg = Cabang::find($request->cabang);
-                    $detail = "Perubahan Cabang $cbg->nama_cabang:";
-                    if (!empty($request->alamat_cabang)) {
-                        $detail .= "<br>- Alamat Cabang: $request->alamat_cabang";
-                    }
+                $cbg = Cabang::find($request->cabang);
+                $detail = "Perubahan Cabang " . strtoupper($cbg->nama_cabang) . ":";
+                $update['cabang'] = false;
+                if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
+                    $update['cabang'] = true;
+                    $detail .= "<br>- Alamat Cabang: $cbg->alamat_cabang menjadi $request->alamat_cabang";
+                }
+                if ($update['cabang']) {
+                    $update['cabang-detail'] = $detail;
                     $this->aktifitas($request->transid, '7', $detail);
                 }
 
@@ -391,15 +292,22 @@ class ProcessController extends Controller
                     'id_cabang'         => $cabang->id,
                     'nopinjaman'        => $request->nopinjaman,
                     'plafond_kredit'    => $request->plafond_kredit,
+                    'outstanding_kredit' => $request->outstanding_kredit,
+                    'agunan_kjpp'       => $request->agunan_kjpp,
                     'policy_no'         => $request->policy_no,
                     'policy_parent'     => $request->nopolis_lama,
                     'masa'              => $request->masa,
                     'id_status'         => '0',
-                    'periode_start'     => $date_start[2] . "/" . $date_start[1] . "/" . $date_start[0],
-                    'periode_end'       => $date_end[2] . "/" . $date_end[1] . "/" . $date_end[0],
+                    'id_jaminan'        => $request->jaminan,
+                    'no_jaminan'        => $request->no_jaminan,
+                    'polis_start'       => $request->polis_start,
+                    'polis_end'         => $request->polis_end,
+                    'kjpp_start'        => $request->kjpp_start,
+                    'kjpp_end'          => $request->kjpp_end,
                     'id_okupasi'        => $request->okupasi,
                     'location'          => $request->lokasi_okupasi,
                     'id_kodepos'        => $request->kodepos,
+                    'catatan'           => $request->catatan,
                     'created_by'        => Auth::user()->id,
                 ]);
 
@@ -408,6 +316,7 @@ class ProcessController extends Controller
                 return response()->json([
                     'message'   => 'Pengajuan ' . $request->name . ' Berhasil Dibuat',
                     'data'      => $save,
+                    'update'    => $update
                 ], 200);
                 break;
 
@@ -481,5 +390,85 @@ class ProcessController extends Controller
             'deskripsi'     => $deskripsi,
             'created_by'     => Auth::user()->id
         ]);
+    }
+
+    public function tertanggung($request)
+    {
+        if (!is_numeric($request->insured)) {
+            $request->insured = null;
+        }
+
+        $insured = Insured::updateOrCreate(
+            ['id' => $request->insured],
+            [
+                'nik_insured'       => $request->nik_insured,
+                'nama_insured'      => strtoupper($request->nama_insured),
+                'npwp_insured'      => $request->npwp_insured,
+                'alamat_insured'    => $request->alamat_insured,
+                'created_by'         => Auth::user()->id,
+            ]
+        );
+
+        if ($insured->wasRecentlyCreated) {
+            $detail = "Pembuatan Tertanggung Baru:<br>
+                               - Nama: " . strtoupper($request->nama_insured);
+            if (!empty($request->nik_insured)) {
+                $detail .= "<br>- NIK: $request->nik_insured";
+            }
+            if (!empty($request->npwp_insured)) {
+                $detail .= "<br>- NPWP: $request->npwp_insured";
+            }
+            if (!empty($request->alamat_insured)) {
+                $detail .= "<br>- Alamat: $request->alamat_insured";
+            }
+            $this->aktifitas($request->transid, '7', $detail);
+        } else {
+            $tertanggung = Insured::find($request->insured);
+            $detail = "Perubahan Tertanggung a/n " . strtoupper($tertanggung->nama_insured) . ":";
+            $update['insured'] = false;
+            if (!empty($request->nik_insured) && $request->nik_insured !== $tertanggung->nik_insured) {
+                $update['insured'] = true;
+                $detail .= "<br>- NIK: $tertanggung->nik_insured menjadi $request->nik_insured";
+            }
+            if (!empty($request->npwp_insured) && $request->npwp_insured !== $tertanggung->npwp_insured) {
+                $update['insured'] = true;
+                $detail .= "<br>- NPWP: $tertanggung->npwp_insured menjadi $request->npwp_insured";
+            }
+            if (!empty($request->alamat_insured) && $request->alamat_insured !== $tertanggung->alamat_insured) {
+                $update['insured'] = true;
+                $detail .= "<br>- Alamat: $tertanggung->alamat_insured menjadi $request->alamat_insured";
+            }
+            if ($update['insured']) {
+                $update['insured-detail'] = $detail;
+                $this->aktifitas($request->transid, '7', $detail);
+            }
+        }
+    }
+
+    public function cabang($request)
+    {
+        if (!is_numeric($request->insured)) {
+            $request->insured = null;
+        }
+        
+        $cabang = Cabang::updateOrCreate(
+            ['id' => $request->cabang],
+            [
+                'alamat_cabang' => $request->alamat_cabang,
+                'created_by'    => Auth::user()->id,
+            ]
+        );
+
+        $cbg = Cabang::find($request->cabang);
+        $detail = "Perubahan Cabang " . strtoupper($cbg->nama_cabang) . ":";
+        $update['cabang'] = false;
+        if (!empty($request->alamat_cabang) && $request->alamat_cabang !== $cbg->alamat_cabang) {
+            $update['cabang'] = true;
+            $detail .= "<br>- Alamat Cabang: $cbg->alamat_cabang menjadi $request->alamat_cabang";
+        }
+        if ($update['cabang']) {
+            $update['cabang-detail'] = $detail;
+            $this->aktifitas($request->transid, '7', $detail);
+        }
     }
 }

@@ -11,7 +11,6 @@
     <meta name="keywords"
         content="admin template, Rubick Admin Template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="LEFT4CODE">
-    {{-- <link href="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/css/tom-select.css" rel="stylesheet"> --}}
     <link href="{{ url('public/vendor/select2/select2.min.css') }}" rel="stylesheet" />
     <title>@yield('title') | BDS General</title>
     <!-- BEGIN: CSS Assets-->
@@ -19,6 +18,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/daterangepicker/daterangepicker.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/datatables/datatables.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/fontawesome/all.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/quill/quill.bubble.css') }}" />
     <!-- END: CSS Assets-->
     <script src="{{ url('public/vendor/jquery/jquery-3.6.0.min.js') }}"></script>
     @yield('header')
@@ -35,14 +35,12 @@
         </div>
     </div>
     @include('layouts.footer')
-
     <script src="{{ url('public/dist/js/app.js') }}"></script>
 
     {{-- script vendor --}}
-    {{-- <script src="https://cdn.jsdelivr.net/npm/tom-select@1.1/dist/js/tom-select.complete.min.js"></script> --}}
     <script src="{{ url('public/vendor/select2/select2.min.js') }}"></script>
     <script src="{{ url('public/vendor/select2/id.js') }}"></script>
-    <script src="{{ url('public/vendor/ckeditor/ckeditor.js') }}"></script>
+    <script src="{{ url('public/vendor/quill/quill.js') }}"></script>
     <script src="{{ url('public/js/jquery.inputmask.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/daterangepicker.min.js') }}"></script>

@@ -9,11 +9,13 @@
             @if (empty($method) && empty($data))
                 <button class="btn btn-sm btn-primary" id="btn-add">Simpan</button>
             @endif
-            @if ($method == 'update')
+            @if ($method == 'update' && !empty($data))
                 <button class="btn btn-sm btn-primary" id="btn-update">Simpan</button>
+            @endif
+            @if ($method == 'perpanjang' && !empty($data))
                 <button class="btn btn-sm btn-primary" id="btn-perpanjang">Perpanjang</button>
             @endif
-            @if ($method == 'approve')
+            @if ($method == 'approve' && !empty($data))
                 @role('ao')
                 <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
                 @endrole
@@ -38,47 +40,77 @@
                     <h2 class="font-medium text-base mr-auto">
                         Data Nasabah
                     </h2>
-                    <a href="javascript:;" data-toggle="modal" data-target="#superlarge-modal-size-preview" class="btn btn-primary mr-1 mb-2">Klausula</a>
+                    <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2">Klausula</a>
                 </div>
-                <div id="superlarge-modal-size-preview" class="modal" tabindex="-1" aria-hidden="true">
+                <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
-                            <div class="modal-body p-10">
-                                <div class="p-5" id="balloon-editor">
-                                    <div class="preview">
-                                        <div data-editor="balloon" class="editor">
-                                            <p>Content of the editor.</p>
-                                        </div>
-                                    </div>
+                            <div class="modal-header">
+                                <h1>Klausula</h1>
+                            </div>
+                            <div class="modal-body">
+                                <div class="p-5" id="editor">
+                                    <p>Content of the editor.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <script>
-                    // editor
-                    //     .create($('#balloon-editor'), options)
-                    //     .then((editor) => {
-                    //         if (cash(el).closest(".editor").data("editor") == "document") {
-                    //             cash(el)
-                    //                 .closest(".editor")
-                    //                 .find(".document-editor__toolbar")
-                    //                 .append(editor.ui.view.toolbar.element);
-                    //         }
+                    $(document).ready(function(){
+                        var toolbarOptions = [
+                            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
 
-                    //         if (cash(el).attr("name")) {
-                    //             window[cash(el).attr("name")] = editor;
-                    //         }
-                    //     })
-                    //     .catch((error) => {
-                    //         console.error(error.stack);
-                    //     });
-                </script>
+                            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
 
-                <div id="horizontal-form" class="p-5">
-                    <form id="frm-data-nasabah">
-                        <div class="preview">
+                            [{ align: '' }, { 'align': 'center' }, { 'align': 'right' }, { 'align': 'justify' }],
+
+                            ['clean']                                         // remove formatting button
+                        ];
+                        var quill = new Quill('#editor', {
+                            modules: {
+                                toolbar: toolbarOptions
+                            },
+                            theme: 'bubble'
+                        });
+                        var klausulaValue = quill.root.innerHTML;
+                        quill.on('text-change', function() {
+                            klausulaValue = quill.root.innerHTML;
+                        });
+                        $('#btn-simpan-klausula').click(function(){
+                            $('#modal-klausula').modal('hide');
                             @if ($act == 'view' || $act == 'edit')
+                                var transid = "@if (!empty($data->transid)){{ $data->transid }}@endif";
+                            @else
+                                var transid = "{{ $transid->seqlead . date($transid->seqformat) . str_pad($transid->seqno, $transid->seqlen, '0', STR_PAD_LEFT) }}";
+                            @endif
+                            $.ajax({
+                                url: "{{ url('api/klausula') }}",
+                                method: "POST",
+                                data: {
+                                    'transid':transid,
+                                    'klausula':klausulaValue,
+                                    '_token':"{{ csrf_token() }}"
+                                },
+                                headers: {
+                                    'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                                },
+                                success: function(d) {
+                                    console.log('success: ',d);
+                                },
+                                error: function(d) {
+                                    console.log('error: ', d);
+                                }
+                            });
+                        })
+                    });
+                </script>
+                <div id="horizontal-form" class="p-5">
+                    <form class="formnya">
+                        <div class="preview">
+                            @if (($act == 'view' || $act == 'edit') && !empty($data->transid))
                                 <div class="form-inline mt-5">
                                     <label for="transid" class="form-label sm:w-20">Nomor Transaksi</label>
                                     <input type="text" id="transid" class="form-control" required name="transid"
@@ -128,6 +160,11 @@
                                 <textarea id="alamat_cabang" name="alamat_cabang" class="form-control" required>@if (!empty($data->alamat_cabang)){{ $data->alamat_cabang }}@endif</textarea>
                             </div>
                             <div class="form-inline mt-5">
+                                <label for="nopinjaman" class="form-label sm:w-20">Nomor Pinjaman</label>
+                                <input type="text" class="form-control allow-decimal" placeholder="Nomor Pinjaman" name="nopinjaman"
+                                    id="nopinjaman" value="@if (!empty($data->nopinjaman)){{ $data->nopinjaman }}@endif">
+                            </div>
+                            <div class="form-inline mt-5">
                                 <label for="insured" class="ml form-label sm:w-20">Tertanggung (QQ)</label>
                                 <select id="insured" style="width:100%;text-transform: uppercase;" class="select2"
                                     name="insured" required>
@@ -155,15 +192,16 @@
                                 <textarea id="alamat_insured" name="alamat_insured" class="form-control" required @if (!empty($data->alamat_insured)) @endif>@if (!empty($data->alamat_insured)){{ $data->alamat_insured }}@endif</textarea>
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="nopinjaman" class="form-label sm:w-20">Nomor Pinjaman</label>
-                                <input type="text" class="form-control allow-decimal" placeholder="Nomor Pinjaman" name="nopinjaman"
-                                    id="nopinjaman" value="@if (!empty($data->nopinjaman)){{ $data->nopinjaman }}@endif">
-                            </div>
-                            <div class="form-inline mt-5">
                                 <label for="plafond_kredit" class="form-label sm:w-20">Plafond Kredit</label>
                                 <input type="text" class="form-control allow-decimal currency masked" placeholder="Plafond Kredit"
                                     id="plafond_kredit" value="@if (!empty($data->plafond_kredit)){{ $data->plafond_kredit }}@endif">
                                 <input type="hidden" name="plafond_kredit" @if (!empty($data->plafond_kredit)) value="{{ $data->plafond_kredit }}" @endif>
+                            </div>
+                            <div class="form-inline mt-5">
+                                <label for="outstanding_kredit" class="form-label sm:w-20">Outstanding Kredit</label>
+                                <input type="text" class="form-control allow-decimal currency masked" placeholder="Outstanding Kredit"
+                                    id="outstanding_kredit" value="@if (!empty($data->outstanding_kredit)){{ $data->outstanding_kredit }}@endif">
+                                <input type="hidden" name="outstanding_kredit" @if (!empty($data->outstanding_kredit)) value="{{ $data->outstanding_kredit }}" @endif>
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
@@ -179,9 +217,11 @@
                                 </div>
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
-                                <input id="range-periode" class="form-control w-full block mx-auto" required
-                                value="@if (!empty($data->periode_start)) {{ date_format(date_create($data->periode_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->periode_end), 'd/m/Y') }} @endif">
+                                <label for="masa" class="form-label sm:w-20">Periode Polis</label>
+                                <input id="periode-polis" class="form-control w-full block mx-auto range-periode" required
+                                value="@if(!empty($data->polis_start)){{ date_format(date_create($data->polis_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->polis_end), 'd/m/Y') }}@endif">
+                                <input type="hidden" name="polis_start" value="@if(!empty($data->polis_start)){{ $data->polis_start }}@endif">
+                                <input type="hidden" name="polis_end" value="@if(!empty($data->polis_end)){{ $data->polis_end }}@endif">
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="masa" class="ml-3 form-label sm:w-20">Masa Asuransi</label>
@@ -190,6 +230,33 @@
                                         id="masa" value="@if (!empty($data->masa)){{ $data->masa }}@endif" required>
                                     <div id="masa" class="input-group-text">Hari</div>
                                 </div>
+                            </div>
+                            <div class="form-inline mt-5">
+                                <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
+                                <input id="periode-kjpp" class="form-control w-full block mx-auto range-periode" required
+                                value="@if (!empty($data->kjpp_start)) {{ date_format(date_create($data->kjpp_start), 'd/m/Y') . ' s/d ' . date_format(date_create($data->kjpp_end), 'd/m/Y') }} @endif">
+                                <input type="hidden" name="kjpp_start" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
+                                <input type="hidden" name="kjpp_end" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
+                            </div>
+                            <div class="form-inline mt-5">
+                                <label for="agunan_kjpp" class="form-label sm:w-20">Nilai Agunan KJPP</label>
+                                <input type="text" class="form-control allow-decimal currency masked" placeholder="Nilai Agunan KJPP"
+                                id="agunan_kjpp" value="@if (!empty($data->agunan_kjpp)){{ $data->agunan_kjpp }}@endif">
+                                <input type="hidden" name="agunan_kjpp" @if (!empty($data->agunan_kjpp)) value="{{ $data->agunan_kjpp }}" @endif>
+                            </div>
+                            <div class="form-inline mt-5">
+                                <label for="jaminan" class="ml-3 form-label sm:w-20">Jenis Jaminan</label>
+                                <select id="jaminan" name="jaminan" required style="width:100%">
+                                    @foreach ($jaminan as $val)
+                                        <option value="{{ $val->msid }}" @if (!empty($data->id_jaminan) && $val->msid == $data->id_jaminan) selected @endif>{{ $val->msdesc }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-inline mt-5">
+                                <label for="nojaminan" class="form-label sm:w-20">Nomor Jenis Jaminan</label>
+                                <input type="text" class="form-control allow-decimal" placeholder="Nomor Jenis Jaminan" name="nojaminan"
+                                    id="nojaminan" value="@if (!empty($data->nojaminan)){{ $data->nojaminan }}@endif">
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
@@ -218,12 +285,9 @@
                             <script>
                                 var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
                                 {{ $data->id_kodepos }}, false, false);
-                                    $('#kodepos').append(newOption).trigger('change');
-                                </script>
+                                $('#kodepos').append(newOption).trigger('change');
+                            </script>
                             @endif
-                            <div class="sm:ml-20 sm:pl-5 mt-5">
-
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -237,7 +301,7 @@
                         Nilai Pertanggungan
                     </h2>
                 </div>
-                <form id="frm-pertanggungan">
+                <form class="formnya">
                     <table class="table">
                         <thead>
                             <tr>
@@ -256,76 +320,66 @@
                                                 placeholder="{{ $row->kodetrans_nama }}"
                                                 aria-label="{{ $row->kodetrans_nama }}"
                                                 d-input="{{ $row->kodetrans_input }}"
+                                                onChange="hitung()"
                                                 id="kodetrans-value[{{ $row->kodetrans_id }}]"
                                                 value="@if (!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
                                             <input type="hidden" name="kodetrans-value[{{ $row->kodetrans_id }}]">
                                         </div>
                                     </td>
                                     <td><input name="kodetrans-remarks[{{ $row->kodetrans_id }}]" class="form-control"
-                                            value=" @if (!empty($pricing[$row->kodetrans_id]->deskripsi)){{ $pricing[$row->kodetrans_id]->deskripsi }}@endif"></td>
+                                            value="@if(!empty($pricing[$row->kodetrans_id]->deskripsi)){{ $pricing[$row->kodetrans_id]->deskripsi }}@endif"></td>
                                 </tr>
                             @endforeach
-                            <tr>
-                                <td colspan="2">
-                                    <div class="input-group">
-                                        <div id="group-t" class="input-group-text">Total</div>
-                                        <input style="text-align:right;" id="kodetrans-value[1]" type="text" d-input="TSI"
-                                            class="currency form-control allow-decimal masked total-si" placeholder="Total Nilai Pertanggungan"
-                                            aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
-                                            value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
-                                        <input type="hidden" name="kodetrans-value[1]">
-                                    </div>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
-                
-            </div>
-            <div class="intro-y box mt-5">
-                <div class="intro-y box p-5">
-                    <div class="input-group">
-                        <div id="group-t" class="input-group-text">Premium</div>
-                        <input style="text-align:right;" id="kodetrans-value[2]" type="text" d-input="PREMI"
-                            class="currency form-control allow-decimal masked" placeholder="Premium"
-                            aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
-                            value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
-                        <input type="hidden" name="kodetrans-value[2]">
-                    </div>
-                    <div class="sm:grid grid-cols-2 gap-2">
-                        <div class="mt-2">
-                            <label for="kodetrans-value[10]" class="form-label">Biaya Materai</label>
-                            <input id="kodetrans-value[10]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai">
-                            <input type="hidden" name="kodetrans-value[10]">
+                    <div class="p-5">
+                        <div class="sm:grid grid-cols-2 gap-2">
+                            <div class="mt-2">
+                                <label for="kodetrans-value[1]" class="form-label">Total</label>
+                                <input id="kodetrans-value[1]" d-input="TSI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control total-si" placeholder="Total Nilai Pertanggungan" readonly aria-describedby="Total Nilai Pertanggungan" value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
+                                <input type="hidden" name="kodetrans-value[1]">
+                            </div>
+                            <div class="mt-2">
+                                <label for="kodetrans-value[2]" class="form-label">Premium</label>
+                                <input id="kodetrans-value[2]" d-input="PREMI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Premium" aria-describedby="Premium" value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
+                                <input type="hidden" name="kodetrans-value[2]">
+                            </div>
+                            <div class="mt-2">
+                                <label for="kodetrans-value[10]" class="form-label">Biaya Materai</label>
+                                <input id="kodetrans-value[10]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[10]->value)){{ $pricing[10]->value }}@endif">
+                                <input type="hidden" name="kodetrans-value[10]">
+                            </div>
+                            <div class="mt-2">
+                                <label for="kodetrans-value[13]" class="form-label">Biaya Admin</label>
+                                <input id="kodetrans-value[13]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin" value="@if (!empty($pricing[13]->value)){{ $pricing[13]->value }}@endif">
+                                <input type="hidden" name="kodetrans-value[13]">
+                            </div>
                         </div>
-                        <div class="mt-2">
-                            <label for="kodetrans-value[13]" class="form-label">Biaya Admin</label>
-                            <input id="kodetrans-value[13]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin">
-                            <input type="hidden" name="kodetrans-value[13]">
-                        </div>
                     </div>
-                </div>
+                </form>
             </div>
             @role('adm|broker|insurance')
             <div class="intro-y box mt-5">
                 <div class="intro-y box p-5">
                     <div>
-                        <div class="sm:grid grid-cols-2 gap-2">
-                            @foreach ($hitung as $row)
-                            <div class="mt-2">
-                                <label for="kodetrans-value[{{ $row->kodetrans_id }}]" class="form-label">{{ $row->kodetrans_nama }}</label>
-                                <input id="kodetrans-value[{{ $row->kodetrans_id }}]" d-input="{{ $row->kodetrans_input }}" {!! $row->kodetrans_attribute !!} onChange="hitung()" type="text" class="@if(strpos($row->kodetrans_nama, '%') !== false) decimal @else currency @endif allow-decimal masked form-control" placeholder="{{ $row->kodetrans_nama }}" aria-describedby="{{ $row->kodetrans_nama }}">
-                                <input type="hidden" name="kodetrans-value[{{ $row->kodetrans_id }}]">
+                        <form class="formnya">
+                            <div class="sm:grid grid-cols-2 gap-2">
+                                @foreach ($hitung as $row)
+                                <div class="mt-2">
+                                    <label for="kodetrans-value[{{ $row->kodetrans_id }}]" class="form-label">{{ $row->kodetrans_nama }}</label>
+                                    <input id="kodetrans-value[{{ $row->kodetrans_id }}]" d-input="{{ $row->kodetrans_input }}" {!! $row->kodetrans_attribute !!} onChange="hitung()" type="text" class="@if(strpos($row->kodetrans_nama, '%') !== false) decimal @else currency @endif allow-decimal masked form-control" placeholder="{{ $row->kodetrans_nama }}" aria-describedby="{{ $row->kodetrans_nama }}">
+                                    <input type="hidden" name="kodetrans-value[{{ $row->kodetrans_id }}]">
+                                </div>
+                                @endforeach
                             </div>
-                            @endforeach
-                        </div>
+                        </form>
                     </div>
                 </div>
-                </form>
             </div>
             @endrole
             <div class="intro-y box mt-5">
                 <div id="horizontal-form" class="p-5">
-                    <form id="frm-data-nasabah">
+                    <form class="formnya">
                         <div class="preview">
                             Catatan
                             <div class="form-inline mt-2">
@@ -336,7 +390,7 @@
                 </div>
             </div>
         </div>
-        @if ($act !== 'add')
+        @if ($act !== 'add' && !empty($data->transid))
             <div class="intro-y col-span-12 lg:col-span-6">
                 <div class="intro-y box">
                     <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
@@ -440,23 +494,26 @@
                 $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }});
             @endforeach
 
-            @foreach ($formula as $row)
-            console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
-            @endforeach
-            console.log('Premium: ',TSI*RATE/1000);
-            console.log("Admin", ADMIN);
-            console.log("Materai", MATERAI);
-            console.log("Biaya Lain", LAIN);
+            // @foreach ($formula as $row)
+            //     console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+            // @endforeach
+            // console.log('TSI: ', TSI);
+            // console.log('Premium: ', PREMI);
+            // console.log("Rate: ", RATE);
+            // console.log("Admin: ", ADMIN);
+            // console.log("Materai: ", MATERAI);
+            // console.log("Biaya Lain: ", LAIN);
+            $('.masked').trigger('keyup');
         }
         $(document).ready(function() {
             $('select').select2();
             $('#npwp_insured').inputmask("99.999.999.9-999.999");
             $('#nik_insured').inputmask("9999999999999999");
-            $('#range-periode').inputmask("99/99/9999 s/d 99/99/9999");
+            $('.range-periode').inputmask("99/99/9999 s/d 99/99/9999");
             $('#masa').inputmask("decimal");
 
             $('.dt-table').DataTable();
-            @if ($act !== 'add')
+            @if ($act !== 'add' && !empty($data->transid))
                 var tableDokumen = $('#tb-dokumen').DataTable({
                     "lengthMenu": [[5, 10, 25, 50], [5, 10, 25, 50]],
                     "serverSide":true,
@@ -703,10 +760,23 @@
                 }
             });
 
-            var startDate = moment($('#range-periode').val().substring(0,10), "YYYYMMDD"),
-                endDate = moment($('#range-periode').val().substring(15), "YYYYMMDD");
+            var startPolis = moment($('#periode-polis').val().substring(0,10), "YYYYMMDD"),
+                endPolis = moment($('#periode-polis').val().substring(15), "YYYYMMDD"),
+                startKJPP = moment($('#periode-kjpp').val().substring(0,10), "YYYYMMDD"),
+                endKJPP = moment($('#periode-kjpp').val().substring(15), "YYYYMMDD");
 
-            $('#range-periode').daterangepicker({
+            $('#periode-kjpp').daterangepicker({
+                autoApply: true,
+                showDropdowns: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+            }, function(start,end,label){
+                $('[name="kjpp_start"]').val(start.format('YYYY-MM-DD'));
+                $('[name="kjpp_end"]').val(end.format('YYYY-MM-DD'));
+            });
+
+            $('#periode-polis').daterangepicker({
                 autoApply: true,
                 showDropdowns: true,
                 locale: {
@@ -715,18 +785,22 @@
             }, function(start, end, label) {
                 console.log('start: ',start);
                 console.log('end: ',end);
-                startDate = start
-                endDate = end;
+                startPolis = start
+                endPolis = end;
                 $('#masa').val(Math.round(moment.duration(end.diff(start)).asDays()));
+                $('[name="polis_start"]').val(start.format('YYYY-MM-DD'));
+                $('[name="polis_end"]').val(end.format('YYYY-MM-DD'));
                 // $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
             });
 
             $('#masa').keyup(function(){
-                endDate = startDate.add($(this).val(), 'day').format('DD/MM/YYYY');
-                startDate = startDate.subtract($(this).val(), 'day');
-                $('#range-periode').data('daterangepicker').setStartDate(startDate);
-                $('#range-periode').data('daterangepicker').setEndDate(endDate);
-                // $('#range-periode').daterangepicker({ startDate: startDate.format(), endDate: '03/06/2005' });
+                endPolis = startPolis.add($(this).val(), 'day').format('DD/MM/YYYY');
+                startPolis = startPolis.subtract($(this).val(), 'day');
+                $('#periode-polis').data('daterangepicker').setStartDate(startPolis);
+                $('#periode-polis').data('daterangepicker').setEndDate(endPolis);
+                $('[name="polis_start"]').val(startPolis.format('YYYY-MM-DD'));
+                $('[name="polis_end"]').val(endPolis.format('YYYY-MM-DD'));
+                // $('#periode-polis').daterangepicker({ startPolis: startPolis.format(), endPolis: '03/06/2005' });
             });
 
             @if (empty($method) && !empty($data))
@@ -744,7 +818,7 @@
                 $.ajax({
                     url: "{{ url('api/pengajuan') }}",
                     method: "POST",
-                    data: $('#frm-data-nasabah, #frm-pertanggungan').serialize() + "&method=create&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
+                    data: $('.formnya').serialize() + "&method=create&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
@@ -780,9 +854,9 @@
 
             // $('#kodetrans-value[2]');
             RATE = parseFloat($("#okupasi option:selected").text().slice($("#okupasi option:selected").text().indexOf("(") + 1, $("#okupasi option:selected").text().lastIndexOf("‰")));
+            $('.masked').trigger('keyup');
             hitung();
             // $(':input').change();
-            // $(':input').keyup();
         });
     </script>
 @endsection

@@ -98,7 +98,7 @@
                         <th class="whitespace-nowrap">Cabang</th>
                         <th class="whitespace-nowrap">Tertanggung</th>
                         <th class="whitespace-nowrap">No. Polis</th>
-                        <th class="whitespace-nowrap">Periode</th>
+                        <th class="whitespace-nowrap">Periode Polis</th>
                         <th class="whitespace-nowrap">Tanggal Dibuat</th>
                         <th class="whitespace-nowrap">Nilai Pertanggungan</th>
                         <th class="whitespace-nowrap">Premium</th>

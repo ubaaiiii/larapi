@@ -210,7 +210,7 @@ $(document).ready(function() {
                 sum += parseFloat($(this).inputmask("unmaskedvalue"));
             }
         });
-        $(".total-si").val(sum).trigger('change');
+        $(".total-si").val(sum).trigger('keyup');
     });
 
     $(".masked").keyup(function() {
