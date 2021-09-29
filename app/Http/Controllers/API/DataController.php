@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Document;
+use App\Models\Instype;
 use App\Models\Insured;
 use App\Models\KodePos;
 use App\Models\Okupasi;
@@ -38,6 +39,26 @@ class DataController extends Controller
         foreach ($provinsi as $row) {
             $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['kecamatan'] . " / " . $row['kelurahan'] . " / " . $row['kodepos'];
+            $key++;
+        }
+        return response()->json($list);
+    }
+
+    public function selectInstype(Request $request)
+    {
+        $instype = Instype::select('id', 'instype_name', 'brokerage_percent', 'klausula_template');
+        if (!empty($request->search)) {
+            $instype->where('id', 'like', '%' . $request->search . '%')
+                ->orWhere('instype_name', 'like', '%' . $request->search . '%');
+        }
+        $instype = $instype->get();
+        $list = [];
+        $key = 0;
+        foreach ($instype as $row) {
+            $list[$key]['id'] = $row['id'];
+            $list[$key]['text'] = $row['instype_name'];
+            $list[$key]['brokerage_percent'] = $row['brokerage_percent'];
+            $list[$key]['klausula_template'] = $row['klausula_template'];
             $key++;
         }
         return response()->json($list);
@@ -263,13 +284,15 @@ class DataController extends Controller
             'okupasi.rate',
             'kecamatan',
             'kelurahan',
-            'kodepos'
+            'kodepos',
+            'instype_name',
         ];
         $data = DB::table('transaksi')
             ->leftJoin('cabang', 'id_cabang', '=', 'cabang.id')
             ->leftJoin('insured', 'id_insured', '=', 'insured.id')
             ->leftJoin('kodepos', 'id_kodepos', '=', 'kodepos.id')
             ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
+            ->leftJoin('instype', 'id_instype', '=', 'instype.id')
             ->where('transid', '=', $transid)
             ->select($select)
             ->first();

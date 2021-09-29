@@ -22,6 +22,13 @@
     <!-- END: CSS Assets-->
     <script src="{{ url('public/vendor/jquery/jquery-3.6.0.min.js') }}"></script>
     @yield('header')
+    <style>
+        .has-error .select2-selection {
+            /*border: 1px solid #a94442;
+            border-radius: 4px;*/
+            border-color:rgb(255, 0, 0) !important;
+        }
+    </style>
 </head>
 <!-- END: Head -->
 
@@ -41,6 +48,7 @@
     <script src="{{ url('public/vendor/select2/select2.min.js') }}"></script>
     <script src="{{ url('public/vendor/select2/id.js') }}"></script>
     <script src="{{ url('public/vendor/quill/quill.js') }}"></script>
+    <script src="{{ url('public/vendor/sweetalert2/sweetalert2.js') }}"></script>
     <script src="{{ url('public/js/jquery.inputmask.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/daterangepicker.min.js') }}"></script>
