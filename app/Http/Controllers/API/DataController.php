@@ -220,6 +220,10 @@ class DataController extends Controller
                 // wherenya broker
                 break;  
 
+            case 'approver':
+                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                break;  
+
             case 'adm':
                 // wherenya administrator
                 break;  
@@ -481,5 +485,18 @@ class DataController extends Controller
             "data"            => $data,
             // "sql"             => $query[3]
         ], 200);
+    }
+
+    public function dataLaporan(Request $request)
+    {
+        switch ($request->jenis) {
+            case 'value':
+                # code...
+                break;
+            
+            default:
+                # code...
+                break;
+        }
     }
 }
