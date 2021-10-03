@@ -20,6 +20,7 @@
         </li>
 
         @php
+        // DB::enableQueryLog();
         $pages = DB::table('model_has_roles as mr')
             ->join('role_has_pages as rp','rp.role_id','=','mr.role_id')
             ->join('pages as p','p.id','=','rp.page_id')
@@ -28,6 +29,7 @@
             ->whereNull('parent_id')
             ->orderBy('index', 'asc')
             ->get();
+        // dd(DB::getQueryLog());
 
         foreach ($pages as $page) {
             $sub_pages = DB::table('model_has_roles as mr')

@@ -67,19 +67,41 @@ class PageController extends Controller
         return view('pengajuan', $data);
     }
 
-    function laporan($transid = null)
+    function laporan(Request $request)
     {
-        $data = [
-            'cabang'    => Cabang::all(),
-            'asuransi'  => Master::where('mstype', 'insurance')->get(),
-            'laporan'   => Laporan::where('laplevel', Auth::user()->getRoleNames()[0])->get(),
-            'level'     => Master::where('mstype', 'level')->get(),
-            'instype'   => Instype::all(),
-        ];
+        // $permission = Permission::create(['name' => 'edit articles']);
+        // $permission->assignRole('');
+        // die;
+        $level = Auth::user()->getRoleNames()[0];
 
-        if (!empty($transid)) {
-            $data['act'] = 'edit';
+        if (count($request->all()) == 0) {
+            switch ($level) {
+                case 'ao':
+                    $cabang = Cabang::where('id',Auth::user()->id_cabang)->get();
+                    break;
+        
+                default:
+                    $cabang = Cabang::all();
+                    break;
+            }
+
+            $data = [
+                'cabang'    => $cabang,
+                'asuransi'  => Asuransi::all(),
+                'laporan'   => Laporan::join('role_has_laporan as rl','laporan.id','=','rl.laporan_id')
+                    ->join('model_has_roles as mr','rl.role_id','=','mr.role_id')
+                    ->where('mr.model_id','=',Auth::user()->id)
+                    ->get(),
+                'instype'   => Instype::all(),
+            ];
+
+        } else {
+            $data = [
+                'data' => $request,
+            ];
+            // return "nyampe sini";
         }
+
         return view('laporan', $data);
     }
 

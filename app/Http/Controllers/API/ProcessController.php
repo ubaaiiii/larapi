@@ -167,6 +167,9 @@ class ProcessController extends Controller
             } else {
                 $remarks = $request->kodetrans_remarks[$key];
             }
+            if ($value == null) {
+                $value = 0;
+            }
             $pricing = Pricing::updateOrCreate(
                 ['id_transaksi' => $request->transid, 'id_kodetrans' => $key],
                 ['value' => $value, 'deskripsi' => $remarks]
@@ -195,8 +198,8 @@ class ProcessController extends Controller
                     'alamat_insured'    => 'required|string',
                     'plafond_kredit'    => 'required',
                     'outstanding_kredit'=> 'required',
-                    'policy_no'         => 'alpha_dash',
-                    'nopolis_lama'      => 'alpha_dash',
+                    'policy_no'         => 'alpha_dash|nullable',
+                    'nopolis_lama'      => 'alpha_dash|nullable',
                     'polis_start'       => 'required|string',
                     'polis_end'         => 'required|string',
                     'masa'              => 'required|numeric',
@@ -314,13 +317,51 @@ class ProcessController extends Controller
 
                 $data = Transaksi::where('transid',$request->transid)->update([
                     'id_status' => $status,
+                    'catatan'   => $request->catatan,
                 ]);
                 
-                $this->aktifitas($request->transid, $status, 'Approval by '. $role);
+                $this->aktifitas($request->transid, $status, $request->catatan);
                 
                 return response()->json([
                     'message'   => 'Debitur '. $request->nama_insured ." berhasil di".$string,
                     'data'      => $data,
+                    'method'    => "approve",
+                ], 200);
+
+                break;
+
+            case 'rollback':
+                $role = Auth::user()->getRoleNames()[0];
+                switch ($role) {
+                    case 'checker':
+                        $status = 0;
+                        break;
+                    case 'approver':
+                        $status = 1;
+                        break;
+                    case 'broker':
+                        $status = 2;
+                        break;
+                    case 'insurance':
+                        $status = 3;
+                        break;
+                    
+                    default:
+                        return redirect()->route('logout');
+                        break;
+                }
+
+                $data = Transaksi::where('transid',$request->transid)->update([
+                    'id_status' => $status,
+                    'catatan'   => $request->catatan,
+                ]);
+                
+                $this->aktifitas($request->transid, $status, $request->catatan);
+                
+                return response()->json([
+                    'message'   => 'Debitur '. $request->nama_insured ." berhasil dikembalikan ",
+                    'data'      => $data,
+                    'method'    => "rollback",
                 ], 200);
 
                 break;

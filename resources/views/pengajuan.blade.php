@@ -16,13 +16,16 @@
                 <button class="btn btn-sm btn-primary" id="btn-perpanjang">Perpanjang</button>
             @endif
             @if ($method == 'approve' && !empty($data))
-                @role('ao')
+                @role('checker')
                 <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
                 @endrole
-                @role('broker|insurance')
+                @role('approver')
                 <button class="btn btn-sm btn-success btn-approve">Setujui</button>
                 @endrole
-                @role('checker')
+                @role('broker')
+                <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
+                @endrole
+                @role('insurance')
                 <button class="btn btn-sm btn-success btn-approve">Aktifkan</button>
                 @endrole
             @endif
@@ -40,7 +43,9 @@
                     <h2 class="font-medium text-base mr-auto">
                         Data Nasabah
                     </h2>
+                    @role('broker|insurance|adm')
                     <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2">Klausula</a>
+                    @endrole
                 </div>
                 <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-xl">
@@ -88,7 +93,7 @@
                                 $('#type_insurance').append(newOption).trigger('change');
                             </script>
                             @endif
-                            @if (!empty($data) && $data->id_status >= 2)
+                            @if (!empty($data) && $data->id_status >= 3)
                             <div class="form-inline mt-5">
                                 <label for="asuransi" class="ml-3 form-label sm:w-20">Asuransi</label>
                                 <select id="asuransi" name="asuransi" required style="width:100%">
@@ -158,7 +163,7 @@
                                     id="outstanding_kredit" value="@if (!empty($data->outstanding_kredit)){{ $data->outstanding_kredit }}@endif">
                                 <input type="hidden" name="outstanding_kredit" @if (!empty($data->outstanding_kredit)) value="{{ $data->outstanding_kredit }}" @endif>
                             </div>
-                            <div class="form-inline mt-5">
+                            <div class="form-inline mt-5" @if(empty($data) ||$data->id_status <=2) style="display:none;" @endif >
                                 <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
                                 <input type="text" class="form-control allow-decimal" placeholder="Nomor Polis" name="policy_no"
                                     id="policy_no" value="@if (!empty($data->policy_no)){{ $data->policy_no }}@endif">
@@ -297,12 +302,12 @@
                                 <input id="kodetrans_value[2]" d-input="PREMI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Premium" readonly aria-describedby="Premium" value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[2]">
                             </div>
-                            <div class="mt-2">
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=2) style="display:none" @endif>
                                 <label for="kodetrans_value[10]" class="form-label">Biaya Materai</label>
                                 <input id="kodetrans_value[10]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[10]->value)){{ $pricing[10]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[10]">
                             </div>
-                            <div class="mt-2">
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=2) style="display:none" @endif>
                                 <label for="kodetrans_value[13]" class="form-label">Biaya Admin</label>
                                 <input id="kodetrans_value[13]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin" value="@if (!empty($pricing[13]->value)){{ $pricing[13]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[13]">
@@ -311,8 +316,11 @@
                     </div>
                 </form>
             </div>
-            @role('adm|broker|insurance')
-            <div class="intro-y box mt-5">
+                @role('adm|broker|insurance')
+                <div class="intro-y box mt-5">
+                @else
+                <div class="intro-y box mt-5" style="display: none">
+                @endrole
                 <div class="intro-y box p-5">
                     <div>
                         <form class="formnya">
@@ -332,7 +340,6 @@
                     </div>
                 </div>
             </div>
-            @endrole
             <div class="intro-y box mt-5">
                 <div id="horizontal-form" class="p-5">
                     <form class="formnya">
@@ -805,6 +812,9 @@
 
             @if (empty($method) && !empty($data))
                 $(":input").prop('disabled', true);
+                $("[type='search']").removeAttr('disabled');
+                $('#multiple-file-upload').hide();
+                $('[name*="_length"]').removeAttr('disabled');
                 $('#catatan').prop('disabled', false);
                 // $("#frm-pertanggungan :input").prop('disabled', true);
             @endif
@@ -848,11 +858,12 @@
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
                     success: function(d) {
-                        Swal.fire({
-                            title: "Berhasil!",
-                            text: d.message,
-                            type: "success"
-                        }).then(function() {
+                        console.log(d);
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        ).then(function() {
                             if (d.method == 'create') {
                                 window.location = "{{ url('inquiry') }}";
                             } else {
@@ -876,23 +887,47 @@
 
             $('.btn-approve').click(function(){
                 var btnHtml = $(this).html(),
-                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...";
-                $(this).attr('disabled',true).html(loading);
+                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
+                    nama_insured = $('#insured option:selected').text(),
+                    nama_cabang = $('#cabang option:selected').text();
+
+                $(this)
+                    .attr('disabled',true)
+                    .html(loading);
 
                 $.ajax({
                     url: "{{ url('api/pengajuan') }}",
                     method: "POST",
-                    data: $('#frm-data-nasabah, #frm-pertanggungan').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang,
+                    data: $('.formnya').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang+"&klausula="+encodeURIComponent(klausulaValue),
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
                     success: function(d) {
-                        console.log('success: ',d);
+                        console.log(d);
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        ).then(function() {
+                            if (d.method == 'create') {
+                                window.location = "{{ url('inquiry') }}";
+                            } else {
+                                window.top.close();
+                            }
+                        });
                     },
                     error: function(d) {
-                        console.log('error: ', d);
+                        var message = d.responseJSON.message;
+                        // console.log(d.responseJSON.errors);
+                        $.each(d.responseJSON.errors, function(i,v){
+                            $('#'+i).closest('div').addClass('has-error');
+                            $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
+                        });
                     }
                 });
+                $(this)
+                .attr('disabled',false)
+                .html(btnHtml);
             });
 
             // $('#kodetrans_value[2]');

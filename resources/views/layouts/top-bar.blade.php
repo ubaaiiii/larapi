@@ -8,7 +8,7 @@
     <!-- END: Breadcrumb -->
     <div class="intro-x relative mr-3 sm:mr-6 <?= empty($search) ? '' : $search ?>">
         <div class="search">
-            <input id="text-search" type="text" class="search__input form-control border-transparent placeholder-theme-13"
+            <input id="text-search" type="search" class="search__input form-control border-transparent placeholder-theme-13"
                 placeholder="Search Inquiry..." name="search">
             <i id="icon-search" data-feather="search" class="search__icon dark:text-gray-300"></i>
         </div>

@@ -49,8 +49,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::get('home', [PageController::class, 'dashboard'])->name('home');
 Route::get('profile', [PageController::class, 'profile'])->name('profile');
-Route::get('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+// laporan
+Route::get('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
+Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 
 // inquiry
 Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
