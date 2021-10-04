@@ -486,17 +486,4 @@ class DataController extends Controller
             // "sql"             => $query[3]
         ], 200);
     }
-
-    public function dataLaporan(Request $request)
-    {
-        switch ($request->jenis) {
-            case 'value':
-                # code...
-                break;
-            
-            default:
-                # code...
-                break;
-        }
-    }
 }

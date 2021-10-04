@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\api\DataController;
+use App\Http\Controllers\api\LaporanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,7 +36,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/datadokumen', 'API\DataController@dataDokumen');
     Route::post('/datadokumen/{any}', 'API\DataController@dataDokumen');
     Route::post('/dataaktifitas', 'API\DataController@dataAktifitas');
-    Route::post('/datauser', 'API\DataController@datauser');
+    Route::post('/datauser', 'API\DataController@dataUser');
+    Route::post('/datalaporan', 'API\LaporanController@tableLaporan');
     
     // proses data
     Route::post('/user', 'API\ProcessController@user');

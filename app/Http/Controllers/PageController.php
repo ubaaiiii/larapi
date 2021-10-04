@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\API\DataController;
+use App\Http\Controllers\API\LaporanController;
 use App\Models\Asuransi;
 use App\Models\Cabang;
 use App\Models\Instype;
@@ -73,31 +74,34 @@ class PageController extends Controller
         // $permission->assignRole('');
         // die;
         $level = Auth::user()->getRoleNames()[0];
-
         if (count($request->all()) == 0) {
             switch ($level) {
                 case 'ao':
                     $cabang = Cabang::where('id',Auth::user()->id_cabang)->get();
                     break;
-        
+                    
                 default:
-                    $cabang = Cabang::all();
-                    break;
+                $cabang = Cabang::all();
+                break;
             }
-
+            
             $data = [
                 'cabang'    => $cabang,
                 'asuransi'  => Asuransi::all(),
                 'laporan'   => Laporan::join('role_has_laporan as rl','laporan.id','=','rl.laporan_id')
-                    ->join('model_has_roles as mr','rl.role_id','=','mr.role_id')
-                    ->where('mr.model_id','=',Auth::user()->id)
-                    ->get(),
+                ->join('model_has_roles as mr','rl.role_id','=','mr.role_id')
+                ->where('mr.model_id','=',Auth::user()->id)
+                ->get(),
                 'instype'   => Instype::all(),
             ];
-
+            
         } else {
+            // return $request->all();
+            $laporan     = new LaporanController;
             $data = [
-                'data' => $request,
+                'data'      => $request,
+                'columns'   => $laporan->tableLaporan($request),
+                // 'dataLaporan'   => $dataController->dataLaporan($request),
             ];
             // return "nyampe sini";
         }

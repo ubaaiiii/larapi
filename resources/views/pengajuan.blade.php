@@ -472,7 +472,7 @@
             $('select').select2();
             $('#npwp_insured').inputmask("99.999.999.9-999.999");
             $('#nik_insured').inputmask("9999999999999999");
-            $('.range-periode').inputmask("99/99/9999 s/d 99/99/9999");
+            $('.range-periode').inputmask("99/99/9999 - 99/99/9999");
             $('#masa').inputmask("decimal");
 
             $('.dt-table').DataTable();
