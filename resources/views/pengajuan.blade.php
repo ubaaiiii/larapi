@@ -125,6 +125,11 @@
                                     id="nopinjaman" value="@if (!empty($data->nopinjaman)){{ $data->nopinjaman }}@endif">
                             </div>
                             <div class="form-inline mt-5">
+                                <label for="cif" class="form-label sm:w-20">CIF</label>
+                                <input type="text" class="form-control allow-decimal" placeholder="CIF" name="cif"
+                                    id="cif" value="@if (!empty($data->cif)){{ $data->cif }}@endif">
+                            </div>
+                            <div class="form-inline mt-5">
                                 <label for="insured" class="ml form-label sm:w-20">Tertanggung (QQ)</label>
                                 <select id="insured" style="width:100%;text-transform: uppercase;" class="select2"
                                     name="insured" required>
@@ -151,6 +156,7 @@
                                 <label for="alamat_insured" class="form-label sm:w-20">Alamat Tertanggung</label>
                                 <textarea id="alamat_insured" name="alamat_insured" class="form-control" required @if (!empty($data->alamat_insured)) @endif>@if (!empty($data->alamat_insured)){{ $data->alamat_insured }}@endif</textarea>
                             </div>
+                            @role('ao|checker|broker|approver|adm')
                             <div class="form-inline mt-5">
                                 <label for="plafond_kredit" class="form-label sm:w-20">Plafond Kredit</label>
                                 <input type="text" class="form-control allow-decimal currency masked" placeholder="Plafond Kredit"
@@ -163,6 +169,7 @@
                                     id="outstanding_kredit" value="@if (!empty($data->outstanding_kredit)){{ $data->outstanding_kredit }}@endif">
                                 <input type="hidden" name="outstanding_kredit" @if (!empty($data->outstanding_kredit)) value="{{ $data->outstanding_kredit }}" @endif>
                             </div>
+                            @endrole
                             <div class="form-inline mt-5" @if(empty($data) ||$data->id_status <=2) style="display:none;" @endif >
                                 <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
                                 <input type="text" class="form-control allow-decimal" placeholder="Nomor Polis" name="policy_no"
@@ -190,6 +197,7 @@
                                     <div id="masa" class="input-group-text">Hari</div>
                                 </div>
                             </div>
+                            @role('ao|checker|broker|approver|adm')
                             <div class="form-inline mt-5">
                                 <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
                                 <input id="periode-kjpp" class="form-control w-full block mx-auto range-periode" required>
@@ -202,6 +210,7 @@
                                 id="agunan_kjpp" value="@if (!empty($data->agunan_kjpp)){{ $data->agunan_kjpp }}@endif">
                                 <input type="hidden" name="agunan_kjpp" @if (!empty($data->agunan_kjpp)) value="{{ $data->agunan_kjpp }}" @endif>
                             </div>
+                            @endrole
                             <div class="form-inline mt-5">
                                 <label for="jaminan" class="ml-3 form-label sm:w-20">Jenis Jaminan</label>
                                 <select id="jaminan" name="jaminan" required style="width:100%">
@@ -216,9 +225,10 @@
                                 <input type="text" class="form-control allow-decimal" placeholder="Nomor Jenis Jaminan" name="no_jaminan"
                                     id="no_jaminan" value="@if (!empty($data->no_jaminan)){{ $data->no_jaminan }}@endif">
                             </div>
+                            @if (!empty($data) && $data->id_status >= 3)
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
-                                <select id="okupasi" style="width:100%" name="okupasi" required>
+                                <select id="okupasi" style="width:100%" name="okupasi">
                                     {{-- @foreach ($okupasi as $val)
                                         <option value="{{ $val->id }}" @if (!empty($data->id_okupasi) && $val->id === $data->id_okupasi) selected="true" @endif>
                                             {{ $val->kode_okupasi . ' - (' . $val->rate . ' ‰) ' . $val->nama_okupasi }}
@@ -245,6 +255,7 @@
                                 {{ $data->id_kodepos }}, false, false);
                                 $('#kodepos').append(newOption).trigger('change');
                             </script>
+                            @endif
                             @endif
                         </div>
                     </form>
@@ -297,7 +308,7 @@
                                 <input id="kodetrans_value[1]" d-input="TSI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control total-si" placeholder="Total Nilai Pertanggungan" readonly aria-describedby="Total Nilai Pertanggungan" value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[1]">
                             </div>
-                            <div class="mt-2">
+                            <div class="mt-2" @if (!empty($data) && $data->id_status >= 3) @else style="display:none" @endif>
                                 <label for="kodetrans_value[2]" class="form-label">Premium</label>
                                 <input id="kodetrans_value[2]" d-input="PREMI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Premium" readonly aria-describedby="Premium" value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[2]">
@@ -759,46 +770,96 @@
                 $('#alamat_cabang').val($('#cabang option:selected').attr('alamat'));
             });
 
-            var startPolis = moment($('#periode-polis').val().substring(0,10), "YYYYMMDD"),
-                endPolis = moment($('#periode-polis').val().substring(15), "YYYYMMDD"),
-                startKJPP = moment($('#periode-kjpp').val().substring(0,10), "YYYYMMDD"),
-                endKJPP = moment($('#periode-kjpp').val().substring(15), "YYYYMMDD");
+            // var startPolis = moment($('#periode-polis').val().substring(0,10), "YYYYMMDD"),
+            //     endPolis = moment($('#periode-polis').val().substring(15), "YYYYMMDD"),
+            //     startKJPP = moment($('#periode-kjpp').val().substring(0,10), "YYYYMMDD"),
+            //     endKJPP = moment($('#periode-kjpp').val().substring(15), "YYYYMMDD");
+
+            @if(!empty($data->kjpp_start) && !empty($data->kjpp_end))
+                var startKJPP = moment("{{ date_format(date_create($data->kjpp_start), 'd/m/Y') }}");
+                var endKJPP = moment("{{ date_format(date_create($data->kjpp_end), 'd/m/Y') }}");
+            @else 
+                var startKJPP = moment();
+                var endKJPP = moment().add(1, 'month');
+            @endif
+
+            function kjpp(startKJPP, endKJPP) {
+                $('#periode-kjpp').html(startKJPP.format('DD/MM/YYYY') + ' - ' + endKJPP.format('DD/MM/YYYY'));
+                $('[name="kjpp_start"]').val(startKJPP.format('YYYY-MM-DD'));
+                $('[name="kjpp_end"]').val(endKJPP.format('YYYY-MM-DD'));
+            }
 
             $('#periode-kjpp').daterangepicker({
                 autoApply: true,
                 showDropdowns: true,
-                @if(!empty($data->kjpp_start) && !empty($data->kjpp_end))
-                    startDate: "{{ date_format(date_create($data->kjpp_start), 'd/m/Y') }}",
-                    endDate: "{{ date_format(date_create($data->kjpp_end), 'd/m/Y') }}",
-                @endif
+                startDate: startKJPP,
+                endDate: endKJPP,
                 locale: {
                     format: 'DD/MM/YYYY'
                 },
-            }, function(start,end,label){
-                $('[name="kjpp_start"]').val(start.format('YYYY-MM-DD'));
-                $('[name="kjpp_end"]').val(end.format('YYYY-MM-DD'));
-            });
+            }, kjpp);
+
+            kjpp(startKJPP,endKJPP);
+
+            @if(!empty($data->polis_start) && !empty($data->polis_end))
+                var startPolis = moment("{{ date_format(date_create($data->polis_start), 'd/m/Y') }}");
+                var endPolis = moment("{{ date_format(date_create($data->polis_end), 'd/m/Y') }}");
+            @else 
+                var startPolis = moment();
+                var endPolis = moment().add(1, 'month');
+            @endif
+
+            function polis(startPolis, endPolis) {
+                console.log(endPolis.format('DD/MM/YYYY'));
+                $('#periode-polis').html(startPolis.format('DD/MM/YYYY') + ' - ' + endPolis.format('DD/MM/YYYY'));
+                $('#masa').val(Math.round(moment.duration(endPolis.diff(startPolis)).asDays()));
+                $('[name="polis_start"]').val(startPolis.format('YYYY-MM-DD'));
+                $('[name="polis_end"]').val(endPolis.format('YYYY-MM-DD'));
+            }
 
             $('#periode-polis').daterangepicker({
                 autoApply: true,
                 showDropdowns: true,
-                @if(!empty($data->polis_start) && !empty($data->polis_end))
-                    startDate: "{{ date_format(date_create($data->polis_start), 'd/m/Y') }}",
-                    endDate: "{{ date_format(date_create($data->polis_end), 'd/m/Y') }}",
-                @endif
+                startDate: startPolis,
+                endDate: endPolis,
                 locale: {
                     format: 'DD/MM/YYYY'
                 },
-            }, function(start, end, label) {
-                console.log('start: ',start);
-                console.log('end: ',end);
-                startPolis = start
-                endPolis = end;
-                $('#masa').val(Math.round(moment.duration(end.diff(start)).asDays()));
-                $('[name="polis_start"]').val(start.format('YYYY-MM-DD'));
-                $('[name="polis_end"]').val(end.format('YYYY-MM-DD'));
-                // $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
-            });
+            }, polis);
+
+            polis(startPolis,endPolis);
+
+            // $('#periode-kjpp').daterangepicker({
+            //     autoApply: true,
+            //     showDropdowns: true,
+            //     locale: {
+            //         format: 'DD/MM/YYYY'
+            //     },
+            // }, function(start,end,label){
+            //     $('[name="kjpp_start"]').val(start.format('YYYY-MM-DD'));
+            //     $('[name="kjpp_end"]').val(end.format('YYYY-MM-DD'));
+            // });
+
+            // $('#periode-polis').daterangepicker({
+            //     autoApply: true,
+            //     showDropdowns: true,
+            //     @if(!empty($data->polis_start) && !empty($data->polis_end))
+            //         startDate: "{{ date_format(date_create($data->polis_start), 'd/m/Y') }}",
+            //         endDate: "{{ date_format(date_create($data->polis_end), 'd/m/Y') }}",
+            //     @endif
+            //     locale: {
+            //         format: 'DD/MM/YYYY'
+            //     },
+            // }, function(start, end, label) {
+            //     console.log('start: ',start);
+            //     console.log('end: ',end);
+            //     startPolis = start
+            //     endPolis = end;
+            //     $('#masa').val(Math.round(moment.duration(end.diff(start)).asDays()));
+            //     $('[name="polis_start"]').val(start.format('YYYY-MM-DD'));
+            //     $('[name="polis_end"]').val(end.format('YYYY-MM-DD'));
+            //     // $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
+            // });
 
             $('#masa').keyup(function(){
                 endPolis = startPolis.add($(this).val(), 'day').format('DD/MM/YYYY');
@@ -806,7 +867,8 @@
                 $('#periode-polis').data('daterangepicker').setStartDate(startPolis);
                 $('#periode-polis').data('daterangepicker').setEndDate(endPolis);
                 $('[name="polis_start"]').val(startPolis.format('YYYY-MM-DD'));
-                $('[name="polis_end"]').val(endPolis.format('YYYY-MM-DD'));
+                // format dibalik karena kebalik detectnya
+                $('[name="polis_end"]').val(moment(endPolis).format('YYYY-DD-MM'));
                 // $('#periode-polis').daterangepicker({ startPolis: startPolis.format(), endPolis: '03/06/2005' });
             });
 

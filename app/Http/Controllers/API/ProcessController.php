@@ -182,11 +182,13 @@ class ProcessController extends Controller
     public function pengajuan(Request $request)
     {
         // return $request->all();
+        $role = Auth::user()->getRoleNames()[0];
         switch ($request->method) {
             case 'store':
                 $request->validate([
                     'transid'           => 'required|string|max:14',
                     'type_insurance'    => 'required|string',
+                    'asuransi'          => 'string',
                     'cabang'            => 'required',
                     'alamat_cabang'     => 'required|string',
                     'nama_cabang'       => 'required|string',
@@ -208,14 +210,23 @@ class ProcessController extends Controller
                     'agunan_kjpp'       => 'required',
                     'jaminan'           => 'required|string',
                     'no_jaminan'        => 'required',
-                    'okupasi'           => 'required|numeric',
-                    'lokasi_okupasi'    => 'required|string',
-                    'kodepos'           => 'required|numeric',
+                    'okupasi'           => 'numeric',
+                    'lokasi_okupasi'    => 'string',
+                    'kodepos'           => 'numeric',
                     'catatan'           => 'string|nullable',
                     'kodetrans_value'   => 'required|array|min:1|nullable',
                     'kodetrans_remarks' => 'array|nullable',
                     'klausula'          => 'required',
                 ]);
+
+                if (in_array($role,['adm','checker','broker','approver','insurance'])) {
+                    $request->validate([
+                        'asuransi'          => 'required|string',
+                        'okupasi'           => 'required|numeric',
+                        'lokasi_okupasi'    => 'required|string',
+                        'kodepos'           => 'required|numeric',
+                    ]);
+                }
 
                 $insured = $this->tertanggung($request);
                 $cabang = $this->cabang($request);
@@ -291,7 +302,6 @@ class ProcessController extends Controller
                 break;
 
             case 'approve':
-                $role = Auth::user()->getRoleNames()[0];
                 switch ($role) {
                     case 'checker':
                         $status = 1;
@@ -331,7 +341,6 @@ class ProcessController extends Controller
                 break;
 
             case 'rollback':
-                $role = Auth::user()->getRoleNames()[0];
                 switch ($role) {
                     case 'checker':
                         $status = 0;

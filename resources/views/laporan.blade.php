@@ -17,7 +17,7 @@
                     <div class="grid grid-cols-12 gap-4 gap-y-5">
                         <div class="intro-y col-span-12 sm:col-span-6">
                             <label for="instype" class="form-label">Tipe Asuransi</label>
-                            <select id="instype" name="instype" required style="width:100%">
+                            <select id="instype" name="instype" required style="width:100%" class="pilih">
                                 <option value="ALL" selected>Semua Tipe Asuransi</option>
                                 @foreach ($instype as $val)
                                     <option value="{{ $val->id }}">{{ $val->instype_name }}</option>
@@ -26,7 +26,7 @@
                         </div>
                         <div class="intro-y col-span-12 sm:col-span-6">
                             <label for="cabang" class="form-label">Cabang</label>
-                            <select id="cabang" name="cabang" required style="width:100%">
+                            <select id="cabang" name="cabang" required style="width:100%" class="pilih">
                                 @role('broker|insurance|checker|approver|adm')
                                 <option value="ALL" selected>Semua Cabang</option>
                                 @endrole
@@ -38,7 +38,7 @@
                         </div>
                         <div class="intro-y col-span-12 sm:col-span-6">
                             <label for="asuransi" class="form-label">Asuransi</label>
-                            <select id="asuransi" name="asuransi" required style="width:100%">
+                            <select id="asuransi" name="asuransi" required style="width:100%" class="pilih">
                                 <option value="ALL" selected>Semua Asuransi</option>
                                 @foreach ($asuransi as $val)
                                     <option value="{{ $val->id }}">
@@ -55,7 +55,7 @@
                         </div>
                         <div class="intro-y col-span-12 sm:col-span-6">
                             <label for="jenis" class="form-label">Jenis Laporan</label>
-                            <select id="jenis" name="jenis" required style="width:100%">
+                            <select id="jenis" name="jenis" required style="width:100%" class="pilih">
                                 @foreach ($laporan as $val)
                                     <option value="{{ $val->id }}" d-date="{{ $val->lapdate }}">
                                         {{ $val->lapdesc }}
@@ -106,8 +106,12 @@
             @if (empty($data))
                 $('select').select2();
                 
-                $('#jenis').on('select2:select',function(){
+                function judul() {
                     $('[name="judul"]').val($('#jenis option:selected').text().trim() + " - " + $('#cabang option:selected').text().trim()  + " (" + $('#range-periode').val() + ")");
+                };
+
+                $('.pilih').on('change',function(){
+                    judul();
                 });
                 
                 $('#range-periode').inputmask("99/99/9999 - 99/99/9999");
@@ -119,6 +123,7 @@
                     $('#range-periode').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
                     $('[name="periode_start"]').val(start.format('YYYY-MM-DD'));
                     $('[name="periode_end"]').val(end.format('YYYY-MM-DD'));
+                    judul();
                 }
 
                 $('#range-periode').daterangepicker({
