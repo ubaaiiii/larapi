@@ -107,6 +107,44 @@ class DataController extends Controller
         return response()->json($list);
     }
 
+    public function viewToQuery($request, $view, $columns)
+    {
+        DB::enableQueryLog();
+        $all_record = $view->get()->count();
+
+        if (!empty($request->search)) {
+            for ($i = 0; $i < count($columns); $i++) {
+                if ($i == 0) {
+                    $view->where($columns[$i], 'like', '%' . $request->search . '%');
+                } else {
+                    $view->orWhere($columns[$i], 'like', '%' . $request->search . '%');
+                }
+            }
+        }
+
+        if (!empty($request->order) && isset($request->order)) {
+            for ($i = 0; $i < count($request->order); $i++) {
+                $view->orderBy($columns[$request->order[$i]['column']], $request->order[$i]['dir']);
+            }
+        }
+
+        $filtered = $view->get()->count();
+
+        if (!empty($request->start)) {
+            $view->skip($request->start);
+        } else {
+            $view->skip(0);
+        }
+
+        if (!empty($request->length)) {
+            $view->take($request->length);
+        }
+
+        $display = $view->get();
+
+        return [$display, $all_record, $filtered, DB::getQueryLog()];
+    }
+
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
         DB::enableQueryLog();
@@ -163,7 +201,7 @@ class DataController extends Controller
         $result = $table->get();
 
         // return DB::getQueryLog();
-        return [$result, $awal, $all_record, $request->search];
+        return [$result, $awal, $all_record, DB::getQueryLog()];
         // return response()->json([
         //     "draw"              => 1,
         //     "recordsTotal"      => $awal,
@@ -178,14 +216,14 @@ class DataController extends Controller
         $columns = [
             'transid',
             'instype_name',
-            'cabang.nama_cabang',
-            'insured.nama_insured',
+            'cabang',
+            'tertanggung',
             'policy_no',
             'polis_start',
-            'transaksi.created_at',
-            'tsi.value',
-            'premi.value',
-            'sts.msdesc',
+            'tgl_dibuat',
+            'tsi',
+            'premi',
+            'statusnya',
         ];
 
         $select = [
@@ -196,11 +234,10 @@ class DataController extends Controller
             'tsi.value as tsi',
             'premi.value as premi',
             'sts.msdesc as statusnya',
-            'cabang.nama_cabang as cabang',
-            'cabang.alamat_cabang',
         ];
 
-        $table = DB::table("transaksi");
+        // $table = DB::table("transaksi");
+        $table = DB::table("vw_inquiry");
 
         $user = Auth::user()->getRoleNames()[0];
         switch ($user) {
@@ -242,7 +279,8 @@ class DataController extends Controller
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
 
-        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+        // $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+        $query = $this->viewToQuery($request, $table, $columns);
         // return $query;
 
         $data = array();
@@ -270,7 +308,7 @@ class DataController extends Controller
             "recordsTotal"    => intval($query[1]),
             "recordsFiltered" => intval($query[2]),
             "data"            => $data,
-            // "sql"             => $query[3]
+            "sql"             => $query[3]
         ], 200);
     }
 

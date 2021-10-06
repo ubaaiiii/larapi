@@ -381,7 +381,7 @@ class LaporanController extends Controller
                     'outstanding_kredit     as "Outstanding Kredit"',
                     'policy_no              as "Nomor Polis"',
                     'policy_parent          as "Nomor Polis Lama"',
-                    DB::raw('DATEDIFF(' . date('Y-m-d') . ',transaksi.created_at) as "Lama Jatuh Tempo"'),
+                    DB::raw('DATEDIFF(' . date('Y-m-d') . ',polis_end) as "Lama Jatuh Tempo"'),
                 ];
                 if (!empty($request->dtable)) {
                     $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end])
@@ -566,7 +566,7 @@ class LaporanController extends Controller
                 "recordsTotal"    => intval($query[1]),
                 "recordsFiltered" => intval($query[2]),
                 "data"            => $data,
-                // "sql"             => $query[3],
+                "sql"             => $query[3],
             ], 200);
         }
 

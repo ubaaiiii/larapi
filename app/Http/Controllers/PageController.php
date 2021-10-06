@@ -40,7 +40,7 @@ class PageController extends Controller
     function pengajuan($transid = null, Request $request)
     {
         $data = [
-            'cabang'    => Cabang::where('visible',1)->orderBy('nama_cabang','asc')->get(),
+            'cabang'    => Cabang::orderBy('nama_cabang','asc')->get(),
             'asuransi'  => Asuransi::all(),
             'okupasi'   => Okupasi::all(),
             'instype'   => Instype::all(),

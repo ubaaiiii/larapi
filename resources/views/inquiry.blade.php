@@ -257,7 +257,9 @@
                         // console.log('datanya: ', d);
                     },
                     // success: function(d) {
-                    //     console.log('sql:', d);
+                    //     $.each(d.sql, function(i,v) {
+                    //         console.log(v.query);
+                    //     })
                     // },
                     error: function(d) {
                         console.log('error:', d.responseText);

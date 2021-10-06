@@ -776,8 +776,8 @@
             //     endKJPP = moment($('#periode-kjpp').val().substring(15), "YYYYMMDD");
 
             @if(!empty($data->kjpp_start) && !empty($data->kjpp_end))
-                var startKJPP = moment("{{ date_format(date_create($data->kjpp_start), 'd/m/Y') }}");
-                var endKJPP = moment("{{ date_format(date_create($data->kjpp_end), 'd/m/Y') }}");
+                var startKJPP = moment("{{ $data->kjpp_start }}","YYYY-MM-DD");
+                var endKJPP = moment("{{ $data->kjpp_end }}","YYYY-MM-DD");
             @else 
                 var startKJPP = moment();
                 var endKJPP = moment().add(1, 'month');
@@ -802,8 +802,8 @@
             kjpp(startKJPP,endKJPP);
 
             @if(!empty($data->polis_start) && !empty($data->polis_end))
-                var startPolis = moment("{{ date_format(date_create($data->polis_start), 'd/m/Y') }}");
-                var endPolis = moment("{{ date_format(date_create($data->polis_end), 'd/m/Y') }}");
+                var startPolis = moment("{{ $data->polis_start }}","YYYY-MM-DD");
+                var endPolis = moment("{{ $data->polis_end }}","YYYY-MM-DD");
             @else 
                 var startPolis = moment();
                 var endPolis = moment().add(1, 'month');
