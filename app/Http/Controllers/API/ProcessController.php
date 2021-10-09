@@ -13,6 +13,7 @@ use App\Models\Pricing;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -122,41 +123,57 @@ class ProcessController extends Controller
 
     public function dokumen(Request $request)
     {
-        $request->validate([
-            'transid'   => 'required|',
-            'file'      => 'required|mimes:xlsx,xls,pdf,doc,docx,jpg,png,jpeg|max:40960', // 20 MB
-        ]);
+        switch ($request->method) {
+            case 'store':
+                $request->validate([
+                    'transid'   => 'required|',
+                    'file'      => 'required|mimes:xlsx,xls,pdf,doc,docx,jpg,png,jpeg|max:40960', // 20 MB
+                ]);
 
-        $file = $request->file('file');
-        $name = $file->getClientOriginalName();
-        $type = $file->extension();
-        $size = $file->getSize();
-        $path = 'public/files/'.$request->transid;
+                $file = $request->file('file');
+                $name = $file->getClientOriginalName();
+                $type = $file->extension();
+                $size = $file->getSize();
+                $path = 'public/files/' . $request->transid;
 
-        if (!is_dir($path)) {
-            mkdir($path, 0777, TRUE);
+                if (!is_dir($path)) {
+                    mkdir($path, 0777, TRUE);
+                }
+                $path = $file->move($path, $name);
+
+                $save = Document::create([
+                        'id_transaksi'  => $request->transid,
+                        'nama_file'     => $name,
+                        'tipe_file'     => $type,
+                        'ukuran_file'   => $size / 1000000,
+                        'lokasi_file'   => $path,
+                        'created_by'    => Auth::user()->id,
+                    ]);
+
+                return response()->json([
+                        'message'   => 'Dokumen <strong>' . $name . '</strong> berhasil diunggah',
+                        'data'      => $file,
+                    ], 200);
+                break;
+            
+            case 'delete':
+                DB::enableQueryLog();
+                $data = Document::find($request->id);
+                $nama_file = $data->nama_file;
+                $data->delete();
+
+                $this->aktifitas($request->transid, '8', 'Hapus file ' . $nama_file);
+
+                return response()->json([
+                    'message'   => 'File ' . $nama_file . ' berhasil dihapus',
+                    'data'      => $data,
+                ], 200);
+                break;
+
+            default:
+                return redirect()->route('logout');
+                break;
         }
-        $path = $file->move($path,$name);
-
-        $save = Document::create([
-            'id_transaksi'  => $request->transid,
-            'nama_file'     => $name,
-            'tipe_file'     => $type,
-            'ukuran_file'   => $size/1000000,
-            'lokasi_file'   => $path,
-            'created_by'    => Auth::user()->id,
-        ]);
-
-        // return response()->json([
-        //     'message'   => 'Dokumen <strong>' . $name . '</strong> berhasil diunggah',
-        //     'data'      => $file,
-        // ], 200);
-
-        return "
-        <script>
-            reloadTable();
-        </script>
-        ";
     }
 
     public function pricing(Request $request)
@@ -188,14 +205,15 @@ class ProcessController extends Controller
                 $request->validate([
                     'transid'           => 'required|string|max:14',
                     'type_insurance'    => 'required|string',
+                    'cif'               => 'string',
                     'asuransi'          => 'string',
                     'cabang'            => 'required',
                     'alamat_cabang'     => 'required|string',
                     'nama_cabang'       => 'required|string',
                     'nopinjaman'        => 'required|numeric',
                     'insured'           => 'required',
-                    'nik_insured'       => 'integer',
-                    'npwp_insured'      => 'required|string',
+                    'nik_insured'       => 'numeric',
+                    'npwp_insured'      => 'required|numeric',
                     'nama_insured'      => 'required|string',
                     'alamat_insured'    => 'required|string',
                     'plafond_kredit'    => 'required',
@@ -247,6 +265,7 @@ class ProcessController extends Controller
                     'policy_no'         => $request->policy_no,
                     'policy_parent'     => $request->nopolis_lama,
                     'masa'              => $request->masa,
+                    'cif'               => $request->cif,
                     'id_status'         => '0',
                     'id_jaminan'        => $request->jaminan,
                     'no_jaminan'        => $request->no_jaminan,
@@ -268,14 +287,14 @@ class ProcessController extends Controller
                     // $original = $save->getRawOriginal();
                     $text = 'Perubahan data pengajuan, sebelumnya:';
                     foreach($changes as $key => $value) {
-                        if ($key !== "updated_at") {
+                        if ($key !== "updated_at" && $key !== "catatan") {
                             $text .= "<br>- ".$key." : ". $data->$key;  
                         }
                     }
                     $this->aktifitas($request->transid, '7', $text);
                 } else if ($save->wasRecentlyCreated) {
                     $method = "create";
-                    $this->aktifitas($request->transid, '0', 'Pembuatan data pengajuan');
+                    $this->aktifitas($request->transid, '0', $request->catatan);
                 }
 
                 return response()->json([
@@ -303,6 +322,10 @@ class ProcessController extends Controller
 
             case 'approve':
                 switch ($role) {
+                    case 'ao':
+                        $status = 1;
+                        $string = "ajukan";
+                        break;
                     case 'checker':
                         $status = 1;
                         $string = "ajukan";
@@ -342,6 +365,9 @@ class ProcessController extends Controller
 
             case 'rollback':
                 switch ($role) {
+                    case 'ao':
+                        $status = 0;
+                        break;
                     case 'checker':
                         $status = 0;
                         break;
@@ -407,7 +433,8 @@ class ProcessController extends Controller
                 'nama_insured'      => strtoupper($request->nama_insured),
                 'npwp_insured'      => $request->npwp_insured,
                 'alamat_insured'    => $request->alamat_insured,
-                'created_by'         => Auth::user()->id,
+                'nohp_insured'      => $request->nohp_insured,
+                'created_by'        => Auth::user()->id,
             ]
         );
 
@@ -416,7 +443,7 @@ class ProcessController extends Controller
             // $original = $insured->getRawOriginal();
             $text = 'Perubahan data tertanggung, sebelumnya:';
             foreach ($changes as $key => $value) {
-                if ($key !== "updated_at" || $key !== "catatan") {
+                if ($key !== "updated_at" && $key !== "catatan") {
                     $text .= "<br>- " . $key . " : " . $data->$key;
                 }
             }
@@ -449,7 +476,7 @@ class ProcessController extends Controller
             // $original = $cabang->getRawOriginal();
             $text = 'Perubahan data cabang, sebelumnya:';
             foreach ($changes as $key => $value) {
-                if ($key !== "updated_at" || $key !== "catatan") {
+                if ($key !== "updated_at" && $key !== "catatan") {
                     $text .= "<br>- " . $key . " : " . $data->$key;
                 }
             }

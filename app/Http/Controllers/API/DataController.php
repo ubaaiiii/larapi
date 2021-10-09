@@ -66,7 +66,7 @@ class DataController extends Controller
 
     public function selectInsured(Request $request)
     {
-        $insured = Insured::select('id', 'nama_insured', 'npwp_insured', 'nik_insured', 'alamat_insured');
+        $insured = Insured::select('*');
         if (!empty($request->search)) {
             $insured->where('nama_insured', 'like', '%' . $request->search . '%');
         }
@@ -78,24 +78,25 @@ class DataController extends Controller
             $list[$key]['text'] = $row['nama_insured'];
             $list[$key]['npwp_insured'] = $row['npwp_insured'];
             $list[$key]['nik_insured'] = $row['nik_insured'];
+            $list[$key]['nohp_insured'] = $row['nohp_insured'];
             $list[$key]['alamat_insured'] = $row['alamat_insured'];
             $key++;
         }
         return response()->json($list);
     }
-    
+
     public function selectOkupasi(Request $request)
     {
         // return $request->all();
-        $okupasi = Okupasi::select('id','kode_okupasi', 'nama_okupasi', 'rate')
-        ->where('instype',$request->instype);
+        $okupasi = Okupasi::select('id', 'kode_okupasi', 'nama_okupasi', 'rate')
+            ->where('instype', $request->instype);
         if (!empty($request->search)) {
             $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
-            ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
-            ->orWhere('rate', 'like', '%' . $request->search . '%');
+                ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
+                ->orWhere('rate', 'like', '%' . $request->search . '%');
         }
         $okupasi = $okupasi->orderBy('kode_okupasi')->get();
-        
+
         $list = [];
         $key = 0;
         foreach ($okupasi as $row) {
@@ -105,44 +106,6 @@ class DataController extends Controller
             $key++;
         }
         return response()->json($list);
-    }
-
-    public function viewToQuery($request, $view, $columns)
-    {
-        DB::enableQueryLog();
-        $all_record = $view->get()->count();
-
-        if (!empty($request->search)) {
-            for ($i = 0; $i < count($columns); $i++) {
-                if ($i == 0) {
-                    $view->where($columns[$i], 'like', '%' . $request->search . '%');
-                } else {
-                    $view->orWhere($columns[$i], 'like', '%' . $request->search . '%');
-                }
-            }
-        }
-
-        if (!empty($request->order) && isset($request->order)) {
-            for ($i = 0; $i < count($request->order); $i++) {
-                $view->orderBy($columns[$request->order[$i]['column']], $request->order[$i]['dir']);
-            }
-        }
-
-        $filtered = $view->get()->count();
-
-        if (!empty($request->start)) {
-            $view->skip($request->start);
-        } else {
-            $view->skip(0);
-        }
-
-        if (!empty($request->length)) {
-            $view->take($request->length);
-        }
-
-        $display = $view->get();
-
-        return [$display, $all_record, $filtered, DB::getQueryLog()];
     }
 
     public function generateQuery($request, $table, $columns, $select, $joins)
@@ -201,7 +164,7 @@ class DataController extends Controller
         $result = $table->get();
 
         // return DB::getQueryLog();
-        return [$result, $awal, $all_record, DB::getQueryLog()];
+        return [$result, $awal, $all_record, $request->search];
         // return response()->json([
         //     "draw"              => 1,
         //     "recordsTotal"      => $awal,
@@ -216,14 +179,14 @@ class DataController extends Controller
         $columns = [
             'transid',
             'instype_name',
-            'cabang',
-            'tertanggung',
+            'cabang.nama_cabang',
+            'insured.nama_insured',
             'policy_no',
             'polis_start',
-            'tgl_dibuat',
-            'tsi',
-            'premi',
-            'statusnya',
+            'transaksi.created_at',
+            'tsi.value',
+            'premi.value',
+            'sts.msdesc',
         ];
 
         $select = [
@@ -234,17 +197,18 @@ class DataController extends Controller
             'tsi.value as tsi',
             'premi.value as premi',
             'sts.msdesc as statusnya',
+            'cabang.nama_cabang as cabang',
+            'cabang.alamat_cabang',
         ];
 
-        // $table = DB::table("transaksi");
-        $table = DB::table("vw_inquiry");
+        $table = DB::table("transaksi");
 
         $user = Auth::user()->getRoleNames()[0];
         switch ($user) {
             case 'ao':
                 $table->where('transaksi.created_by', Auth::user()->id);
                 break;
-            
+
             case 'checker':
                 $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 break;
@@ -255,16 +219,16 @@ class DataController extends Controller
 
             case 'broker':
                 // wherenya broker
-                break;  
+                break;
 
             case 'approver':
                 $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
-                break;  
+                break;
 
             case 'adm':
                 // wherenya administrator
-                break;  
-            
+                break;
+
             default:
                 return redirect()->route('logout');
                 break;
@@ -279,8 +243,7 @@ class DataController extends Controller
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
 
-        // $query = $this->generateQuery($request, $table, $columns, $select, $joins);
-        $query = $this->viewToQuery($request, $table, $columns);
+        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
         // return $query;
 
         $data = array();
@@ -308,7 +271,7 @@ class DataController extends Controller
             "recordsTotal"    => intval($query[1]),
             "recordsFiltered" => intval($query[2]),
             "data"            => $data,
-            "sql"             => $query[3]
+            // "sql"             => $query[3]
         ], 200);
     }
 
@@ -381,7 +344,7 @@ class DataController extends Controller
         $table->where('id_transaksi', $request->transid);
 
         $joins = [
-            ['masters', ['activities.id_status = masters.msid','masters.mstype = status']],
+            ['masters', ['activities.id_status = masters.msid', 'masters.mstype = status']],
             ['users', 'activities.created_by = users.id'],
         ];
 
@@ -427,7 +390,8 @@ class DataController extends Controller
         ];
 
         $table = DB::table("documents");
-        $table->where('id_transaksi',$request->transid);
+        $table->where('id_transaksi', $request->transid);
+        $table->whereNull('documents.deleted_at');
 
         $joins = [
             ['users', 'documents.created_by = users.id'],
@@ -439,11 +403,10 @@ class DataController extends Controller
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
-            $nestedData[] = "<a style='cursor:pointer'
-                                class='flex items-center text-theme-6 d-id='" . $row->id . "' block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md'>
-                                <i data-feather='trash-2' class='w-4 h-4 dark:text-gray-300 mr-2'></i>
+            $nestedData[] = '<a style="cursor:pointer" onClick="hapusDokumen(' . $row->id . ')" class="flex items-center text-theme-6 block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
                                 Hapus
-                            </a>";
+                            </a>';
             $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url($row->lokasi_file) . "' target='_blank'>" . $row->nama_file . "</a>";
             $nestedData[] = $row->created_at;
             $nestedData[] = $row->username;

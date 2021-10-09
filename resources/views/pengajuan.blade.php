@@ -16,11 +16,8 @@
                 <button class="btn btn-sm btn-primary" id="btn-perpanjang">Perpanjang</button>
             @endif
             @if ($method == 'approve' && !empty($data))
-                @role('checker')
+                @role('checker|ao')
                 <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
-                @endrole
-                @role('approver')
-                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
                 @endrole
                 @role('broker')
                 <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
@@ -29,9 +26,13 @@
                 <button class="btn btn-sm btn-success btn-approve">Aktifkan</button>
                 @endrole
             @endif
-            @if ($method == 'view' && !empty($data))
-                <button class="btn btn-sm btn-warning" id="btn-rollback">Kembalikan</button>
-                <button class="btn btn-sm btn-danger" id="btn-hapus">Hapus</button>
+            @if (empty($method) && !empty($data))
+                @if ($data->id_status == 1)
+                @role('approver')
+                    <button class="btn btn-sm btn-success btn-approve">SETUJUI</button>
+                    <button class="btn btn-sm btn-warning btn-rollback">KEMBALIKAN</button>
+                @endrole
+                @endif
             @endif
         </h2>
     </div>
@@ -153,6 +154,14 @@
                                 <input type="hidden" name="npwp_insured" @if (!empty($data->npwp_insured)) value="{{ $data->npwp_insured }}" @endif>
                             </div>
                             <div class="form-inline mt-5">
+                                <label for="nohp_insured" class="form-label sm:w-20">No. HP Tertanggung</label>
+                                <div class="input-group w-full">
+                                    <div class="input-group-text">+62</div>
+                                    <input type="text" class="form-control" name="nohp_insured" id="nohp_insured"
+                                        value="@if (!empty($data->nohp_insured)){{ $data->nohp_insured }}@endif" required>
+                                </div>
+                            </div>
+                            <div class="form-inline mt-5">
                                 <label for="alamat_insured" class="form-label sm:w-20">Alamat Tertanggung</label>
                                 <textarea id="alamat_insured" name="alamat_insured" class="form-control" required @if (!empty($data->alamat_insured)) @endif>@if (!empty($data->alamat_insured)){{ $data->alamat_insured }}@endif</textarea>
                             </div>
@@ -199,7 +208,7 @@
                             </div>
                             @role('ao|checker|broker|approver|adm')
                             <div class="form-inline mt-5">
-                                <label for="masa" class="form-label sm:w-20">Periode KJPP</label>
+                                <label for="periode-kjpp" class="form-label sm:w-20">Periode KJPP</label>
                                 <input id="periode-kjpp" class="form-control w-full block mx-auto range-periode" required>
                                 <input type="hidden" name="kjpp_start" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
                                 <input type="hidden" name="kjpp_end" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
@@ -299,19 +308,31 @@
                                             value="@if(!empty($pricing[$row->kodetrans_id]->deskripsi)){{ $pricing[$row->kodetrans_id]->deskripsi }}@endif"></td>
                                 </tr>
                             @endforeach
+                            <tr>
+                                <td colspan="2">
+                                    <div class="input-group">
+                                        <div id="group-t" class="input-group-text">Total</div>
+                                        <input style="text-align:right;" id="kodetrans_value[1]" type="text" d-input="TSI"
+                                            class="currency form-control allow-decimal masked total-si" placeholder="Total Nilai Pertanggungan"
+                                            aria-label="Total Nilai Pertanggungan" aria-describedby="group-t" readonly
+                                            value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
+                                        <input type="hidden" name="kodetrans_value[1]">
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="p-5">
                         <div class="sm:grid grid-cols-2 gap-2">
-                            <div class="mt-2">
-                                <label for="kodetrans_value[1]" class="form-label">Total</label>
-                                <input id="kodetrans_value[1]" d-input="TSI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control total-si" placeholder="Total Nilai Pertanggungan" readonly aria-describedby="Total Nilai Pertanggungan" value="@if (!empty($pricing[1]->value)){{ $pricing[1]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[1]">
-                            </div>
                             <div class="mt-2" @if (!empty($data) && $data->id_status >= 3) @else style="display:none" @endif>
                                 <label for="kodetrans_value[2]" class="form-label">Premium</label>
                                 <input id="kodetrans_value[2]" d-input="PREMI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Premium" readonly aria-describedby="Premium" value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[2]">
+                            </div>
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=2) style="display:none" @endif>
+                                <label for="kodetrans_value[20]" class="form-label">Biaya Polis</label>
+                                <input id="kodetrans_value[20]" d-input="POLIS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control total-si" placeholder="Biaya Polis" aria-describedby="Biaya Polis" value="@if (!empty($pricing[20]->value)){{ $pricing[20]->value }}@endif">
+                                <input type="hidden" name="kodetrans_value[20]">
                             </div>
                             <div class="mt-2" @if (empty($data) || $data->id_status <=2) style="display:none" @endif>
                                 <label for="kodetrans_value[10]" class="form-label">Biaya Materai</label>
@@ -374,7 +395,7 @@
                     </div>
                     <div id="multiple-file-upload" class="p-5">
                         <div class="preview">
-                            <form action="{{ url('api/dokumen') }}" class="dropzone" method="post">
+                            <form id="frm-document" action="{{ url('api/dokumen') }}" class="dropzone" method="post">
                                 @csrf
                                 <input name="transid" type="hidden" value="{{ $data->transid }}"/>
                                 <div class="fallback">
@@ -388,6 +409,33 @@
                             </form>
                         </div>
                     </div>
+                    <script>
+                        $(document).ready(function(){
+                            $('.dropzone').each(function () {
+                                let dropzoneControl = $(this)[0].dropzone;
+                                if (dropzoneControl) {
+                                    dropzoneControl.destroy();
+                                }
+                            });
+                            Dropzone.autoDiscover = false;
+                            $("#frm-document").dropzone({
+                                url: "{{ url('api/dokumen') }}",
+                                method: "POST",
+                                init: function() {
+                                    this.on("sending", function(file, xhr, formData) {
+                                        $.each($('#frm-document').serializeArray(), function(i, v) {
+                                            formData.append(v.name, v.value);
+                                        });
+                                        formData.append("method", "store");
+                                    }),
+                                    this.on("success", function(file, xhr) {
+                                        $('#tb-dokumen').DataTable().ajax.reload();
+                                        $('#tb-aktifitas').DataTable().ajax.reload();
+                                    });
+                                },
+                            });
+                        });
+                    </script>
                     <div class="p-5" id="responsive-table">
                         <div class="preview">
                             <div class="overflow-x-auto">
@@ -479,12 +527,48 @@
             // console.log("Biaya Lain: ", LAIN);
             $('.masked').trigger('keyup');
         }
+        @if ($act !== 'add' && !empty($data->transid))
+            function hapusDokumen(id){
+                console.log('hapus');
+                $.ajax({
+                    url: "{{ url('api/dokumen') }}",
+                    method: "POST",
+                    data: $('#frm-document').serialize() + "&method=delete&id="+id,
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    success: function(d) {
+                        console.log(d);
+                        console.log('id:',id);
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        ).then(function() {
+                            $('#tb-dokumen').DataTable().ajax.reload();
+                            $('#tb-aktifitas').DataTable().ajax.reload();
+                        });
+                    },
+                    error: function(d) {
+                        Swal.fire(
+                            'Gagal!',
+                            d.message,
+                            'error'
+                        );
+                        $('#tb-dokumen').DataTable().ajax.reload();
+                        $('#tb-aktifitas').DataTable().ajax.reload();
+                        // var message = d.responseJSON.message;
+                    }
+                });
+            };
+        @endif
         $(document).ready(function() {
             $('select').select2();
             $('#npwp_insured').inputmask("99.999.999.9-999.999");
             $('#nik_insured').inputmask("9999999999999999");
             $('.range-periode').inputmask("99/99/9999 - 99/99/9999");
             $('#masa').inputmask("decimal");
+            $('#nohp_insured').inputmask("decimal");
 
             $('.dt-table').DataTable();
             @if ($act !== 'add' && !empty($data->transid))
@@ -510,12 +594,13 @@
                             console.log('error:', d.responseText);
                         },
                     },
+                    "order": [[ 2, "desc" ]],
                     "aoColumns": [{
                             "bSortable": false,
                             "className": "border-b",
                         },
                         {
-                            "bSortable": true,
+                            "bSortable": true,  
                             "className": "border-b",
                         },
                         {
@@ -573,6 +658,7 @@
                             console.log('error:', d.responseText);
                         },
                     },
+                    "order": [[ 0, "desc" ]],
                     "initComplete": function(settings, json) {
                         $("#tb-aktifitas_filter label input").unbind();
                         $("#tb-aktifitas_filter label input").bind('keyup', function(e) {
@@ -740,17 +826,26 @@
 
             $('#insured').on('select2:select', function(e) {
                 var data = e.params.data;
+                // console.log('data:',data);
                 $('#npwp_insured').val("").trigger('change');
+                $('[name="npwp_insured"]').val("").trigger('change');
                 $('#nik_insured').val("").trigger('change');
+                $('[name="nik_insured"]').val("").trigger('change');
                 $('#alamat').val("");
+                $('#nohp_insured').val("");
                 if (data.npwp_insured !== undefined) {
                     $('#npwp_insured').val(data.npwp_insured).trigger('change');
+                    $('[name="npwp_insured"]').val(data.npwp_insured).trigger('change');
                 }
                 if (data.nik_insured !== undefined) {
+                    $('[name="nik_insured"]').val(data.nik_insured).trigger('change');
                     $('#nik_insured').val(data.nik_insured).trigger('change');
                 }
                 if (data.alamat_insured !== undefined) {
                     $('#alamat_insured').val(data.alamat_insured);
+                }
+                if (data.nohp_insured !== undefined) {
+                    $('#nohp_insured').val(data.nohp_insured);
                 }
             });
             
@@ -766,9 +861,11 @@
                 }
             });
 
-            $('#cabang').on('select2:select', function() {
+            $('#cabang').change(function() {
                 $('#alamat_cabang').val($('#cabang option:selected').attr('alamat'));
             });
+
+            $('#cabang').change();
 
             // var startPolis = moment($('#periode-polis').val().substring(0,10), "YYYYMMDD"),
             //     endPolis = moment($('#periode-polis').val().substring(15), "YYYYMMDD"),
@@ -877,7 +974,9 @@
                 $("[type='search']").removeAttr('disabled');
                 $('#multiple-file-upload').hide();
                 $('[name*="_length"]').removeAttr('disabled');
+                $('#transid').prop('disabled', false);
                 $('#catatan').prop('disabled', false);
+                $('button').prop('disabled', false);
                 // $("#frm-pertanggungan :input").prop('disabled', true);
             @endif
 
@@ -950,8 +1049,7 @@
             $('.btn-approve').click(function(){
                 var btnHtml = $(this).html(),
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
-                    nama_insured = $('#insured option:selected').text(),
-                    nama_cabang = $('#cabang option:selected').text();
+                    nama_insured = $('#insured option:selected').text();
 
                 $(this)
                     .attr('disabled',true)
@@ -960,7 +1058,7 @@
                 $.ajax({
                     url: "{{ url('api/pengajuan') }}",
                     method: "POST",
-                    data: $('.formnya').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang+"&klausula="+encodeURIComponent(klausulaValue),
+                    data: $('.formnya').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured,
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
@@ -988,8 +1086,52 @@
                     }
                 });
                 $(this)
-                .attr('disabled',false)
-                .html(btnHtml);
+                    .attr('disabled',false)
+                    .html(btnHtml);
+            });
+
+            $('.btn-rollback').click(function(){
+                var btnHtml = $(this).html(),
+                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
+                    nama_insured = $('#insured option:selected').text();
+
+                $(this)
+                    .attr('disabled',true)
+                    .html(loading);
+
+                $.ajax({
+                    url: "{{ url('api/pengajuan') }}",
+                    method: "POST",
+                    data: $('.formnya').serialize() + "&method=rollback&_token={{ csrf_token() }}&nama_insured="+nama_insured,
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    success: function(d) {
+                        console.log(d);
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        ).then(function() {
+                            if (d.method == 'create') {
+                                window.location = "{{ url('inquiry') }}";
+                            } else {
+                                window.top.close();
+                            }
+                        });
+                    },
+                    error: function(d) {
+                        var message = d.responseJSON.message;
+                        // console.log(d.responseJSON.errors);
+                        $.each(d.responseJSON.errors, function(i,v){
+                            $('#'+i).closest('div').addClass('has-error');
+                            $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
+                        });
+                    }
+                });
+                $(this)
+                    .attr('disabled',false)
+                    .html(btnHtml);
             });
 
             // $('#kodetrans_value[2]');

@@ -37,70 +37,44 @@
                                 <i data-feather="search" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Lihat
                             </a>
-                            @can('edit pengajuan')
-                                <a id="ps-ubah"
-                                    class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
-                                    style="cursor:pointer">
-                                    <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Ubah
-                                </a>
-                            @endcan
-                            @can('ajukan pengajuan')
-                                @role('checker|adm')
-                                    <a 
-                                        class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
-                                        style="cursor:pointer">
-                                        <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                        Ajukan
-                                    </a>
-                                @endrole
-                            @endcan
-                            @can('approve pengajuan')
-                                @role('approver|adm')
-                                    <a
-                                        class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
-                                        style="cursor:pointer">
-                                        <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                        Setujui
-                                    </a>
-                                @endrole
-                                @role('broker|adm')
-                                    <a
-                                        class=" ps-approveflex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
-                                        style="cursor:pointer">
-                                        <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                        Verifikasi
-                                    </a>
-                                @endrole
-                                @role('insurance|adm')
-                                    <a id="ps-aktifkan"
-                                    class="flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
+                            <a id="ps-ubah"
+                                class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                style="cursor:pointer">
+                                <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                Ubah
+                            </a>
+                            @role('ao|checker|adm')
+                                <a 
+                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Aktifkan
+                                    Ajukan
                                 </a>
-                                @endrole
-                            @endcan
-                            @can('hapus pengajuan')
-                                @role('ao|checker|adm')
-                                <a id="ps-hapus"
-                                    class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                            @endrole
+                            @role('broker|adm')
+                                <a
+                                    class=" ps-approveflex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
                                     style="cursor:pointer">
-                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Hapus
+                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Verifikasi
                                 </a>
-                                @endrole
-                            @endcan
-                            @can('rollback pengajuan')
-                                @role('checker|approver|insurance|broker|adm')
-                                <a id="ps-kembalikan"
-                                    class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1 st-2 st-3 st-4"
-                                    style="cursor:pointer">
-                                    <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Kembalikan
-                                </a>
-                                @endrole
-                            @endcan
+                            @endrole
+                            @role('insurance|adm')
+                                <a id="ps-aktifkan"
+                                class="flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
+                                style="cursor:pointer">
+                                <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                Aktifkan
+                            </a>
+                            @endrole
+                            @role('ao|checker|adm')
+                            <a id="ps-hapus"
+                                class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                style="cursor:pointer">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                Hapus
+                            </a>
+                            @endrole
                         </div>
                         @role('checker|ao|broker|adm')
                         <div class="p-2 border-t border-gray-200 dark:border-dark-5  ps-st st-4">
@@ -333,6 +307,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('approve');
+                $('#text-inquiry').click();
                 $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
             });
             
@@ -340,6 +315,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('update');
+                $('#text-inquiry').click();
                 $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
             });
         });

@@ -407,7 +407,7 @@ class LaporanController extends Controller
                         'sts.msdesc',
                         'catatan',
                         'transid',
-                        'DATEDIFF(transaksi.created_at,' . date('Y-m-d') . ')',
+                        'polis_end',
                     ];
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
