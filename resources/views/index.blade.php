@@ -18,7 +18,7 @@
                     <div class="grid grid-cols-12 gap-6 mt-5">
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5">
+                                <div class="box p-5" onclick="redirectInquiry('pengajuan')">
                                     <div class="flex">
                                         <i data-feather="shopping-cart" class="report-box__icon text-theme-10"></i>
                                         <div class="ml-auto">
@@ -540,12 +540,20 @@
             </div>
         </div>
     </div>
+    <form id="frm" method="GET">
+        <input type="hidden" id="frm-data" name="data">
+    </form>
 @endsection
 
 @section('script')
     <script>
+        function redirectInquiry(type) {
+            console.log(type);
+            $('#frm-data').val(type);
+            $('#frm').attr('action','{{ url('inquiry') }}').submit();
+        }
         $(document).ready(function() {
-
+            
         });
     </script>
 @endsection

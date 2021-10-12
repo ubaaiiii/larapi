@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
+use App\Models\Asuransi;
 use App\Models\Document;
 use App\Models\Instype;
 use App\Models\Insured;
@@ -108,6 +109,25 @@ class DataController extends Controller
         return response()->json($list);
     }
 
+    public function selectAsuransi(Request $request)
+    {
+        // return $request->all();
+        $asuransi = Asuransi::select('*');
+        if (!empty($request->search)) {
+            $asuransi->where('nama_asuransi', 'like', '%' . $request->search . '%');
+        }
+        $asuransi = $asuransi->orderBy('nama_asuransi')->get();
+
+        $list = [];
+        $key = 0;
+        foreach ($asuransi as $row) {
+            $list[$key]['id'] = $row['id'];
+            $list[$key]['text'] = $row['nama_asuransi'];
+            $key++;
+        }
+        return response()->json($list);
+    }
+
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
         DB::enableQueryLog();
@@ -164,7 +184,7 @@ class DataController extends Controller
         $result = $table->get();
 
         // return DB::getQueryLog();
-        return [$result, $awal, $all_record, $request->search];
+        return [$result, $awal, $all_record, DB::getQueryLog()];
         // return response()->json([
         //     "draw"              => 1,
         //     "recordsTotal"      => $awal,
@@ -178,10 +198,12 @@ class DataController extends Controller
         // sorting column datatables
         $columns = [
             'transid',
+            'nama_asuransi',
             'instype_name',
             'cabang.nama_cabang',
             'insured.nama_insured',
             'policy_no',
+            'cover_note',
             'polis_start',
             'transaksi.created_at',
             'tsi.value',
@@ -191,6 +213,7 @@ class DataController extends Controller
 
         $select = [
             'transaksi.*',
+            'nama_asuransi',
             'instype_name',
             'insured.nama_insured as tertanggung',
             'transaksi.created_at as tgl_dibuat',
@@ -213,16 +236,16 @@ class DataController extends Controller
                 $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 break;
 
-            case 'insurance':
-                $table->where('transaksi.id_asuransi', Auth::user()->id_cabang);
+            case 'approver':
+                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 break;
-
+                
             case 'broker':
                 // wherenya broker
                 break;
 
-            case 'approver':
-                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+            case 'insurance':
+                $table->where('transaksi.id_asuransi', Auth::user()->id_asuransi);
                 break;
 
             case 'adm':
@@ -234,26 +257,68 @@ class DataController extends Controller
                 break;
         }
 
+        if (!empty($request->data)) {
+            switch ($request->data) {
+                case 'pengajuan':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "0");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "0");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "1");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "2");
+                            break;
+
+                        case 'insurance':
+                            $table->where('id_status', "3");
+                            break;
+
+                        case 'adm':
+                            // wherenya administrator
+                            break;
+
+                        default:
+                            return redirect()->route('logout');
+                            break;
+                    }
+                    break;
+
+                default:
+                    return redirect()->route('logout');
+                    break;
+            }
+        }
+
         $joins = [
             ['insured', 'id_insured = insured.id'],
             ['instype', 'id_instype = instype.id'],
-            ['masters as sts', ['id_status = sts.msid', 'sts.mstype = status']],
+            ['asuransi', 'id_asuransi = asuransi.id'],
+            ['masters as sts', ['id_status = sts.msid', "sts.mstype = status"]],
             ['cabang', 'id_cabang = cabang.id'],
             ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
 
         $query = $this->generateQuery($request, $table, $columns, $select, $joins);
-        // return $query;
 
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
             $nestedData[] = $row->transid;
+            $nestedData[] = $row->nama_asuransi;
             $nestedData[] = $row->instype_name;
             $nestedData[] = $row->cabang;
             $nestedData[] = $row->tertanggung;
             $nestedData[] = $row->policy_no;
+            $nestedData[] = $row->cover_note;
             $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
             $nestedData[] = $row->tgl_dibuat;
             $nestedData[] = number_format($row->tsi, 2);
@@ -271,7 +336,7 @@ class DataController extends Controller
             "recordsTotal"    => intval($query[1]),
             "recordsFiltered" => intval($query[2]),
             "data"            => $data,
-            // "sql"             => $query[3]
+            "sql"             => $query[3]
         ], 200);
     }
 
@@ -284,9 +349,11 @@ class DataController extends Controller
             'insured.npwp_insured',
             'insured.nik_insured',
             'insured.alamat_insured',
+            'insured.nohp_insured',
             'okupasi.kode_okupasi',
             'okupasi.nama_okupasi',
             'okupasi.rate',
+            'asuransi.nama_asuransi',
             'kecamatan',
             'kelurahan',
             'kodepos',
@@ -298,6 +365,7 @@ class DataController extends Controller
             ->leftJoin('kodepos', 'id_kodepos', '=', 'kodepos.id')
             ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
             ->leftJoin('instype', 'id_instype', '=', 'instype.id')
+            ->leftJoin('asuransi', 'id_asuransi', '=', 'asuransi.id')
             ->where('transid', '=', $transid)
             ->select($select)
             ->first();
@@ -317,27 +385,18 @@ class DataController extends Controller
 
     public function dataAktifitas(Request $request)
     {
-        // return Activity::where('id_transaksi', '=', $transid)
-        //     ->leftJoin('masters', function ($jn) {
-        //         $jn->on('id_status', '=', 'masters.msid');
-        //         $jn->where('masters.mstype', '=', 'status');
-        //     })
-        //     ->leftJoin('users', 'activities.created_by', '=', 'users.id')
-        //     ->select('activities.*', 'masters.msdesc as statusnya', 'users.username')
-        //     ->orderBy('activities.created_at', 'ASC')
-        //     ->get();
-
         $columns = [
             'activities.created_at',
             'masters.msdesc',
-            'username',
+            'name',
             'deskripsi',
         ];
 
         $select = [
-            'activities.*',
+            'activities.created_at',
             'masters.msdesc as statusnya',
-            'users.username'
+            'users.name',
+            'activities.deskripsi',
         ];
 
         $table = DB::table("activities");
@@ -357,7 +416,7 @@ class DataController extends Controller
             $nestedData = array();
             $nestedData[] = $row->created_at;
             $nestedData[] = $row->statusnya;
-            $nestedData[] = $row->username;
+            $nestedData[] = $row->name;
             $nestedData[] = $row->deskripsi;
 
             $data[] = $nestedData;

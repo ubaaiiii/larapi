@@ -38,6 +38,7 @@ class ProcessController extends Controller
                     'password'      => 'required|alpha_dash',
                     'id_cabang'     => 'required|numeric',
                     'id_parent'     => 'required|numeric',
+                    'id_asuransi'   => 'nullable|numeric',
                     'level'         => 'required|string',
                 ]);
 
@@ -50,6 +51,7 @@ class ProcessController extends Controller
                     'unpass'        => $request->password,
                     'id_cabang'     => $request->id_cabang,
                     'id_parent'     => $request->id_parent,
+                    'id_asuransi'   => $request->id_asuransi,
                     'created_by'    => Auth::user()->id,
                     'created_at'    => date('Y-m-d h:m:s'),
                 ]);
@@ -75,6 +77,7 @@ class ProcessController extends Controller
                     'password'      => 'required|alpha_dash',
                     'id_cabang'     => 'required|numeric',
                     'id_parent'     => 'required|numeric',
+                    'id_asuransi'   => 'nullable|numeric',
                 ]);
 
                 $user = $user->update([
@@ -86,7 +89,7 @@ class ProcessController extends Controller
                     'unpass'        => $request->password,
                     'id_cabang'     => $request->id_cabang,
                     'id_parent'     => $request->id_parent,
-                    'updated_at'    => date('Y-m-d h:m:s'),
+                    'id_asuransi'   => 'nullable|numeric',
                 ]);
 
                 $user->syncRoles($request->level);
@@ -237,18 +240,9 @@ class ProcessController extends Controller
                     'klausula'          => 'required',
                 ]);
 
-                if (in_array($role,['adm','checker','broker','approver','insurance'])) {
-                    $request->validate([
-                        'asuransi'          => 'required|string',
-                        'okupasi'           => 'required|numeric',
-                        'lokasi_okupasi'    => 'required|string',
-                        'kodepos'           => 'required|numeric',
-                    ]);
-                }
-
-                $insured = $this->tertanggung($request);
-                $cabang = $this->cabang($request);
-                $pricing = $this->pricing($request);
+                $insured    = $this->tertanggung($request);
+                $cabang     = $this->cabang($request);
+                $pricing    = $this->pricing($request);
 
                 $data = Transaksi::find($request->transid);
                 $save = Transaksi::updateOrCreate([
@@ -320,25 +314,49 @@ class ProcessController extends Controller
                 ], 200);
                 break;
 
-            case 'approve':
+            case 'approve':                
                 switch ($role) {
                     case 'ao':
                         $status = 1;
                         $string = "ajukan";
                         break;
+
                     case 'checker':
                         $status = 1;
                         $string = "ajukan";
                         break;
+
                     case 'approver':
                         $status = 2;
                         $string = "setujui";
                         break;
+
                     case 'broker':
+                        $request->validate([
+                            'asuransi'          => 'required|string',
+                            'okupasi'           => 'required|numeric',
+                            'lokasi_okupasi'    => 'required|string',
+                            'kodepos'           => 'required|numeric',
+                        ]);
+                        
+                        $update['id_asuransi'] = $request->asuransi;
+                        $update['id_okupasi'] = $request->okupasi;
+                        $update['id_kodepos'] = $request->kodepos;
+                        $update['location'] = $request->lokasi_okupasi;
+
                         $status = 3;
                         $string = "verifikasi";
                         break;
+                        
                     case 'insurance':
+                        $request->validate([
+                            'policy_no'     => 'required_without:cover_note',
+                            'cover_note'    => 'required_without:policy_no',
+                        ]);
+
+                        $update['policy_no']    = $request->policy_no;
+                        $update['cover_note']   = $request->cover_note;
+
                         $status = 4;
                         $string = "aktifkan";
                         break;
@@ -348,11 +366,12 @@ class ProcessController extends Controller
                         break;
                 }
 
-                $data = Transaksi::where('transid',$request->transid)->update([
-                    'id_status' => $status,
-                    'catatan'   => $request->catatan,
-                ]);
-                
+                $update['id_status'] = $status;
+                $update['catatan'] = $request->catatan;
+
+                $data = Transaksi::where('transid',$request->transid)->update($update);
+
+                $this->pricing($request);
                 $this->aktifitas($request->transid, $status, $request->catatan);
                 
                 return response()->json([
@@ -372,13 +391,13 @@ class ProcessController extends Controller
                         $status = 0;
                         break;
                     case 'approver':
-                        $status = 1;
+                        $status = 0;
                         break;
                     case 'broker':
-                        $status = 2;
+                        $status = 1;
                         break;
                     case 'insurance':
-                        $status = 3;
+                        $status = 2;
                         break;
                     
                     default:
@@ -415,7 +434,7 @@ class ProcessController extends Controller
             'id_transaksi'  => $transid,
             'id_status'     => $status,
             'deskripsi'     => $deskripsi,
-            'created_by'     => Auth::user()->id
+            'created_by'    => Auth::user()->id
         ]);
     }
 

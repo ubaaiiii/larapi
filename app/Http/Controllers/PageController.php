@@ -58,9 +58,11 @@ class PageController extends Controller
         // dd($data['hitung']);
         if (!empty($transid)) {
             $dataController     = new DataController;
+            $transaksi = $dataController->dataPengajuan($transid);
             $data['act']        = 'edit';
-            $data['data']       = $dataController->dataPengajuan($transid);
+            $data['data']       = $transaksi;
             $data['pricing']    = $dataController->dataPricing($transid);
+            $data['status']     = Master::where('msid', $transaksi->id_status)->where('mstype','status')->first();
             // dd($data['document']);
         } else {
             Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);
@@ -109,14 +111,15 @@ class PageController extends Controller
         return view('laporan', $data);
     }
 
-    function inquiry($search = null)
+    function inquiry(Request $request, $search = null)
     {
         $data = [
             'cabang'    => Cabang::all(),
             'level'     => Master::where('mstype', 'level')->get(),
             'provinsi'  => KodePos::select('provinsi')->distinct()->get(),
             'search'    => 'hidden',
-            'qsearch'   => $search
+            'qsearch'   => $search,
+            'request'   => $request->all(),
         ];
         return view('inquiry', $data);
     }

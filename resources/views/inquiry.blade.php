@@ -5,7 +5,7 @@
 
 @section('content')
     <h2 class="intro-y text-lg font-medium mt-5" id="text-inquiry">
-        Inquiry
+        Inquiry {{ (!empty($_GET['data']))?(ucwords($_GET['data'])):("") }}
     </h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
@@ -53,19 +53,19 @@
                             @endrole
                             @role('broker|adm')
                                 <a
-                                    class=" ps-approveflex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
+                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Verifikasi
                                 </a>
                             @endrole
                             @role('insurance|adm')
-                                <a id="ps-aktifkan"
-                                class="flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
-                                style="cursor:pointer">
-                                <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                Aktifkan
-                            </a>
+                                <a 
+                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
+                                    style="cursor:pointer">
+                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Aktifkan
+                                </a>
                             @endrole
                             @role('ao|checker|adm')
                             <a id="ps-hapus"
@@ -77,7 +77,7 @@
                             @endrole
                         </div>
                         @role('checker|ao|broker|adm')
-                        <div class="p-2 border-t border-gray-200 dark:border-dark-5  ps-st st-4">
+                        <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-4">
                             <a id="ps-invoice"
                                 class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                 style="cursor:pointer">
@@ -104,10 +104,12 @@
                 <thead>
                     <tr>
                         <th class="whitespace-nowrap">No. App</th>
+                        <th class="whitespace-nowrap">Asuransi</th>
                         <th class="whitespace-nowrap">Tipe Asuransi</th>
                         <th class="whitespace-nowrap">Cabang</th>
                         <th class="whitespace-nowrap">Tertanggung</th>
                         <th class="whitespace-nowrap">No. Polis</th>
+                        <th class="whitespace-nowrap">Cover Note</th>
                         <th class="whitespace-nowrap">Periode Polis</th>
                         <th class="whitespace-nowrap">Tanggal Dibuat</th>
                         <th class="whitespace-nowrap">Nilai Pertanggungan</th>
@@ -203,6 +205,14 @@
                     },
                     {
                         "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
                         "className": "border-b text-right"
                     },
                     {
@@ -228,15 +238,19 @@
                         d.search = $("#filterSearch").val();
                         d.length = $("#filterlength").val();
                         d._token = '{{ csrf_token() }}';
+                        @if (!empty($_GET))
+                            d.data = '{{ $_GET['data'] }}';
+                        @endif
                         // console.log('datanya: ', d);
                     },
                     // success: function(d) {
+                    //     // console.log(d);
                     //     $.each(d.sql, function(i,v) {
                     //         console.log(v.query);
                     //     })
                     // },
                     error: function(d) {
-                        console.log('error:', d.responseText);
+                        console.log('error:', d);
                     },
                 },
                 "createdRow": function(row, data, dataIndex) {
@@ -292,7 +306,7 @@
                         $('.dropdown-toggle').attr('disabled', true);
                     }
                 }, 64);
-                var statusnya = tablenya.row(this).data()[10];
+                var statusnya = tablenya.row(this).data()[12];
                 $('.ps-st').css('display', 'none');
                 $('.st-' + statusnya).css('display', 'block');
             });

@@ -25,12 +25,13 @@
                 @role('insurance')
                 <button class="btn btn-sm btn-success btn-approve">Aktifkan</button>
                 @endrole
+                <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
             @endif
             @if (empty($method) && !empty($data))
                 @if ($data->id_status == 1)
                 @role('approver')
-                    <button class="btn btn-sm btn-success btn-approve">SETUJUI</button>
-                    <button class="btn btn-sm btn-warning btn-rollback">KEMBALIKAN</button>
+                    <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                    <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
                 @endrole
                 @endif
             @endif
@@ -43,6 +44,9 @@
                 <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200 dark:border-dark-5">
                     <h2 class="font-medium text-base mr-auto">
                         Data Nasabah
+                        @if (!empty($data))
+                            <span class="px-2 py-1 rounded-full border text-gray-700 dark:text-gray-600 dark:border-dark-5 mr-1">{{ $status->msdesc }}</span>
+                        @endif
                     </h2>
                     @role('broker|insurance|adm')
                     <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2">Klausula</a>
@@ -94,15 +98,15 @@
                                 $('#type_insurance').append(newOption).trigger('change');
                             </script>
                             @endif
-                            @if (!empty($data) && $data->id_status >= 3)
+                            @if (!empty($data) && $data->id_status >= 2)
                             <div class="form-inline mt-5">
                                 <label for="asuransi" class="ml-3 form-label sm:w-20">Asuransi</label>
                                 <select id="asuransi" name="asuransi" required style="width:100%">
-                                    @foreach ($asuransi as $val)
-                                        <option @if(!$val->aktif) disabled @endif value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
+                                    {{-- @foreach ($asuransi as $val)
+                                        <option value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
                                             {{ $val->nama_asuransi }}
                                         </option>
-                                    @endforeach
+                                    @endforeach --}}
                                 </select>
                             </div>
                             @endif
@@ -184,6 +188,11 @@
                                 <input type="text" class="form-control allow-decimal" placeholder="Nomor Polis" name="policy_no"
                                     id="policy_no" value="@if (!empty($data->policy_no)){{ $data->policy_no }}@endif">
                             </div>
+                            <div class="form-inline mt-5" @if(empty($data) ||$data->id_status <=2) style="display:none;" @endif >
+                                <label for="cover_note" class="form-label sm:w-20">Cover Note</label>
+                                <input type="text" class="form-control allow-decimal" placeholder="Cover Note" name="cover_note"
+                                    id="cover_note" value="@if (!empty($data->cover_note)){{ $data->cover_note }}@endif">
+                            </div>
                             <div class="form-inline mt-5">
                                 <label for="nopolis_lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
                                 <div class="input-group w-full">
@@ -234,7 +243,7 @@
                                 <input type="text" class="form-control allow-decimal" placeholder="Nomor Jenis Jaminan" name="no_jaminan"
                                     id="no_jaminan" value="@if (!empty($data->no_jaminan)){{ $data->no_jaminan }}@endif">
                             </div>
-                            @if (!empty($data) && $data->id_status >= 3)
+                            @if (!empty($data) && $data->id_status >= 2)
                             <div class="form-inline mt-5">
                                 <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
                                 <select id="okupasi" style="width:100%" name="okupasi">
@@ -324,22 +333,22 @@
                     </table>
                     <div class="p-5">
                         <div class="sm:grid grid-cols-2 gap-2">
-                            <div class="mt-2" @if (!empty($data) && $data->id_status >= 3) @else style="display:none" @endif>
+                            <div class="mt-2" @if (!empty($data) && $data->id_status >= 2) @else style="display:none" @endif>
                                 <label for="kodetrans_value[2]" class="form-label">Premium</label>
                                 <input id="kodetrans_value[2]" d-input="PREMI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Premium" readonly aria-describedby="Premium" value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[2]">
                             </div>
-                            <div class="mt-2" @if (empty($data) || $data->id_status <=2) style="display:none" @endif>
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
                                 <label for="kodetrans_value[20]" class="form-label">Biaya Polis</label>
-                                <input id="kodetrans_value[20]" d-input="POLIS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control total-si" placeholder="Biaya Polis" aria-describedby="Biaya Polis" value="@if (!empty($pricing[20]->value)){{ $pricing[20]->value }}@endif">
+                                <input id="kodetrans_value[20]" d-input="POLIS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Polis" aria-describedby="Biaya Polis" value="@if (!empty($pricing[20]->value)){{ $pricing[20]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[20]">
                             </div>
-                            <div class="mt-2" @if (empty($data) || $data->id_status <=2) style="display:none" @endif>
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
                                 <label for="kodetrans_value[10]" class="form-label">Biaya Materai</label>
                                 <input id="kodetrans_value[10]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[10]->value)){{ $pricing[10]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[10]">
                             </div>
-                            <div class="mt-2" @if (empty($data) || $data->id_status <=2) style="display:none" @endif>
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
                                 <label for="kodetrans_value[13]" class="form-label">Biaya Admin</label>
                                 <input id="kodetrans_value[13]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin" value="@if (!empty($pricing[13]->value)){{ $pricing[13]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[13]">
@@ -527,6 +536,16 @@
             // console.log("Biaya Lain: ", LAIN);
             $('.masked').trigger('keyup');
         }
+
+        function disableInput() {
+            $(":input").prop('readonly', true);
+            $("select").prop('disabled', true);
+            $(".range-periode").prop('disabled', true);
+            $('#multiple-file-upload').hide();
+            $('#catatan').removeAttr('readonly');
+            $("[type='search']").removeAttr('readonly');
+            $('[name*="_length"]').removeAttr('disabled');
+        }
         @if ($act !== 'add' && !empty($data->transid))
             function hapusDokumen(id){
                 console.log('hapus');
@@ -703,6 +722,33 @@
                     },
                 }
             });
+            $("#asuransi").select2({
+                language: "id",
+                allowClear: true,
+                placeholder: "Pilih Asuransi",
+                ajax: {
+                    dataType: "json",
+                    url: "{{ url('api/selectasuransi') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                        };
+                    },
+                    processResults: function(data, page) {
+                        return {
+                            results: data,
+                        };
+                    },
+                }
+            });
+            @if (!empty($data->id_asuransi))
+                var newOption = new Option("{{ $data->nama_asuransi }}",
+                {{ $data->id_asuransi }}, false, false);
+                $('#asuransi').append(newOption).trigger('change');
+            @endif
             function cekType() {
                 if ($("#type_insurance").val() === "PAR") {
                     $('.extended-clause').removeAttr('style');
@@ -969,15 +1015,43 @@
                 // $('#periode-polis').daterangepicker({ startPolis: startPolis.format(), endPolis: '03/06/2005' });
             });
 
-            @if (empty($method) && !empty($data))
-                $(":input").prop('disabled', true);
-                $("[type='search']").removeAttr('disabled');
-                $('#multiple-file-upload').hide();
-                $('[name*="_length"]').removeAttr('disabled');
-                $('#transid').prop('disabled', false);
-                $('#catatan').prop('disabled', false);
-                $('button').prop('disabled', false);
-                // $("#frm-pertanggungan :input").prop('disabled', true);
+            @if (empty($method))
+                @if (!empty($data))
+                    disableInput();
+                @endif
+            @else
+                disableInput();
+                @switch($data->id_status)
+                    @case("2")
+                        $('#multiple-file-upload').show();
+                        $('#asuransi').prop('disabled', false);
+                        $('#okupasi').prop('disabled', false);
+                        $('#lokasi_okupasi').prop('readonly', false);
+                        $('#kodepos').prop('disabled', false);
+                        $('[d-input="POLIS"]').prop('readonly', false);
+                        $('[d-input="MATERAI"]').prop('readonly', false);
+                        $('[d-input="ADMIN"]').prop('readonly', false);
+                        $('[d-input="LAIN"]').prop('readonly', false);
+                        $('[d-input="BROKERPERC"]').prop('disabled', false);
+                        $('#frm-document :input').prop('disabled',false);
+                        $('.dz-hidden-input').prop('disabled',false);
+                        @break
+
+                    @case("3")
+                        $('#multiple-file-upload').show();
+                        $('#policy_no').prop('readonly', false);
+                        $('#cover_note').prop('readonly', false);
+                        $('[d-input="POLIS"]').prop('readonly', false);
+                        $('[d-input="MATERAI"]').prop('readonly', false);
+                        $('[d-input="ADMIN"]').prop('readonly', false);
+                        $('[d-input="LAIN"]').prop('readonly', false);
+                        $('#frm-document :input').prop('disabled',false);
+                        $('.dz-hidden-input').prop('disabled',false);
+                        @break
+                
+                    @default
+                        
+                @endswitch
             @endif
 
             var toolbarOptions = [
@@ -1034,7 +1108,12 @@
                     },
                     error: function(d) {
                         var message = d.responseJSON.message;
-                        // console.log(d.responseJSON.errors);
+                        console.log('message:',message);
+                        Swal.fire(
+                            'Gagal!',
+                            message,
+                            'error'
+                        );
                         $.each(d.responseJSON.errors, function(i,v){
                             $('#'+i).closest('div').addClass('has-error');
                             $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
@@ -1077,8 +1156,14 @@
                         });
                     },
                     error: function(d) {
+                        console.log(d);
                         var message = d.responseJSON.message;
-                        // console.log(d.responseJSON.errors);
+                        console.log('message:',message);
+                        Swal.fire(
+                            'Gagal!',
+                            message,
+                            'error'
+                        );
                         $.each(d.responseJSON.errors, function(i,v){
                             $('#'+i).closest('div').addClass('has-error');
                             $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
@@ -1099,36 +1184,49 @@
                     .attr('disabled',true)
                     .html(loading);
 
-                $.ajax({
-                    url: "{{ url('api/pengajuan') }}",
-                    method: "POST",
-                    data: $('.formnya').serialize() + "&method=rollback&_token={{ csrf_token() }}&nama_insured="+nama_insured,
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                    },
-                    success: function(d) {
-                        console.log(d);
-                        Swal.fire(
-                            'Berhasil!',
-                            d.message,
-                            'success'
-                        ).then(function() {
-                            if (d.method == 'create') {
-                                window.location = "{{ url('inquiry') }}";
-                            } else {
-                                window.top.close();
+                Swal.fire({
+                    title: 'Apakah Anda Yakin?',
+                    text: "Data akan dikembalikan ke Broker",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Kembalikan!',
+                    cancelButtonText: 'Tidak Jadi'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ url('api/pengajuan') }}",
+                            method: "POST",
+                            data: $('.formnya').serialize() + "&method=rollback&_token={{ csrf_token() }}&nama_insured="+nama_insured,
+                            headers: {
+                                'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                            },
+                            success: function(d) {
+                                console.log(d);
+                                Swal.fire(
+                                    'Berhasil!',
+                                    d.message,
+                                    'success'
+                                ).then(function() {
+                                    if (d.method == 'create') {
+                                        window.location = "{{ url('inquiry') }}";
+                                    } else {
+                                        window.top.close();
+                                    }
+                                });
+                            },
+                            error: function(d) {
+                                var message = d.responseJSON.message;
+                                // console.log(d.responseJSON.errors);
+                                $.each(d.responseJSON.errors, function(i,v){
+                                    $('#'+i).closest('div').addClass('has-error');
+                                    $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
+                                });
                             }
                         });
-                    },
-                    error: function(d) {
-                        var message = d.responseJSON.message;
-                        // console.log(d.responseJSON.errors);
-                        $.each(d.responseJSON.errors, function(i,v){
-                            $('#'+i).closest('div').addClass('has-error');
-                            $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
-                        });
                     }
-                });
+                })
                 $(this)
                     .attr('disabled',false)
                     .html(btnHtml);
