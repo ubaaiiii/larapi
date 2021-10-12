@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\CetakController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,9 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 // laporan
 Route::get('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
+
+// Cetak
+Route::get('test', [CetakController::class, 'cetakInvoice'])->name('cetak')->middleware();
 
 // inquiry
 Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
