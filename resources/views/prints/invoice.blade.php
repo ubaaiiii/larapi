@@ -1,6 +1,10 @@
 <style>
+  @page { 
+    size: 21.6cm 16.5cm;
+  }
   body {
     font-family: Arial, Helvetica, sans-serif;
+    margin:-10px -10px;
   }
   table {
     width: 100%;
@@ -13,7 +17,7 @@
   }
 </style>
 <body>
-  <table style="font-size:9" width="100%">
+  <table style="font-size:7" width="100%">
     <tr>
       <td><img src="{{ url('public/dist/images/Logo BDS insurance SIUP.png') }}" width="35%"></td>
       <td style="text-align: right">
@@ -32,14 +36,14 @@
 
   <table width="100%">
     <tr>
-      <td width="70%" style="font-size:15">
+      <td width="65%" style="font-size:11">
         <b>PT. BANK KB BUKOPIN, TBK. CAB {CABANG}</b><br>
         {ALAMAT_CABANG}
       </td>
-      <td align="right" width="auto" style="font-size:12">
+      <td align="right" width="auto" style="font-size:9">
         <table>
           <tr>
-            <td>Tanggal</td><td>:</td><td>11 November 2021</td>
+            <td>Tanggal</td><td>:</td><td>{TGL_PRODUKSI}</td>
           </tr>
           <tr>
             <td>ID Trasaksi</td><td>:</td><td>{TRANSID}</td>
@@ -51,13 +55,14 @@
       </td>
     </tr>
   </table>
-
+  <br>
+  <br>
   <table width="100%">
     <tr>
-      <td colspan="4" class="gbawah" style="font-size: 16;text-align: center;"><b>INVOICE</b></td>
+      <td colspan="4" class="gbawah" style="font-size: 14;text-align: center;"><b>INVOICE</b></td>
     </tr>
     <tr>
-      <table class="content">
+      <table style="font-size: 8;">
         <tr>
           <td width="25%">TIPE ASURANSI</td>
           <td width="44%">{INSTYPE}</td>
@@ -116,7 +121,7 @@
     </tr>
   </table>
 
-  <table>
+  <table style="font-size: 8;">
     <tr>
       <td valign="top">
         <u><b>Notes</b></u><br>
@@ -125,19 +130,17 @@
           <b>
             Pembayaran ditransfer ke rekening PT. BINA DANA SEJAHTERA pada:<br>
             {REKENING}<br>
-            Mohon pembayaran premi tidak melebihi dari 14 hari untuk menjaga berlakunya coverage/jaminan dari polis ini.
+            Mohon pembayaran premi tidak melebihi dari 14 hari untuk menjaga<br>
+            berlakunya coverage/jaminan dari polis ini.
           </b>
         </i>
       </td>
-      <td class="gbawah">
+      <td align="center">
         JAKARTA, {{ date('d F Y') }}<br>
         <br>
         <u>PT. BINA DANA SEJAHTERA</u><br>
         <br>
-        <br>
-        <br>
-        <br>
-        <br>
+        <img src="data:image/png;base64, {!! $qrcode !!}">
       </td>
     </tr>
   </table>
