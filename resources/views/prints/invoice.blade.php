@@ -1,10 +1,10 @@
 <style>
   @page { 
-    size: 21.6cm 16.5cm;
+    size: 21cm 14.8cm;
   }
   body {
     font-family: Arial, Helvetica, sans-serif;
-    margin:-10px -10px;
+    margin:-20px -20px;
   }
   table {
     width: 100%;
@@ -17,7 +17,7 @@
   }
 </style>
 <body>
-  <table style="font-size:7" width="100%">
+  <table style="font-size:6" width="100%">
     <tr>
       <td><img src="{{ url('public/dist/images/Logo BDS insurance SIUP.png') }}" width="35%"></td>
       <td style="text-align: right">
@@ -33,14 +33,13 @@
       <td colspan="2" style="border-bottom: 1px solid #238bcc !important;">&nbsp;</td>
     </tr>
   </table>
-
   <table width="100%">
     <tr>
       <td width="65%" style="font-size:11">
         <b>PT. BANK KB BUKOPIN, TBK. CAB {CABANG}</b><br>
         {ALAMAT_CABANG}
       </td>
-      <td align="right" width="auto" style="font-size:9">
+      <td align="right" width="auto" style="font-size:8">
         <table>
           <tr>
             <td>Tanggal</td><td>:</td><td>{TGL_PRODUKSI}</td>
@@ -55,11 +54,9 @@
       </td>
     </tr>
   </table>
-  <br>
-  <br>
   <table width="100%">
     <tr>
-      <td colspan="4" class="gbawah" style="font-size: 14;text-align: center;"><b>INVOICE</b></td>
+      <td colspan="4" class="gbawah" style="font-size: 13;text-align: center;"><b>INVOICE</b></td>
     </tr>
     <tr>
       <table style="font-size: 8;">
@@ -120,10 +117,10 @@
       </table>
     </tr>
   </table>
-
-  <table style="font-size: 8;">
+  <br>
+  <table>
     <tr>
-      <td valign="top">
+      <td valign="top" style="font-size: 7;">
         <u><b>Notes</b></u><br>
         <br>
         <i>
@@ -135,7 +132,7 @@
           </b>
         </i>
       </td>
-      <td align="center">
+      <td align="center"  style="font-size: 9;">
         JAKARTA, {{ date('d F Y') }}<br>
         <br>
         <u>PT. BINA DANA SEJAHTERA</u><br>

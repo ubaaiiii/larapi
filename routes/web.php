@@ -48,7 +48,8 @@ Route::get('mode/{value}', [AuthController::class, 'DarkMode']);
 Route::post('register', [AuthController::class, 'register']);
 
 // Cek Invoice
-Route::get('cekinvoice/{any}', [CetakController::class, 'cekInvoice']);
+Route::get('test', [CetakController::class, 'redirectInvoice']);
+Route::get('cek_invoice/{any}', [CetakController::class, 'cekInvoice']);
 
 Route::group(['middleware' => 'auth'], function () {
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Transaksi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -48,8 +49,8 @@ class CetakController extends Controller
         // return $pdf->download('pdf_file.pdf');
 
         // Streaming PDF, not saved on local
-        // return $pdf->stream("dompdf_out.pdf", array("Attachment" => false));
-        // exit(0);
+        return $pdf->stream("dompdf_out.pdf", array("Attachment" => false));
+        exit(0);
 
         // Saving PDF to local and redirect to the file
         $output = $pdf->output();
@@ -57,16 +58,31 @@ class CetakController extends Controller
         if (!is_dir($path)) {
             mkdir($path, 0777, TRUE);
         }
-        file_put_contents($path.'invoice.pdf', $output);
-        return redirect($path.'invoice.pdf');
+        file_put_contents($path. 'Invoice-BDS2110000001.pdf', $output);
+        return redirect($path. 'Invoice-BDS2110000001.pdf');
+    }
+    
+    public function redirectInvoice()
+    {
+        $parameter = [
+            'id' => "BDS2110000001",
+        ];
+        $parameter = Crypt::encrypt($parameter);
+        
+        return redirect('cek_invoice',$parameter);
     }
 
     public function cekInvoice($params)
     {
-        $data = Crypt::decrypt($params);
+        $encrypted = Crypt::decrypt($params);
         $data = [
-            'id'    => $data['id'],
+            'id'    => $encrypted['id'],
         ];
+
+        $transaksi = Transaksi::find($encrypted['id']);
+        if ($transaksi->id_status == 4) {
+            $data['data'] = $transaksi;
+        }
 
         return view('cekinvoice', $data);
     }
