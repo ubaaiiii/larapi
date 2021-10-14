@@ -46,28 +46,33 @@ Route::post('login', [AuthController::class, 'login']);
 Route::get('mode/{value}', [AuthController::class, 'DarkMode']);
 
 Route::post('register', [AuthController::class, 'register']);
+
+// Cek Invoice
+Route::get('testt', [CetakController::class, 'redirectCek']);
+Route::get('testtt/{any}', [CetakController::class, 'cekInvoice'])->name('testtt');
+
 Route::group(['middleware' => 'auth'], function () {
 
-Route::get('home', [PageController::class, 'dashboard'])->name('home');
-Route::get('profile', [PageController::class, 'profile'])->name('profile');
-Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+  Route::get('home', [PageController::class, 'dashboard'])->name('home');
+  Route::get('profile', [PageController::class, 'profile'])->name('profile');
+  Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
-// laporan
-Route::get('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
-Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
+  // laporan
+  Route::get('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
+  Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 
-// Cetak
-Route::get('test', [CetakController::class, 'cetakInvoice'])->name('cetak')->middleware();
+  // Cetak
+  Route::get('test', [CetakController::class, 'cetakInvoice'])->name('cetak')->middleware();
 
-// inquiry
-Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
-Route::get('inquiry/{any}', [PageController::class, 'inquiry'])->name('inquiry');
+  // inquiry
+  Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
+  Route::get('inquiry/{any}', [PageController::class, 'inquiry'])->name('inquiry');
 
-// pengajuan
-Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:ao|checker|adm');
-Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
-Route::post('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+  // pengajuan
+  Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:ao|checker|adm');
+  Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+  Route::post('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
 
-// master
-Route::get('user', [PageController::class, 'user'])->name('user')->middleware('role:adm|broker');
+  // master
+  Route::get('user', [PageController::class, 'user'])->name('user')->middleware('role:adm|broker');
 });

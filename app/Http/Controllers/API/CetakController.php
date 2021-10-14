@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use PDF;
 
 class CetakController extends Controller
@@ -53,5 +54,20 @@ class CetakController extends Controller
         // }
         // file_put_contents($path.'invoice.pdf', $output);
         // return redirect($path.'invoice.pdf');
+    }
+
+    public function redirectCek()
+    {
+        $parameter = [
+            'id' => 1,
+        ];
+        $parameter = Crypt::encrypt($parameter);
+        return redirect()->route('testtt', $parameter);
+    }
+
+    public function cekInvoice($params)
+    {
+        $data = Crypt::decrypt($params);
+        dd($data);
     }
 }
