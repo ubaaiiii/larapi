@@ -19,6 +19,9 @@
                 @role('checker|ao')
                 <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
                 @endrole
+                @role('approver')
+                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                @endrole
                 @role('broker')
                 <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
                 @endrole
@@ -1022,6 +1025,36 @@
             @else
                 disableInput();
                 @switch($data->id_status)
+                    @case("0")
+                        $('#multiple-file-upload').show();
+                        $('#asuransi').prop('disabled', false);
+                        $('#okupasi').prop('disabled', false);
+                        $('#lokasi_okupasi').prop('readonly', false);
+                        $('#kodepos').prop('disabled', false);
+                        $('[d-input="POLIS"]').prop('readonly', false);
+                        $('[d-input="MATERAI"]').prop('readonly', false);
+                        $('[d-input="ADMIN"]').prop('readonly', false);
+                        $('[d-input="LAIN"]').prop('readonly', false);
+                        $('[d-input="BROKERPERC"]').prop('disabled', false);
+                        $('#frm-document :input').prop('disabled',false);
+                        $('.dz-hidden-input').prop('disabled',false);
+                        @break
+
+                    @case("1")
+                        $('#multiple-file-upload').show();
+                        $('#asuransi').prop('disabled', false);
+                        $('#okupasi').prop('disabled', false);
+                        $('#lokasi_okupasi').prop('readonly', false);
+                        $('#kodepos').prop('disabled', false);
+                        $('[d-input="POLIS"]').prop('readonly', false);
+                        $('[d-input="MATERAI"]').prop('readonly', false);
+                        $('[d-input="ADMIN"]').prop('readonly', false);
+                        $('[d-input="LAIN"]').prop('readonly', false);
+                        $('[d-input="BROKERPERC"]').prop('disabled', false);
+                        $('#frm-document :input').prop('disabled',false);
+                        $('.dz-hidden-input').prop('disabled',false);
+                        @break
+
                     @case("2")
                         $('#multiple-file-upload').show();
                         $('#asuransi').prop('disabled', false);

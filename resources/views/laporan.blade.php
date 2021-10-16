@@ -215,12 +215,12 @@
                             d.dtable        = true;
                             // console.log('datanya: ', d);
                         },
-                            success: function(d) {
-                                $.each(d.sql, function(i,v){
-                                    console.log(v.query);
-                                });
-                                console.log('success:', d);
-                            },
+                            // success: function(d) {
+                            //     $.each(d.sql, function(i,v){
+                            //         console.log(v.query);
+                            //     });
+                            //     console.log('success:', d);
+                            // },
                         error: function(d) {
                             console.log('error:', d);
                         },

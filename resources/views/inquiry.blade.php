@@ -51,6 +51,14 @@
                                     Ajukan
                                 </a>
                             @endrole
+                            @role('approver|adm')
+                                <a 
+                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
+                                    style="cursor:pointer">
+                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Setujui
+                                </a>
+                            @endrole
                             @role('broker|adm')
                                 <a
                                     class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
