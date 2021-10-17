@@ -303,7 +303,6 @@
                     selected += " | ";
                 });
                 navigator.clipboard.writeText(selected);
-                $('#text-inquiry').click();
             });
 
             $('#tb-inquiry').on('click', 'tbody > tr', function() {
@@ -312,6 +311,7 @@
                         $('.dropdown-toggle').attr('disabled', false);
                     } else {
                         $('.dropdown-toggle').attr('disabled', true);
+                        $('.ps-st').css('display', 'none');
                     }
                 }, 64);
                 var statusnya = tablenya.row(this).data()[12];
@@ -329,7 +329,6 @@
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('approve');
-                $('#text-inquiry').click();
                 $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
             });
             
@@ -337,9 +336,12 @@
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('update');
-                $('#text-inquiry').click();
                 $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
             });
+
+            $('a').click(function() {
+                $('#text-inquiry').click();
+            })
         });
     </script>
 @endsection

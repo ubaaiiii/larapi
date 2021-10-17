@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\API\CetakController;
+use App\Http\Controllers\CetakController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
@@ -48,7 +48,7 @@ Route::get('mode/{value}', [AuthController::class, 'DarkMode']);
 Route::post('register', [AuthController::class, 'register']);
 
 // Cek Invoice
-Route::get('test', [CetakController::class, 'redirectInvoice']);
+// Route::get('cetak_invoice', [CetakController::class, 'redirectInvoice']);
 Route::get('cek_invoice/{any}', [CetakController::class, 'cekInvoice']);
 
 Route::group(['middleware' => 'auth'], function () {
@@ -62,7 +62,7 @@ Route::group(['middleware' => 'auth'], function () {
   Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 
   // Cetak
-  Route::get('test', [CetakController::class, 'cetakInvoice'])->name('cetak')->middleware();
+  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('cetak')->middleware('role:ao|checker|adm');
 
   // inquiry
   Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');

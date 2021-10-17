@@ -72,9 +72,7 @@
               <div class="mt-1">
                 <b>Ruko Sentradana Kalimalang</b><br>
                 Jl. Seulawah Raya No.B Jakarta Timur - 13620<br>
-                Telp: +62 21 22 32 20 32. Fax: +62 21 22 32 20 17<br>
-                www.bdspt.com<br>
-                No. Keanggotaan: 083/APPARINDO/2003</div>
+                Telp: +62 21 22 32 20 32. Fax: +62 21 22 32 20 17
             </div>
           </div>
         </div>

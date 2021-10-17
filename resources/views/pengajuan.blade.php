@@ -266,6 +266,10 @@
                                 <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                             </div>
                             <div class="form-inline mt-5">
+                                <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
+                                <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
+                            </div>
+                            <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
                                 <select id="kodepos" style="width:100%" name="kodepos" required>
                                 </select>
@@ -342,19 +346,19 @@
                                 <input type="hidden" name="kodetrans_value[2]">
                             </div>
                             <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
-                                <label for="kodetrans_value[20]" class="form-label">Biaya Polis</label>
-                                <input id="kodetrans_value[20]" d-input="POLIS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Polis" aria-describedby="Biaya Polis" value="@if (!empty($pricing[20]->value)){{ $pricing[20]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[20]">
-                            </div>
-                            <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
-                                <label for="kodetrans_value[10]" class="form-label">Biaya Materai</label>
-                                <input id="kodetrans_value[10]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[10]->value)){{ $pricing[10]->value }}@endif">
+                                <label for="kodetrans_value[10]" class="form-label">Biaya Polis</label>
+                                <input id="kodetrans_value[10]" d-input="POLIS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Polis" aria-describedby="Biaya Polis" value="@if (!empty($pricing[10]->value)){{ $pricing[10]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[10]">
                             </div>
                             <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
-                                <label for="kodetrans_value[13]" class="form-label">Biaya Admin</label>
-                                <input id="kodetrans_value[13]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin" value="@if (!empty($pricing[13]->value)){{ $pricing[13]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[13]">
+                                <label for="kodetrans_value[11]" class="form-label">Biaya Materai</label>
+                                <input id="kodetrans_value[11]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[11]->value)){{ $pricing[11]->value }}@endif">
+                                <input type="hidden" name="kodetrans_value[11]">
+                            </div>
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
+                                <label for="kodetrans_value[12]" class="form-label">Biaya Admin</label>
+                                <input id="kodetrans_value[12]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin" value="@if (!empty($pricing[12]->value)){{ $pricing[12]->value }}@endif">
+                                <input type="hidden" name="kodetrans_value[12]">
                             </div>
                         </div>
                     </div>
@@ -926,7 +930,7 @@
                 var endKJPP = moment("{{ $data->kjpp_end }}","YYYY-MM-DD");
             @else 
                 var startKJPP = moment();
-                var endKJPP = moment().add(1, 'month');
+                var endKJPP = moment().add(1, 'year');
             @endif
 
             function kjpp(startKJPP, endKJPP) {
@@ -952,7 +956,7 @@
                 var endPolis = moment("{{ $data->polis_end }}","YYYY-MM-DD");
             @else 
                 var startPolis = moment();
-                var endPolis = moment().add(1, 'month');
+                var endPolis = moment().add(1, 'year');
             @endif
 
             function polis(startPolis, endPolis) {
@@ -1265,7 +1269,6 @@
                     .html(btnHtml);
             });
 
-            // $('#kodetrans_value[2]');
             RATE = parseFloat($("#okupasi option:selected").text().slice($("#okupasi option:selected").text().indexOf("(") + 1, $("#okupasi option:selected").text().lastIndexOf("‰")));
             $('.masked').trigger('keyup');
             @if(!empty($pricing))
