@@ -470,7 +470,7 @@ class ProcessController extends Controller
             }
             $this->aktifitas($request->transid, '7', $text);
         } else if ($insured->wasRecentlyCreated) {
-            $this->aktifitas($request->transid, '7', 'Pembuatan data tertanggung baru');
+            $this->aktifitas($request->transid, '7', 'Pembuatan data tertanggung baru a/n '. strtoupper($request->nama_insured));
         }
 
         return $insured;
@@ -497,7 +497,7 @@ class ProcessController extends Controller
             // $original = $cabang->getRawOriginal();
             $text = 'Perubahan data cabang, sebelumnya:';
             foreach ($changes as $key => $value) {
-                if ($key !== "updated_at" && $key !== "catatan") {
+                if ($key !== "updated_at" && $key !== "catatan" && $key !== "created_by") {
                     $text .= "<br>- " . $key . " : " . $data->$key;
                 }
             }

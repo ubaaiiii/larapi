@@ -1012,14 +1012,12 @@
             // });
 
             $('#masa').keyup(function(){
-                endPolis = startPolis.add($(this).val(), 'day').format('DD/MM/YYYY');
+                endPolis = startPolis.add($(this).val(), 'days').format('DD/MM/YYYY');
                 startPolis = startPolis.subtract($(this).val(), 'day');
                 $('#periode-polis').data('daterangepicker').setStartDate(startPolis);
                 $('#periode-polis').data('daterangepicker').setEndDate(endPolis);
-                $('[name="polis_start"]').val(startPolis.format('YYYY-MM-DD'));
-                // format dibalik karena kebalik detectnya
-                $('[name="polis_end"]').val(moment(endPolis).format('YYYY-DD-MM'));
-                // $('#periode-polis').daterangepicker({ startPolis: startPolis.format(), endPolis: '03/06/2005' });
+                $('[name="polis_start"]').val($('#periode-polis').data('daterangepicker').startDate.format('YYYY-MM-DD'));
+                $('[name="polis_end"]').val($('#periode-polis').data('daterangepicker').endDate.format('YYYY-MM-DD'));
             });
 
             @if (empty($method))
@@ -1064,6 +1062,7 @@
                         $('#asuransi').prop('disabled', false);
                         $('#okupasi').prop('disabled', false);
                         $('#lokasi_okupasi').prop('readonly', false);
+                        $('#objek_okupasi').prop('readonly', false);
                         $('#kodepos').prop('disabled', false);
                         $('[d-input="POLIS"]').prop('readonly', false);
                         $('[d-input="MATERAI"]').prop('readonly', false);
