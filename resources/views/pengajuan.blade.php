@@ -78,13 +78,6 @@
                                     <input type="text" id="transid" class="form-control" required name="transid"
                                         value="@if (!empty($data->transid)){{ $data->transid }}@endif" readonly>
                                 </div>
-                            @else
-                                <div class="form-inline mt-5">
-                                    <label for="transid" class="form-label sm:w-20">Nomor Transaksi</label>
-                                    <input type="text" id="transid" class="form-control" required name="transid"
-                                        value="{{ $transid->seqlead . date($transid->seqformat) . str_pad($transid->seqno, $transid->seqlen, '0', STR_PAD_LEFT) }}"
-                                        readonly>
-                                </div>
                             @endif
                             <div class="form-inline mt-5">
                                 <label for="type_insurance" class="ml-3 form-label sm:w-20">Tipe Asuransi</label>

@@ -248,6 +248,10 @@ class DataController extends Controller
                 $table->where('transaksi.id_asuransi', Auth::user()->id_asuransi);
                 break;
 
+            case 'finance':
+
+                break;
+
             case 'adm':
                 // wherenya administrator
                 break;
@@ -279,6 +283,10 @@ class DataController extends Controller
 
                         case 'insurance':
                             $table->where('id_status', "3");
+                            break;
+
+                        case 'finance':
+                            
                             break;
 
                         case 'adm':

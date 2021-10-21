@@ -44,6 +44,11 @@ class CetakController extends Controller
         $url = url('cek_invoice') . "/" . $parameter;
         if (!empty($transaksi)) {
             if ($transaksi->id_status == 4) {
+                // return $transaksi->billing_at;
+                if (empty($transaksi->billing_at)) {
+                    Transaksi::where('transid',$transaksi->transid)->update(['billing_at' => date('Y-m-d')]);
+                    $transaksi = Transaksi::find($transid);
+                }
                 $data = [
                     'instype'     => Instype::find($transaksi->id_instype),
                     'asuransi'    => Asuransi::find($transaksi->id_asuransi),
@@ -67,7 +72,7 @@ class CetakController extends Controller
                 // return $pdf->download('pdf_file.pdf');
         
                 // Streaming PDF, not saved on local
-                return $pdf->stream("dompdf_out.pdf", array("Attachment" => false));
+                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
                 exit(0);
         
                 // Saving PDF to local and redirect to the file

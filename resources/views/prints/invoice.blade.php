@@ -1,7 +1,32 @@
+@php
+function tgl_indo($tanggal){
+  $bulan = array (
+  1 => 'JANUARI',
+  'FEBRUARI',
+  'MARET',
+  'APRIL',
+  'MEI',
+  'JUNI',
+  'JULI',
+  'AGUSTUS',
+  'SEPTEMBER',
+  'OKTOBER',
+  'NOVEMBER',
+  'DESEMBER'
+  );
+  $pecahkan = explode('-', $tanggal);
+
+  // variabel pecahkan 0 = tanggal
+  // variabel pecahkan 1 = bulan
+  // variabel pecahkan 2 = tahun
+
+  return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+}
+@endphp
 <style>
-  @page { 
-    size: 21cm 14.8cm;
-  }
+  /* @page { 
+    size: 18.5cm 16.5cm;
+  } */
   body {
     font-family: Arial, Helvetica, sans-serif;
     margin:-20px -20px;
@@ -43,7 +68,7 @@
       <td align="right" width="auto" style="font-size:8">
         <table>
           <tr>
-            <td>Tanggal</td><td>:</td><td>{{ date_format(date_create($data['transaksi']->created_at),"d F Y") }}</td>
+            <td>Tanggal Cetak</td><td>:</td><td>{{ tgl_indo(date('Y-m-d')) }}</td>
           </tr>
           <tr>
             <td>ID Trasaksi</td><td>:</td><td>{{ $data['transaksi']->transid }}</td>
@@ -81,27 +106,26 @@
         </tr>
         <tr>
           <td>PERIODE POLIS</td>
-          <td>{{ date_format(date_create($data['transaksi']->polis_start),"d F Y") }} - {{ date_format(date_create($data['transaksi']->polis_end),"d F Y") }}</td>
-          <td>By. Lain</td>
-          <td class="tright gbawah">{{ number_format($data['pricing'][16]->value,2) }}</td>
+          <td>{{ tgl_indo($data['transaksi']->polis_start) ." - ". tgl_indo($data['transaksi']->polis_end) }}</td>
+          {{-- <td>{{ date_format(date_create($data['transaksi']->polis_start),"d F Y") }} - {{ date_format(date_create($data['transaksi']->polis_end),"d F Y") }}</td> --}}
+          <td>By. Admin</td>
+          <td class="tright">{{ number_format($data['pricing'][11]->value,2) }}</td>
         </tr>
         <tr>
           <td>TERTANGGUNG</td>
           <td>QQ {{ $data['insured']->nama_insured }}</td>
-          <td>Gross Premium</td>
-          <td class="tright">{{ number_format($data['pricing'][18]->value,2) }}</td>
+          <td>By. Lain</td>
+          <td class="tright gbawah">{{ number_format($data['pricing'][16]->value,2) }}</td>
         </tr>
         <tr>
           <td>OBJEK PERTANGGUNGAN</td>
           <td>{{ $data['transaksi']->object }}</td>
-          <td>By. Admin</td>
-          <td class="tright gbawah">{{ number_format($data['pricing'][11]->value,2) }}</td>
+          <td>Total Tagihan</td>
+          <td class="tright">{{ number_format($data['pricing'][18]->value,2) }}</td>
         </tr>
         <tr>
           <td>TOTAL PERTANGGUNGAN</td>
-          <td>{{ number_format($data['pricing'][0]->value,2) }}</td>
-          <td>Gross NET</td>
-          <td class="tright">{{ number_format($data['pricing'][19]->value,2) }}</td>
+          <td colspan="3">{{ number_format($data['pricing'][0]->value,2) }}</td>
         </tr>
         <tr>
           <td>LOKASI PERTANGGUNGAN</td>
@@ -109,14 +133,18 @@
         </tr>
         <tr>
           <td>TANGGAL JATUH TEMPO</td>
-          <td colspan="3">{{ (!empty($data['due_date']->created_at))?$data['due_date']->created_at:"" }}</td>
+          @php
+            $date = date_create($data['transaksi']->billing_at);
+            date_add($date,date_interval_create_from_date_string("14 days"));
+          @endphp
+          <td colspan="3">{{ tgl_indo($date->format('Y-m-d')) }}</td>
         </tr>
       </table>
     </tr>
   </table>
   <table>
     <tr>
-      <td valign="top" style="font-size: 7;">
+      <td valign="top" style="font-size: 8;" width="75%">
         <u><b>Notes</b></u><br>
         <br>
         <i>
@@ -128,10 +156,10 @@
           </b>
         </i>
       </td>
-      <td align="center"  style="font-size: 9;">
-        JAKARTA, {{ date('d F Y') }}<br>
-        <br>
+      <td align="center" style="font-size: 9;">
+        JAKARTA, {{ tgl_indo($data['transaksi']->billing_at) }}<br>
         <u>PT. BINA DANA SEJAHTERA</u><br>
+        <b id="test"></b>
         <br>
         <img src="data:image/png;base64, {!! $qrcode !!}">
       </td>

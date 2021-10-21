@@ -338,6 +338,12 @@
                 $('#frm-method').val('update');
                 $('#frm').attr('action','{{ url('pengajuan') }}/'+transid).submit();
             });
+            
+            $('#ps-invoice').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[0];
+                window.open("{{ url('cetak_invoice') }}/"+transid);
+            });
 
             $('a').click(function() {
                 $('#text-inquiry').click();

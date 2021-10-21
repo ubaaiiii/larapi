@@ -73,9 +73,10 @@ class PageController extends Controller
 
     function laporan(Request $request)
     {
+        $role = Role::create(['name' => 'finance']);
         // $permission = Permission::create(['name' => 'edit articles']);
         // $permission->assignRole('');
-        // die;
+        die;
         $level = Auth::user()->getRoleNames()[0];
         if (count($request->all()) == 0) {
             switch ($level) {
