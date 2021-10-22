@@ -10,6 +10,7 @@ use App\Models\Cabang;
 use App\Models\Insured;
 use App\Models\KodeTrans;
 use App\Models\Pricing;
+use App\Models\Sequential;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -206,18 +207,19 @@ class ProcessController extends Controller
         switch ($request->method) {
             case 'store':
                 $request->validate([
-                    'transid'           => 'required|string|max:14',
+                    'transid'           => 'string|max:12',
                     'type_insurance'    => 'required|string',
-                    'cif'               => 'string',
                     'asuransi'          => 'string',
                     'cabang'            => 'required',
                     'alamat_cabang'     => 'required|string',
                     'nama_cabang'       => 'required|string',
                     'nopinjaman'        => 'required|numeric',
+                    'cif'               => 'string',
                     'insured'           => 'required',
                     'nik_insured'       => 'numeric',
                     'npwp_insured'      => 'required|numeric',
                     'nama_insured'      => 'required|string',
+                    'nohp_insured'      => 'required|string',
                     'alamat_insured'    => 'required|string',
                     'plafond_kredit'    => 'required',
                     'outstanding_kredit'=> 'required',
@@ -245,29 +247,40 @@ class ProcessController extends Controller
                 $cabang     = $this->cabang($request);
                 $pricing    = $this->pricing($request);
 
-                $data = Transaksi::find($request->transid);
+                $transid = $request->transid;
+                if (empty($request->transid) || !isset($request->transid)) {
+                    $nourut     = DB::table('transaksi')->whereYear('created_at','=',date('Y'))->whereMonth('created_at','=',date('m'))->count();
+                    $sequential = Sequential::where('seqdesc', 'transid')->first();
+                    $transid    = $sequential->seqlead.date($sequential->seqformat).str_pad($nourut, $sequential->seqlen, '0', STR_PAD_LEFT);
+                    
+                    if (Transaksi::find($transid) !== null) {
+                        $nourut++;
+                        $transid = $sequential->seqlead.date($sequential->seqformat).str_pad($nourut, $sequential->seqlen, '0', STR_PAD_LEFT);
+                    }
+                }
+                $data = Transaksi::find($transid);
+
                 $save = Transaksi::updateOrCreate([
-                    'transid'           => $request->transid,
+                    'transid'           => $transid,
                 ],
                 [
                     'id_instype'        => $request->type_insurance,
-                    'id_insured'        => $insured->id,
                     'id_cabang'         => $cabang->id,
                     'nopinjaman'        => $request->nopinjaman,
+                    'cif'               => $request->cif,
+                    'id_insured'        => $insured->id,
                     'plafond_kredit'    => round($request->plafond_kredit, 2),
                     'outstanding_kredit'=> round($request->outstanding_kredit, 2),
-                    'agunan_kjpp'       => round($request->agunan_kjpp, 2),
                     'policy_no'         => $request->policy_no,
                     'policy_parent'     => $request->nopolis_lama,
-                    'masa'              => $request->masa,
-                    'cif'               => $request->cif,
-                    'id_status'         => '0',
-                    'id_jaminan'        => $request->jaminan,
-                    'no_jaminan'        => $request->no_jaminan,
                     'polis_start'       => $request->polis_start,
                     'polis_end'         => $request->polis_end,
+                    'masa'              => $request->masa,
                     'kjpp_start'        => $request->kjpp_start,
                     'kjpp_end'          => $request->kjpp_end,
+                    'agunan_kjpp'       => round($request->agunan_kjpp, 2),
+                    'id_jaminan'        => $request->jaminan,
+                    'no_jaminan'        => $request->no_jaminan,
                     'id_okupasi'        => $request->okupasi,
                     'location'          => $request->lokasi_okupasi,
                     'object'            => $request->objek_okupasi,
@@ -275,6 +288,7 @@ class ProcessController extends Controller
                     'catatan'           => $request->catatan,
                     'klausula'          => $request->klausula,
                     'created_by'        => Auth::user()->id,
+                    'id_status'         => '0',
                 ]);
 
                 if (!$save->wasRecentlyCreated && $save->wasChanged()) {
@@ -283,14 +297,17 @@ class ProcessController extends Controller
                     // $original = $save->getRawOriginal();
                     $text = 'Perubahan data pengajuan, sebelumnya:';
                     foreach($changes as $key => $value) {
-                        if ($key !== "updated_at" && $key !== "catatan") {
+                        if ($key !== "updated_at" && $key !== "catatan" && $key !== "created_by") {
                             $text .= "<br>- ".$key." : ". $data->$key;  
                         }
                     }
-                    $this->aktifitas($request->transid, '7', $text);
+                    if (!empty($request->catatan)) {
+                        $text .= "<br>Catatan: ".$request->catatan;
+                    }
+                    $this->aktifitas($transid, '7', $text);
                 } else if ($save->wasRecentlyCreated) {
                     $method = "create";
-                    $this->aktifitas($request->transid, '0', $request->catatan);
+                    $this->aktifitas($transid, '0', $request->catatan);
                 }
 
                 return response()->json([
@@ -305,10 +322,10 @@ class ProcessController extends Controller
                 $data->delete();
 
                 if (!empty($request->catatan)) {
-                    $catatan = "";
+                    $catatan = ". Catatan: ".$request->catatan;
                 }
 
-                $this->aktifitas($request->transid, '8', 'Penghapusan data '.$request->transid);
+                $this->aktifitas($request->transid, '8', 'Penghapusan data '.$request->transid.$catatan);
 
                 return response()->json([
                     'message'   => 'Transaksi '.$request->transid.' berhasil dihapus',
@@ -319,13 +336,87 @@ class ProcessController extends Controller
             case 'approve':                
                 switch ($role) {
                     case 'ao':
-                        $status = 1;
-                        $string = "ajukan";
+                        $status     = 1;
+                        $string     = "ajukan";
+                        $insured    = $this->tertanggung($request);
+                        $cabang     = $this->cabang($request);
+                        $pricing    = $this->pricing($request);
+                        $update     = [
+                            'id_instype'        => $request->type_insurance,
+                            'id_cabang'         => $cabang->id,
+                            'nopinjaman'        => $request->nopinjaman,
+                            'cif'               => $request->cif,
+                            'id_insured'        => $insured->id,
+                            'plafond_kredit'    => round($request->plafond_kredit, 2),
+                            'outstanding_kredit' => round($request->outstanding_kredit, 2),
+                            'policy_parent'     => $request->nopolis_lama,
+                            'polis_start'       => $request->polis_start,
+                            'polis_end'         => $request->polis_end,
+                            'masa'              => $request->masa,
+                            'kjpp_start'        => $request->kjpp_start,
+                            'kjpp_end'          => $request->kjpp_end,
+                            'agunan_kjpp'       => round($request->agunan_kjpp, 2),
+                            'id_jaminan'        => $request->jaminan,
+                            'no_jaminan'        => $request->no_jaminan,
+                            'catatan'           => $request->catatan,
+                        ];
                         break;
 
                     case 'checker':
-                        $status = 1;
-                        $string = "ajukan";
+                        $status     = 1;
+                        $string     = "ajukan";
+                        $insured    = $this->tertanggung($request);
+                        $cabang     = $this->cabang($request);
+                        $pricing    = $this->pricing($request);
+
+                        $request->validate([
+                            'type_insurance'    => 'required|string',
+                            'cabang'            => 'required',
+                            'alamat_cabang'     => 'required|string',
+                            'nama_cabang'       => 'required|string',
+                            'nopinjaman'        => 'required|numeric',
+                            'cif'               => 'string',
+                            'insured'           => 'required',
+                            'nik_insured'       => 'numeric',
+                            'npwp_insured'      => 'required|numeric',
+                            'nama_insured'      => 'required|string',
+                            'nohp_insured'      => 'required|string',
+                            'alamat_insured'    => 'required|string',
+                            'plafond_kredit'    => 'required',
+                            'outstanding_kredit'=> 'required',
+                            'nopolis_lama'      => 'alpha_dash|nullable',
+                            'polis_start'       => 'required|string',
+                            'polis_end'         => 'required|string',
+                            'masa'              => 'required|numeric',
+                            'kjpp_start'        => 'required|string',
+                            'kjpp_end'          => 'required|string',
+                            'agunan_kjpp'       => 'required',
+                            'jaminan'           => 'required|string',
+                            'no_jaminan'        => 'required',
+                            'catatan'           => 'string|nullable',
+                            'kodetrans_value'   => 'required|array|min:1|nullable',
+                            'kodetrans_remarks' => 'array|nullable',
+                        ]);
+
+                        $update     = [
+                            'id_instype'        => $request->type_insurance,
+                            'id_cabang'         => $cabang->id,
+                            'nopinjaman'        => $request->nopinjaman,
+                            'cif'               => $request->cif,
+                            'id_insured'        => $insured->id,
+                            'plafond_kredit'    => round($request->plafond_kredit, 2),
+                            'outstanding_kredit'=> round($request->outstanding_kredit, 2),
+                            'policy_parent'     => $request->nopolis_lama,
+                            'polis_start'       => $request->polis_start,
+                            'polis_end'         => $request->polis_end,
+                            'masa'              => $request->masa,
+                            'kjpp_start'        => $request->kjpp_start,
+                            'kjpp_end'          => $request->kjpp_end,
+                            'agunan_kjpp'       => round($request->agunan_kjpp, 2),
+                            'id_jaminan'        => $request->jaminan,
+                            'no_jaminan'        => $request->no_jaminan,
+                            'catatan'           => $request->catatan,
+                        ];
                         break;
 
                     case 'approver':
@@ -334,20 +425,25 @@ class ProcessController extends Controller
                         break;
 
                     case 'broker':
+                        $status = 3;
+                        $string = "verifikasi";
+                        
                         $request->validate([
                             'asuransi'          => 'required|string',
                             'okupasi'           => 'required|numeric',
-                            'lokasi_okupasi'    => 'required|string',
                             'kodepos'           => 'required|numeric',
+                            'lokasi_okupasi'    => 'required|string',
+                            'objek_okupasi'     => 'required|string',
                         ]);
                         
-                        $update['id_asuransi'] = $request->asuransi;
-                        $update['id_okupasi'] = $request->okupasi;
-                        $update['id_kodepos'] = $request->kodepos;
-                        $update['location'] = $request->lokasi_okupasi;
+                        $update = [
+                            'id_asuransi'   => $request->asuransi,
+                            'id_okupasi'    => $request->okupasi,
+                            'id_kodepos'    => $request->kodepos,
+                            'location'      => $request->lokasi_okupasi,
+                            'object'        => $request->objek_okupasi,
+                        ];
 
-                        $status = 3;
-                        $string = "verifikasi";
                         break;
                         
                     case 'insurance':
@@ -356,8 +452,10 @@ class ProcessController extends Controller
                             'cover_note'    => 'required_without:policy_no',
                         ]);
 
-                        $update['policy_no']    = $request->policy_no;
-                        $update['cover_note']   = $request->cover_note;
+                        $update = [
+                            'policy_no'     => $request->policy_no,
+                            'cover_note'    => $request->cover_note,
+                        ];
 
                         $status = 4;
                         $string = "aktifkan";
@@ -464,7 +562,7 @@ class ProcessController extends Controller
             // $original = $insured->getRawOriginal();
             $text = 'Perubahan data tertanggung, sebelumnya:';
             foreach ($changes as $key => $value) {
-                if ($key !== "updated_at" && $key !== "catatan") {
+                if ($key !== "updated_at" && $key !== "catatan" && $key !== "created_by") {
                     $text .= "<br>- " . $key . " : " . $data->$key;
                 }
             }

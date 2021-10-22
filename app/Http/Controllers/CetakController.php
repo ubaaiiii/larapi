@@ -13,6 +13,7 @@ use App\Models\User;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class CetakController extends Controller
 {
@@ -109,11 +110,17 @@ class CetakController extends Controller
         $data = [
             'id'    => $encrypted['id'],
         ];
-
-        $transaksi = Transaksi::find($encrypted['id']);
+        
+        $transaksi = Transaksi::where('transid','=',$encrypted['id'])
+        ->join('insured', 'insured.id', '=', 'transaksi.id_insured')
+        ->join('cabang', 'cabang.id', '=', 'transaksi.id_cabang')
+        ->first();
         if ($transaksi->id_status == 4) {
-            $data['data'] = $transaksi;
+            $data['data']    = $transaksi;
+            $data['pricing'] = Pricing::where('id_transaksi',$encrypted['id'])->orderBy('id_kodetrans','ASC')->get();
         }
+
+        // dd($data['pricing']);
 
         return view('cekinvoice', $data);
     }

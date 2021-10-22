@@ -1,28 +1,3 @@
-@php
-function tgl_indo($tanggal){
-  $bulan = array (
-  1 => 'JANUARI',
-  'FEBRUARI',
-  'MARET',
-  'APRIL',
-  'MEI',
-  'JUNI',
-  'JULI',
-  'AGUSTUS',
-  'SEPTEMBER',
-  'OKTOBER',
-  'NOVEMBER',
-  'DESEMBER'
-  );
-  $pecahkan = explode('-', $tanggal);
-
-  // variabel pecahkan 0 = tanggal
-  // variabel pecahkan 1 = bulan
-  // variabel pecahkan 2 = tahun
-
-  return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
-}
-@endphp
 <style>
   /* @page { 
     size: 18.5cm 16.5cm;
@@ -68,7 +43,7 @@ function tgl_indo($tanggal){
       <td align="right" width="auto" style="font-size:8">
         <table>
           <tr>
-            <td>Tanggal Cetak</td><td>:</td><td>{{ tgl_indo(date('Y-m-d')) }}</td>
+            <td>Tanggal Cetak</td><td>:</td><td>{{ FunctionsHelp::tgl_indo(date('Y-m-d')) }}</td>
           </tr>
           <tr>
             <td>ID Trasaksi</td><td>:</td><td>{{ $data['transaksi']->transid }}</td>
@@ -106,7 +81,7 @@ function tgl_indo($tanggal){
         </tr>
         <tr>
           <td>PERIODE POLIS</td>
-          <td>{{ tgl_indo($data['transaksi']->polis_start) ." - ". tgl_indo($data['transaksi']->polis_end) }}</td>
+          <td>{{ FunctionsHelp::tgl_indo($data['transaksi']->polis_start) ." - ". FunctionsHelp::tgl_indo($data['transaksi']->polis_end) }}</td>
           {{-- <td>{{ date_format(date_create($data['transaksi']->polis_start),"d F Y") }} - {{ date_format(date_create($data['transaksi']->polis_end),"d F Y") }}</td> --}}
           <td>By. Admin</td>
           <td class="tright">{{ number_format($data['pricing'][11]->value,2) }}</td>
@@ -137,7 +112,7 @@ function tgl_indo($tanggal){
             $date = date_create($data['transaksi']->billing_at);
             date_add($date,date_interval_create_from_date_string("14 days"));
           @endphp
-          <td colspan="3">{{ tgl_indo($date->format('Y-m-d')) }}</td>
+          <td colspan="3">{{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }}</td>
         </tr>
       </table>
     </tr>
@@ -150,14 +125,14 @@ function tgl_indo($tanggal){
         <i>
           <b>
             Pembayaran ditransfer ke rekening PT. BINA DANA SEJAHTERA pada:<br>
-            {REKENING}<br>
+            PT. Bank KB Bukopin Capem Bulog II, Jakarta No. 101.5266.011 (IDR Rupiah)<br>
             Mohon pembayaran premi tidak melebihi dari 14 hari untuk menjaga<br>
             berlakunya coverage/jaminan dari polis ini.
           </b>
         </i>
       </td>
       <td align="center" style="font-size: 9;">
-        JAKARTA, {{ tgl_indo($data['transaksi']->billing_at) }}<br>
+        JAKARTA, {{ FunctionsHelp::tgl_indo($data['transaksi']->billing_at) }}<br>
         <u>PT. BINA DANA SEJAHTERA</u><br>
         <b id="test"></b>
         <br>

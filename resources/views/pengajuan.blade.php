@@ -260,7 +260,7 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
-                                <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
+                                <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->object)){{ $data->object }}@endif</textarea>
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
