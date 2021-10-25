@@ -21,14 +21,25 @@
                 @endrole
                 @role('approver')
                 <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                <?php 
+                    $status_rollback = "TERTUNDA";
+                ?>
                 @endrole
                 @role('broker')
                 <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
+                <?php 
+                    $status_rollback = "DISETUJUI";
+                ?>
                 @endrole
                 @role('insurance')
                 <button class="btn btn-sm btn-success btn-approve">Aktifkan</button>
+                <?php 
+                    $status_rollback = "DIVERIFIKASI";
+                ?>
                 @endrole
+                @role('approver|broker|insurance|adm')
                 <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
+                @endrole
             @endif
             @if (empty($method) && !empty($data))
                 @if ($data->id_status == 1)
@@ -75,8 +86,8 @@
                             @if (($act == 'view' || $act == 'edit') && !empty($data->transid))
                                 <div class="form-inline mt-5">
                                     <label for="transid" class="form-label sm:w-20">Nomor Transaksi</label>
-                                    <input type="text" id="transid" class="form-control" required name="transid"
-                                        value="@if (!empty($data->transid)){{ $data->transid }}@endif" readonly>
+                                    <input type="text" id="transid" class="form-control" required
+                                        value="{{ $data->transid }}" disabled>
                                 </div>
                             @endif
                             <div class="form-inline mt-5">
@@ -179,24 +190,26 @@
                                 <input type="hidden" name="outstanding_kredit" @if (!empty($data->outstanding_kredit)) value="{{ $data->outstanding_kredit }}" @endif>
                             </div>
                             @endrole
-                            <div class="form-inline mt-5" @if(empty($data) ||$data->id_status <=2) style="display:none;" @endif >
+                            <div class="form-inline mt-5" @if(empty($data) ||$data->id_status <=5) style="display:none;" @endif >
                                 <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
                                 <input type="text" class="form-control allow-decimal" placeholder="Nomor Polis" name="policy_no"
                                     id="policy_no" value="@if (!empty($data->policy_no)){{ $data->policy_no }}@endif">
                             </div>
-                            <div class="form-inline mt-5" @if(empty($data) ||$data->id_status <=2) style="display:none;" @endif >
+                            <div class="form-inline mt-5" @if(empty($data) ||$data->id_status <=3) style="display:none;" @endif >
                                 <label for="cover_note" class="form-label sm:w-20">Cover Note</label>
                                 <input type="text" class="form-control allow-decimal" placeholder="Cover Note" name="cover_note"
                                     id="cover_note" value="@if (!empty($data->cover_note)){{ $data->cover_note }}@endif">
                             </div>
+                            @if (!empty($data->policy_parent))
                             <div class="form-inline mt-5">
                                 <label for="nopolis_lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
                                 <div class="input-group w-full">
                                     <input type="text" class="form-control" placeholder="Nomor Polis Lama" name="nopolis_lama"
-                                        id="nopolis_lama" value="@if (!empty($data->policy_parent)){{ $data->policy_parent }}@endif">
+                                        id="nopolis_lama" value="{{ $data->policy_parent }}">
                                     <div id="nopolis_lama" class="input-group-text">Jika Renewal.</div>
                                 </div>
                             </div>
+                            @endif
                             <div class="form-inline mt-5">
                                 <label for="periode-polis" class="form-label sm:w-20">Periode Polis</label>
                                 <input id="periode-polis" class="form-control w-full block mx-auto range-periode" required>
@@ -258,10 +271,10 @@
                                 <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
                                 <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                             </div>
-                            <div class="form-inline mt-5">
+                            {{-- <div class="form-inline mt-5">
                                 <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
                                 <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->object)){{ $data->object }}@endif</textarea>
-                            </div>
+                            </div> --}}
                             <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
                                 <select id="kodepos" style="width:100%" name="kodepos" required>
@@ -274,6 +287,9 @@
                                 $('#kodepos').append(newOption).trigger('change');
                             </script>
                             @endif
+                            @endif
+                            @if (!empty($data->transid))
+                            <input type="hidden" class="form-control" required name="transid" value="{{ $data->transid }}" readonly>
                             @endif
                         </div>
                     </form>
@@ -1021,18 +1037,10 @@
                 disableInput();
                 @switch($data->id_status)
                     @case("0")
+                        $(":input").prop('readonly', false);
+                        $("select").prop('disabled', false);
+                        $(".range-periode").prop('disabled', false);
                         $('#multiple-file-upload').show();
-                        $('#asuransi').prop('disabled', false);
-                        $('#okupasi').prop('disabled', false);
-                        $('#lokasi_okupasi').prop('readonly', false);
-                        $('#kodepos').prop('disabled', false);
-                        $('[d-input="POLIS"]').prop('readonly', false);
-                        $('[d-input="MATERAI"]').prop('readonly', false);
-                        $('[d-input="ADMIN"]').prop('readonly', false);
-                        $('[d-input="LAIN"]').prop('readonly', false);
-                        $('[d-input="BROKERPERC"]').prop('disabled', false);
-                        $('#frm-document :input').prop('disabled',false);
-                        $('.dz-hidden-input').prop('disabled',false);
                         @break
 
                     @case("1")
@@ -1157,7 +1165,8 @@
             $('.btn-approve').click(function(){
                 var btnHtml = $(this).html(),
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
-                    nama_insured = $('#insured option:selected').text();
+                    nama_insured = $('#insured option:selected').text(),
+                    nama_cabang = $('#cabang option:selected').text();
 
                 $(this)
                     .attr('disabled',true)
@@ -1166,7 +1175,7 @@
                 $.ajax({
                     url: "{{ url('api/pengajuan') }}",
                     method: "POST",
-                    data: $('.formnya').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured,
+                    data: $('.formnya').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang+"",
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
@@ -1204,10 +1213,15 @@
                     .html(btnHtml);
             });
 
+            @if (!empty($data) && $data->id_status !== 0 && $method == 'approve')
             $('.btn-rollback').click(function(){
                 var btnHtml = $(this).html(),
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
-                    nama_insured = $('#insured option:selected').text();
+                    nama_insured = $('#insured option:selected').text(),
+                    method  = "rollback",
+                    _token  = "{{ csrf_token() }}",
+                    catatan = $('#catatan').val(),
+                    transid = "{{ $data->transid }}";
 
                 $(this)
                     .attr('disabled',true)
@@ -1215,42 +1229,52 @@
 
                 Swal.fire({
                     title: 'Apakah Anda Yakin?',
-                    text: "Data akan dikembalikan ke Broker",
+                    text: "Data akan dikembalikan ke status {{ $status_rollback }}",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
                     confirmButtonText: 'Ya, Kembalikan!',
                     cancelButtonText: 'Tidak Jadi'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ url('api/pengajuan') }}",
-                            method: "POST",
-                            data: $('.formnya').serialize() + "&method=rollback&_token={{ csrf_token() }}&nama_insured="+nama_insured,
-                            headers: {
-                                'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                            },
-                            success: function(d) {
-                                console.log(d);
-                                Swal.fire(
-                                    'Berhasil!',
-                                    d.message,
-                                    'success'
-                                ).then(function() {
-                                    if (d.method == 'create') {
-                                        window.location = "{{ url('inquiry') }}";
-                                    } else {
-                                        window.top.close();
+                        Swal.fire({
+                            title: 'Catatan Pengembalian',
+                            input: 'textarea',
+                            inputValue: catatan,
+                            showCancelButton: true,
+                            confirmButtonText: 'Konfirmasi',
+                            cancelButtonText: 'Batal'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ url('api/pengajuan') }}",
+                                    method: "POST",
+                                    data: {catatan,transid,nama_insured,method,_token},
+                                    headers: {
+                                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                                    },
+                                    success: function(d) {
+                                        console.log(d);
+                                        Swal.fire(
+                                            'Berhasil!',
+                                            d.message,
+                                            'success'
+                                        ).then(function() {
+                                            if (d.method == 'create') {
+                                                window.location = "{{ url('inquiry') }}";
+                                            } else {
+                                                window.top.close();
+                                            }
+                                        });
+                                    },
+                                    error: function(d) {
+                                        var message = d.responseJSON.message;
+                                        // console.log(d.responseJSON.errors);
+                                        Swal.fire(
+                                            'Gagal!',
+                                            message,
+                                            'error'
+                                        )
                                     }
-                                });
-                            },
-                            error: function(d) {
-                                var message = d.responseJSON.message;
-                                // console.log(d.responseJSON.errors);
-                                $.each(d.responseJSON.errors, function(i,v){
-                                    $('#'+i).closest('div').addClass('has-error');
-                                    $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
                                 });
                             }
                         });
@@ -1260,6 +1284,7 @@
                     .attr('disabled',false)
                     .html(btnHtml);
             });
+            @endif
 
             RATE = parseFloat($("#okupasi option:selected").text().slice($("#okupasi option:selected").text().indexOf("(") + 1, $("#okupasi option:selected").text().lastIndexOf("‰")));
             $('.masked').trigger('keyup');

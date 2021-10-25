@@ -40,9 +40,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/datauser', 'API\DataController@dataUser');
     Route::post('/datalaporan', 'API\LaporanController@tableLaporan');
     
+    // cari data
+    Route::get('/caritransaksi', 'API\DataController@cariTransaksi');
+    
+    
     // proses data
     Route::post('/user', 'API\ProcessController@user');
     Route::post('/dokumen', 'API\ProcessController@dokumen');
+    Route::post('/dokumen/{any}', 'API\ProcessController@dokumen');
     Route::post('/pengajuan', 'API\ProcessController@pengajuan');
 
 });

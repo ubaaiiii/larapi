@@ -48,8 +48,9 @@ Route::get('mode/{value}', [AuthController::class, 'DarkMode']);
 Route::post('register', [AuthController::class, 'register']);
 
 // Cek Invoice
-// Route::get('cetak_invoice', [CetakController::class, 'redirectInvoice']);
+Route::get('test/{any}', [CetakController::class, 'cetakCoverNote']);
 Route::get('cek_invoice/{any}', [CetakController::class, 'cekInvoice']);
+Route::get('cek_covernote/{any}', [CetakController::class, 'cekCoverNote']);
 
 Route::group(['middleware' => 'auth'], function () {
 
@@ -62,11 +63,15 @@ Route::group(['middleware' => 'auth'], function () {
   Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 
   // Cetak
-  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('cetak')->middleware('role:ao|checker|adm');
+  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('cetak')->middleware('role:ao|checker|adm|broker');
 
   // inquiry
   Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
   Route::get('inquiry/{any}', [PageController::class, 'inquiry'])->name('inquiry');
+
+  // pembayaran
+  Route::get('pembayaran', [PageController::class, 'pembayaran'])->name('pembayaran');
+  Route::get('pembayaran/{any}', [PageController::class, 'pembayaran'])->name('pembayaran');
 
   // pengajuan
   Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:ao|checker|adm');

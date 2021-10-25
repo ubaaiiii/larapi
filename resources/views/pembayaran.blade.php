@@ -1,11 +1,11 @@
 @extends('layouts.master')
-@section('title', 'Inquiry')
-@section('breadcrumb', 'Inquiry')
-@section('menu', 'Inquiry')
+@section('title', 'Pembayaran')
+@section('breadcrumb', 'Pembayaran')
+@section('menu', 'Pembayaran')
 
 @section('content')
     <h2 class="intro-y text-lg font-medium mt-5" id="text-inquiry">
-        Inquiry {{ (!empty($_GET['data']))?(ucwords($_GET['data'])):("") }}
+        Data Pembayaran
     </h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
@@ -66,12 +66,6 @@
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Verifikasi
-                                </a>
-                                <a
-                                    class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
-                                    style="cursor:pointer">
-                                    <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Input Pembayaran
                                 </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
@@ -156,51 +150,24 @@
         </div>
         <!-- END: Pagination -->
     </div>
-    <div id="modal-bayar" class="modal" data-backdrop="static" tabindex="-1" aria-hidden="true">
+    <!-- BEGIN: Delete Confirmation Modal -->
+    <div id="delete-confirmation-modal" class="modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <!-- BEGIN: Modal Header -->
-                <form>
-                    @csrf
-                    <div class="modal-header">
-                        <h2 class="font-medium text-base mr-auto">
-                            Input Pembayaran
-                        </h2>
-                    </div>
-                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="transid" class="form-label">Nomor Transaksi</label>
-                            <input id="transid" type="text" class="form-control" readonly>
-                            <input type="hidden" name="transid" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="nama_insured" class="form-label">Nama Tertanggung</label>
-                            <input id="nama_insured" name="nama_insured" type="text" class="form-control" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="cover_note" class="form-label">Cover Note</label>
-                            <input id="cover_note" name="cover_note" type="text" class="form-control" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="tgl_bayar" class="form-label">Tanggal Bayar</label>
-                            <input id="tgl_bayar" name="tgl_bayar" type="date" class="form-control" value="{{ date('Y-m-d') }}">
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="tagihan" class="form-label">Tagihan Premi</label>
-                            <input id="tagihan" name="tagihan" type="text" class="form-control currency" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="paid" class="form-label">Nominal Dibayar</label>
-                            <input id="paid" name="paid" type="text" class="form-control currency">
+                <div class="modal-body p-0">
+                    <div class="p-5 text-center">
+                        <i data-feather="x-circle" class="w-16 h-16 text-theme-6 mx-auto mt-3"></i>
+                        <div class="text-3xl mt-5">Apakah Anda Yakin?</div>
+                        <div class="text-gray-600 mt-2">
+                            Apa benar Anda ingin mengembalikan data?
                         </div>
                     </div>
-                    <!-- END: Modal Body -->
-                    <!-- BEGIN: Modal Footer -->
-                    <div class="modal-footer text-right">
-                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
-                        <button type="submit" class="btn btn-primary w-20">Send</button>
+                    <div class="px-5 pb-8 text-center">
+                        <button type="button" data-dismiss="modal"
+                            class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
+                        <button type="button" class="btn btn-danger w-24">Delete</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -371,26 +338,6 @@
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('update');
                 $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
-            });
-
-            $('.ps-bayar').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                $.ajax({
-                    url:"{{ url('api/caritransaksi') }}",
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                    },
-                    type: "GET",
-                    data: {transid},
-                    success: function(d) {
-                        console.log('d',d);
-                    },
-                    error: function(d) {
-                        console.log('d',d);
-                    },
-                })
-                cash('#modal-bayar').modal('show');
             });
             
             $('#ps-hapus').click(function(e) {

@@ -55,7 +55,7 @@
         <div class="border-b border-gray-200 dark:border-dark-5 text-center sm:text-left">
           <div class="px-5 py-10 sm:px-20 sm:py-20">
             <div class="text-theme-1 dark:text-theme-10 font-semibold text-3xl">INVOICE</div>
-            <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap menyertakan catatan pembayaran seperti berikut saat akan transfer :&nbsp;<b>PEMB_PREMI {{ $id." A/N ".$data->nama_insured." NO. POLIS: ".$data->policy_no }}</b> </div>
+            <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap menyertakan catatan pembayaran seperti berikut saat akan transfer :&nbsp;<b>PEMB_PREMI {{ $id." A/N ".$data->nama_insured." NO. COVER NOTE: ".$data->cover_note }}</b> </div>
             @php
               $date = date_create($data->billing_at);
               date_add($date,date_interval_create_from_date_string("14 days"));

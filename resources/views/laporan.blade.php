@@ -27,7 +27,7 @@
                         <div class="intro-y col-span-12 sm:col-span-6">
                             <label for="cabang" class="form-label">Cabang</label>
                             <select id="cabang" name="cabang" required style="width:100%" class="pilih">
-                                @role('broker|insurance|checker|approver|adm')
+                                @role('broker|insurance|checker|approver|adm|finance')
                                 <option value="ALL" selected>Semua Cabang</option>
                                 @endrole
                                 @foreach ($cabang as $val)
@@ -39,7 +39,9 @@
                         <div class="intro-y col-span-12 sm:col-span-6">
                             <label for="asuransi" class="form-label">Asuransi</label>
                             <select id="asuransi" name="asuransi" required style="width:100%" class="pilih">
+                                @role('ao|checker|broker|approver|adm|finance')
                                 <option value="ALL" selected>Semua Asuransi</option>
+                                @endrole
                                 @foreach ($asuransi as $val)
                                     <option value="{{ $val->id }}">
                                         {{ $val->nama_asuransi }}

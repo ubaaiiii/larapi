@@ -73,25 +73,31 @@ class PageController extends Controller
 
     function laporan(Request $request)
     {
-        $role = Role::create(['name' => 'finance']);
+        // $role = Role::create(['name' => 'finance']);
         // $permission = Permission::create(['name' => 'edit articles']);
         // $permission->assignRole('');
-        die;
+        // die;
         $level = Auth::user()->getRoleNames()[0];
         if (count($request->all()) == 0) {
+            $cabang = Cabang::all();
+            $asuransi = Asuransi::all();
             switch ($level) {
                 case 'ao':
                     $cabang = Cabang::where('id',Auth::user()->id_cabang)->get();
                     break;
+
+                case 'insurance':
+                    $asuransi = Asuransi::where('id',Auth::user()->id_asuransi)->get();
+                    break;
                     
                 default:
-                $cabang = Cabang::all();
-                break;
+                    break;
             }
+            
             
             $data = [
                 'cabang'    => $cabang,
-                'asuransi'  => Asuransi::all(),
+                'asuransi'  => $asuransi,
                 'laporan'   => Laporan::join('role_has_laporan as rl','laporan.id','=','rl.laporan_id')
                 ->join('model_has_roles as mr','rl.role_id','=','mr.role_id')
                 ->where('mr.model_id','=',Auth::user()->id)
@@ -124,6 +130,19 @@ class PageController extends Controller
             'request'   => $request->all(),
         ];
         return view('inquiry', $data);
+    }
+
+    function pembayaran(Request $request, $search = null)
+    {
+        $data = [
+            'cabang'    => Cabang::all(),
+            'level'     => Master::where('mstype', 'level')->get(),
+            'provinsi'  => KodePos::select('provinsi')->distinct()->get(),
+            'search'    => 'hidden',
+            'qsearch'   => $search,
+            'request'   => $request->all(),
+        ];
+        return view('pembayaran', $data);
     }
 
     function user($search = null)

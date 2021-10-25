@@ -19,7 +19,7 @@
             </a>
         </li>
 
-        @php
+        <?php
         // DB::enableQueryLog();
         $pages = DB::table('model_has_roles as mr')
             ->join('role_has_pages as rp','rp.role_id','=','mr.role_id')
@@ -41,7 +41,7 @@
                 ->orderBy('index', 'asc')
                 ->get();
 
-        @endphp
+        ?>
             <li>
                 <a href="{{ ($page->link =='#') ? 'javascript:;' : url($page->link) }}" class="side-menu">
                     <div class="side-menu__icon"> <i data-feather="{{ $page->page_icon }}"></i> </div>
@@ -64,10 +64,10 @@
                 </ul>
                 @endif
             </li>
-        @php
+        <?php
         }
         // dd(DB::getQueryLog());
-        @endphp
+        ?>
     </ul>
 </nav>
 <!-- END: Side Menu -->

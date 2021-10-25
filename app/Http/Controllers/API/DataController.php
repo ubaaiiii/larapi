@@ -12,6 +12,7 @@ use App\Models\KodePos;
 use App\Models\Okupasi;
 use App\Models\Pricing;
 use App\Models\Transaksi;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -224,7 +225,7 @@ class DataController extends Controller
             'cabang.alamat_cabang',
         ];
 
-        $table = DB::table("transaksi");
+        $table = DB::table("transaksi")->whereNull('transaksi.deleted_at');
 
         $user = Auth::user()->getRoleNames()[0];
         switch ($user) {
@@ -467,13 +468,26 @@ class DataController extends Controller
         $query = $this->generateQuery($request, $table, $columns, $select, $joins);
         // return $query;
 
+        $role = Auth::user()->getRoleNames()[0];
+
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
-            $nestedData[] = '<a style="cursor:pointer" onClick="hapusDokumen(' . $row->id . ')" class="flex items-center text-theme-6 block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
-                                <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                                Hapus
-                            </a>';
+            if ($row->jenis_file == 'POLIS') {
+                if ($role == 'insurance') {
+                    $nestedData[] = '<a style="cursor:pointer" onClick="hapusDokumen(' . $row->id . ')" class="flex items-center text-theme-6 block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                        <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                        Hapus
+                                    </a>';
+                } else {
+                    $nestedData[] = "";
+                }
+            } else {
+                $nestedData[] = '<a style="cursor:pointer" onClick="hapusDokumen(' . $row->id . ')" class="flex items-center text-theme-6 block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
+                                    <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                                    Hapus
+                                </a>';
+            }
             $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url($row->lokasi_file) . "' target='_blank'>" . $row->nama_file . "</a>";
             $nestedData[] = $row->created_at;
             $nestedData[] = $row->username;
@@ -553,5 +567,13 @@ class DataController extends Controller
             "data"            => $data,
             // "sql"             => $query[3]
         ], 200);
+    }
+
+    public function cariTransaksi(Request $request){
+        $data = [
+            'transaksi' => Transaksi::find($request->transid),
+            'pricing'   => Pricing::where('id_transaksi',$request->transid)->orderBy('id_kodetrans','ASC')->get(),
+        ];
+        return $data;
     }
 }
