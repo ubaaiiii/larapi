@@ -126,6 +126,7 @@ class CetakController extends Controller
                         ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
                 ];
                 $data['covernote'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen)."/CN/".$data['asuransi']->akronim."/".Functions::angka_romawi(date('m'))."/".date('Y');
+                $transaksi->update(['cover_note'=>$data['covernote']]);
                 $parameter = [
                     'id' => $data['covernote'],
                 ];

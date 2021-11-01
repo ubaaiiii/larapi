@@ -4,6 +4,11 @@
 @section('menu', 'Inquiry')
 
 @section('content')
+<style>
+    .swal2-container {
+        z-index: 99999;
+    }
+</style>
     <h2 class="intro-y text-lg font-medium mt-5" id="text-inquiry">
         Inquiry {{ (!empty($_GET['data']))?(ucwords($_GET['data'])):("") }}
     </h2>
@@ -87,6 +92,12 @@
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Aktifkan
                                 </a>
+                                <a 
+                                    class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-6"
+                                    style="cursor:pointer">
+                                    <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Upload E-Polis
+                                </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                     style="cursor:pointer">
@@ -160,7 +171,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <!-- BEGIN: Modal Header -->
-                <form>
+                <form id="frm-bayar">
                     @csrf
                     <div class="modal-header">
                         <h2 class="font-medium text-base mr-auto">
@@ -183,15 +194,66 @@
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="tgl_bayar" class="form-label">Tanggal Bayar</label>
-                            <input id="tgl_bayar" name="tgl_bayar" type="date" class="form-control" value="{{ date('Y-m-d') }}">
+                            <input id="tgl_bayar" required name="tgl_bayar" type="date" class="form-control" value="{{ date('Y-m-d') }}">
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="tagihan" class="form-label">Tagihan Premi</label>
-                            <input id="tagihan" name="tagihan" type="text" class="form-control currency" readonly>
+                            <input id="tagihan" type="text" class="form-control currency allow-decimal masked" readonly>
+                            <input name="tagihan" type="hidden">
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="paid" class="form-label">Nominal Dibayar</label>
-                            <input id="paid" name="paid" type="text" class="form-control currency">
+                            <input id="paid" required type="text" class="form-control currency allow-decimal masked">
+                            <input name="paid" required type="hidden">
+                        </div>
+                    </div>
+                    <!-- END: Modal Body -->
+                    <!-- BEGIN: Modal Footer -->
+                    <div class="modal-footer text-right">
+                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
+                        <button type="submit" class="btn btn-primary w-20">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-polis" class="modal" data-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- BEGIN: Modal Header -->
+                <form id="frm-polis">
+                    @csrf
+                    <div class="modal-header">
+                        <h2 class="font-medium text-base mr-auto">
+                            Input Polis
+                        </h2>
+                    </div>
+                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                        <div class="col-span-12 sm:col-span-6">
+                            <label for="transid" class="form-label">Nomor Transaksi</label>
+                            <input id="transid" type="text" class="form-control" readonly>
+                            <input type="hidden" name="transid" readonly>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6">
+                            <label for="nama_insured" class="form-label">Nama Tertanggung</label>
+                            <input id="nama_insured" name="nama_insured" type="text" class="form-control" readonly>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6">
+                            <label for="cover_note" class="form-label">Cover Note</label>
+                            <input id="cover_note" name="cover_note" type="text" class="form-control" readonly>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6">
+                            <label for="nopolis" class="form-label">Nomor Polis</label>
+                            <input id="nopolis" required name="nopolis" type="text" class="form-control">
+                        </div>
+                        <div class="col-span-12 sm:col-span-6">
+                            <label for="e-polis" class="form-label">Upload E-Polis</label>
+                            <input id="e-polis" type="file" class="form-control" required>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6">
+                            <label for="invoice" class="form-label">Upload Invoice</label>
+                            <input id="invoice" type="file" class="form-control" required>
                         </div>
                     </div>
                     <!-- END: Modal Body -->
@@ -306,7 +368,7 @@
                     error: function(d) {
                         console.log('error:', d);
                         if (d.status = 401) {
-                            window.location.href = "{{ url('logout') }}";
+                            // window.location.href = "{{ url('logout') }}";
                         }
                     },
                 },
@@ -384,14 +446,95 @@
                     type: "GET",
                     data: {transid},
                     success: function(d) {
-                        console.log('d',d);
+                        $('#frm-bayar #transid').val(d.transaksi.transid);
+                        $('#frm-bayar [name="transid"]').val(d.transaksi.transid);
+                        $('#frm-bayar #nama_insured').val(d.insured.nama_insured);
+                        $('#frm-bayar #cover_note').val(d.transaksi.cover_note);
+                        $('#frm-bayar #tagihan').val(d.pricing[18].value);
+                        $('.masked').trigger('keyup');
+                        cash('#modal-bayar').modal('show');
                     },
                     error: function(d) {
                         console.log('d',d);
                     },
-                })
-                cash('#modal-bayar').modal('show');
+                });
             });
+
+            $('.ps-polis').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[0];
+                
+            });
+
+            cash('#modal-bayar').on('hidden.bs.modal',function() {
+                console.log('tutup');
+            });
+
+            $('.ps-polis').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[0];
+                $.ajax({
+                    url:"{{ url('api/caritransaksi') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    type: "GET",
+                    data: {transid},
+                    success: function(d) {
+                        $('#frm-polis #transid').val(d.transaksi.transid);
+                        $('#frm-polis [name="transid"]').val(d.transaksi.transid);
+                        $('#frm-polis #nama_insured').val(d.insured.nama_insured);
+                        $('#frm-polis #cover_note').val(d.transaksi.cover_note);
+                        cash('#modal-polis').modal('show');
+                    },
+                    error: function(d) {
+                        console.log('d',d);
+                    },
+                });
+            })
+
+            $('#frm-bayar').submit(function(e) {
+                e.preventDefault();
+                var data = $(this).serializeArray(),
+                    paid = data[6].value,
+                    tagihan = data[5].value;
+                data.push({ name: "method", value: "store" });
+                console.log(data);
+                if (paid == tagihan) {
+                    $.ajax({
+                        url: "{{ url('api/pembayaran') }}",
+                        data: data,
+                        type: "POST",
+                        success: function(d) {
+                            console.log(d);
+                            Swal.fire(
+                                'Berhasil!',
+                                d.message,
+                                'success'
+                            );
+                            $(':input','#frm-bayar')
+                                .not(':button, :submit, :reset, :hidden')
+                                .val('');
+                            $('#tgl_bayar').val("{{ date('Y-m-d') }}");
+                            cash('#modal-bayar').modal('hide');
+                        },
+                        error: function(d) {
+                            console.log(d);
+                            Swal.fire(
+                                'Gagal!',
+                                d.message,
+                                'error'
+                            );
+                        },
+                    });
+                } else {
+                    Swal.fire(
+                        'Gagal!',
+                        'Nominal yang dibayar tidak sesuai dengan tagihan premi',
+                        'error'
+                    );
+                }
+            })
             
             $('#ps-hapus').click(function(e) {
                 e.preventDefault();

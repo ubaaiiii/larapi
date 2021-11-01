@@ -49,6 +49,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/dokumen', 'API\ProcessController@dokumen');
     Route::post('/dokumen/{any}', 'API\ProcessController@dokumen');
     Route::post('/pengajuan', 'API\ProcessController@pengajuan');
+    Route::post('/pembayaran', 'API\ProcessController@pembayaran');
 
 });
 

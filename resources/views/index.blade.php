@@ -20,7 +20,7 @@
                             <div class="report-box zoom-in">
                                 <div class="box p-5" onclick="redirectInquiry('pengajuan')">
                                     <div class="flex">
-                                        <i data-feather="shopping-cart" class="report-box__icon text-theme-10"></i>
+                                        <i data-feather="square" class="report-box__icon text-theme-10"></i>
                                         <div class="ml-auto">
                                             <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"
                                                 title="33% Higher than last month"> 33% <i data-feather="chevron-up"
@@ -34,9 +34,9 @@
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5">
+                                <div class="box p-5" onclick="redirectInquiry('approval')">
                                     <div class="flex">
-                                        <i data-feather="credit-card" class="report-box__icon text-theme-11"></i>
+                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
                                         <div class="ml-auto">
                                             <div class="report-box__indicator bg-theme-6 tooltip cursor-pointer"
                                                 title="2% Lower than last month"> 2% <i data-feather="chevron-down"
@@ -50,9 +50,9 @@
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5">
+                                <div class="box p-5" onclick="redirectInquiry('dibayar')">
                                     <div class="flex">
-                                        <i data-feather="monitor" class="report-box__icon text-theme-12"></i>
+                                        <i data-feather="circle" class="report-box__icon text-theme-12"></i>
                                         <div class="ml-auto">
                                             <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"
                                                 title="12% Higher than last month"> 12% <i data-feather="chevron-up"
@@ -60,15 +60,15 @@
                                         </div>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6">2.149</div>
-                                    <div class="text-base text-gray-600 mt-1">Total Products</div>
+                                    <div class="text-base text-gray-600 mt-1">Data Dibayar</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5">
+                                <div class="box p-5" onclick="redirectInquiry('polis siap')">
                                     <div class="flex">
-                                        <i data-feather="user" class="report-box__icon text-theme-9"></i>
+                                        <i data-feather="check-circle" class="report-box__icon text-theme-9"></i>
                                         <div class="ml-auto">
                                             <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"
                                                 title="22% Higher than last month"> 22% <i data-feather="chevron-up"
@@ -76,7 +76,7 @@
                                         </div>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6">152.040</div>
-                                    <div class="text-base text-gray-600 mt-1">Unique Visitor</div>
+                                    <div class="text-base text-gray-600 mt-1">Data Polis SIAP</div>
                                 </div>
                             </div>
                         </div>

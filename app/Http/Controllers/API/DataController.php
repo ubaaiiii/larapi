@@ -300,6 +300,115 @@ class DataController extends Controller
                     }
                     break;
 
+                case 'approval':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "4");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "4");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "4");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "5");
+                            break;
+
+                        case 'insurance':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'finance':
+                            $table->where('id_status', "5");
+                            break;
+
+                        case 'adm':
+                            // wherenya administrator
+                            break;
+                    }
+                    break;
+
+                case 'dibayar':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "8");
+                            break;
+
+                        case 'insurance':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'finance':
+                            $table->leftJoin('activities pmby', function ($q) use ($user) {
+                                $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                                ->where('pmby.id_status', '=', "9");
+                            });
+                            $table->whereNull('pmby.id_transaksi');
+                            $table->whereIn('transaksi.id_status', ["8","10"]);
+                            break;
+
+                        case 'adm':
+                            // wherenya administrator
+                            break;
+
+                        default:
+                            return redirect()->route('logout');
+                            break;
+                    }
+                    break;
+
+                case 'polis siap':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "9");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "9");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "9");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "9");
+                            break;
+
+                        case 'insurance':
+                            $table->where('id_status', "9");
+                            break;
+
+                        case 'finance':
+                            $table->where('id_status', "9");
+                            break;
+
+                        case 'adm':
+                            // wherenya administrator
+                            break;
+
+                        default:
+                            return redirect()->route('logout');
+                            break;
+                    }
+                    break;
+
                 default:
                     return redirect()->route('logout');
                     break;
@@ -574,6 +683,7 @@ class DataController extends Controller
             'transaksi' => Transaksi::find($request->transid),
             'pricing'   => Pricing::where('id_transaksi',$request->transid)->orderBy('id_kodetrans','ASC')->get(),
         ];
+        $data['insured'] = Insured::find($data['transaksi']->id_insured);
         return $data;
     }
 }

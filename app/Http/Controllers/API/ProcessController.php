@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Helpers\Functions;
 use App\Http\Controllers\CetakController;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
@@ -10,6 +11,7 @@ use App\Models\Activity;
 use App\Models\Cabang;
 use App\Models\Insured;
 use App\Models\KodeTrans;
+use App\Models\Pembayaran;
 use App\Models\Pricing;
 use App\Models\Sequential;
 use App\Models\Transaksi;
@@ -215,6 +217,54 @@ class ProcessController extends Controller
         }
         
         return $pricing;
+    }
+
+    public function pembayaran(Request $request)
+    {
+        $transaksi = Transaksi::where('transid',$request->transid)->where('cover_note',$request->cover_note)->first();
+        switch ($request->method) {
+            case 'store':
+                $request->validate([
+                    'transid'   => 'required',
+                    'paid'      => 'required',
+                    'tgl_bayar' => 'required',
+                ]);
+
+                $insert = [
+                    'id_transaksi'  => $request->transid,
+                    'paid_amount'   => $request->paid,
+                    'paid_at'       => $request->tgl_bayar,
+                    'created_by'    => Auth::user()->id,
+                ];
+                if ($transaksi->id_status == 4) {
+                    $cekPembayaran = Pembayaran::where('id_transaksi',$request->tarnsid)->where('paid_type','PD01')->first();
+                    if (!empty($cekPembayaran)) {
+                        return response()->json([
+                            'message'   => 'Gagal input pembayaran karena data sudah pernah dibayar pada tanggal '.Functions::tgl_indo($cekPembayaran->paid_at),
+                            'data'      => $cekPembayaran,
+                        ], 400);
+                    }
+                    $insert['paid_type'] = "PD01";
+                    $update = [
+                        'id_status' => 6
+                    ];
+                }
+
+                Pembayaran::create($insert);
+                $transaksi->update($update);
+                $this->aktifitas($transaksi->transid,'5','Pembayaran Premi Diterima Oleh BDS.');
+                $this->aktifitas($transaksi->transid,'6','Menunggu E-Polis untuk diupload oleh Asuransi.');
+
+                return response()->json([
+                    'message'   => 'Berhasil input pembayaran atas Nomor Transaksi '.$transaksi->transid,
+                    'data'      => $transaksi,
+                ], 200);
+                break;
+            
+            default:
+                # code...
+                break;
+        }
     }
 
     public function pengajuan(Request $request)
@@ -484,11 +534,11 @@ class ProcessController extends Controller
                         if ($transaksi->id_status == 3) {
                             $status = 4;
                             $string = "aktifkan";
-                            $cetakController = new CetakController;
-                            $covernote = $cetakController->cetakCoverNote($request->transid);
-                            $update = [
-                                'cover_note'    => $covernote,
-                            ];
+                            // $cetakController = new CetakController;
+                            // $covernote = $cetakController->cetakCoverNote($request->transid);
+                            // $update = [
+                            //     'cover_note'    => $covernote,
+                            // ];
                         } else if ($transaksi->id_status == 6) {
                             $status = 7;
                             $string = "aktifkan polisnya";
