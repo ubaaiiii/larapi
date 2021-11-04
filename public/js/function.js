@@ -160,6 +160,28 @@ function gotoPage(e, table) {
     // console.log(page);
     table.page(page).draw("page");
 }
+
+function prettyDate(time) {
+    d = new Date();
+    var date = new Date(time),
+        diff = (d.getTime() + d.getTimezoneOffset() * 60000 - date.getTime()) / 1000,
+        day_diff = Math.floor(diff / 86400);
+    if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31) return;
+
+    return (
+        (day_diff == 0 &&
+            ((diff < 60 && "baru saja") ||
+                (diff < 120 && "1 menit yang lalu") ||
+                (diff < 3600 && Math.floor(diff / 60) + " menit yang lalu") ||
+                (diff < 7200 && "1 jam yang lalu") ||
+                (diff < 86400 && Math.floor(diff / 3600) + " jam yang lalu"))) ||
+        (day_diff == 1 && "Kemarin") ||
+        (day_diff < 7 && day_diff + " hari yang lalu") ||
+        (day_diff < 31 && Math.ceil(day_diff / 7) + " minggu yang lalu") ||
+        (day_diff >= 31 && Math.ceil(day_diff / 30) + " bulan yang lalu")
+    );
+}
+
 $(document).ready(function() {
 
     $(".dark-mode-switcher").removeAttr("style");

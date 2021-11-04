@@ -50,7 +50,7 @@ class CetakController extends Controller
         $parameter = Crypt::encrypt($parameter);
         $url = url('cek_invoice') . "/" . $parameter;
         if (!empty($transaksi)) {
-            if ($transaksi->id_status == 4) {
+            if ($transaksi->id_status == 5) {
                 // return $transaksi->billing_at;
                 if (empty($transaksi->billing_at)) {
                     Transaksi::where('transid',$transaksi->transid)->update(['billing_at' => date('Y-m-d')]);
@@ -90,10 +90,10 @@ class CetakController extends Controller
                 }
                 file_put_contents($path . "Invoice-$transid.pdf", $output);
                 return redirect($path . "Invoice-$transid.pdf");
-            } elseif ($transaksi->id_status < 4) {
+            } elseif ($transaksi->id_status < 5) {
                 abort(403, "Belum disetujui oleh asuransi");
             } else {
-                return redirect($url);
+                abort(403, "Sudah dibayarkan, invoice tidak dapat dicetak kembali");
             }
         } else {
             abort(404);
@@ -105,7 +105,7 @@ class CetakController extends Controller
         // DB::enableQueryLog();
         $transaksi = Transaksi::find($transid);
         if (!empty($transaksi)) {
-            if ($transaksi->id_status == 4) {
+            if ($transaksi->id_status >= 4) {
                 // return $transaksi->billing_at;
                 $data = [
                     'transaksi'   => $transaksi,
@@ -145,8 +145,8 @@ class CetakController extends Controller
                 // return $pdf->download('pdf_file.pdf');
 
                 // Streaming PDF, not saved on local
-                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
-                exit(0);
+                // return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                // exit(0);
 
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
@@ -173,7 +173,79 @@ class CetakController extends Controller
             } elseif ($transaksi->id_status < 4) {
                 abort(403, "Belum disetujui oleh asuransi");
             } else {
-                return redirect($url);
+                abort(404);
+            }
+        } else {
+            abort(404);
+        }
+    }
+
+    public function cetakAkseptasi($transid)
+    {
+        // DB::enableQueryLog();
+        $transaksi  = Transaksi::find($transid);
+        if (!empty($transaksi)) {
+            $asuransi   = Asuransi::find($transaksi->id_asuransi);
+            if ($transaksi->id_status >= 3) {
+                // return $transaksi->billing_at;
+                $data = [
+                    'transaksi'   => $transaksi,
+                    'asuransi'    => Asuransi::find($transaksi->id_asuransi),
+                    'instype'     => Instype::find($transaksi->id_instype),
+                    'tgl_aktif'   => Activity::where('id_transaksi', $transaksi->transid)->where('id_status', '4')->orderBy('created_at', 'DESC')->first(),
+                    'sequential'  => Sequential::where('seqdesc', 'transid')->first(),
+                    'tertanggung' => Insured::find($transaksi->id_insured),
+                    'cabang'      => Cabang::find($transaksi->id_cabang),
+                    'okupasi'     => Okupasi::find($transaksi->id_okupasi),
+                    'pricing'     => Pricing::where('id_transaksi', $transaksi->transid)
+                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')
+                        ->orderBy('id_kodetrans', 'ASC')
+                        ->get(),
+                    'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
+                        ->where('tsi', 1)
+                        ->where('transaksi_pricing.value', '<>', 0)
+                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
+                ];
+                // share data to view
+                // view()->share('employee', $data);
+                $pdf = PDF::loadView('prints/akseptasi', compact(
+                    'data',
+                ));
+                // Download PDF without viewing
+                // return $pdf->download('pdf_file.pdf');
+
+                // Streaming PDF, not saved on local
+                // return $pdf->setpaper('a4', 'portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                // exit(0);
+
+                // Saving PDF to local and redirect to the file
+                $output = $pdf->setpaper('a4', 'portrait')->output();
+                $path   = "public/files/$transid/";
+                $filename = "Akseptasi_".$asuransi->akronim."-$transid.pdf";
+                if (!is_dir($path)) {
+                    mkdir($path, 0777, TRUE);
+                }
+                file_put_contents($path . $filename, $output);
+                // return redirect($path . $filename);
+                $insert = [
+                    'id_transaksi'  => $transaksi->transid,
+                    'nama_file'     => $filename,
+                    'tipe_file'     => "pdf",
+                    'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
+                    'lokasi_file'   => $path . $filename,
+                    'jenis_file'    => "AKSEPTASI",
+                    'created_by'    => Auth::user()->id,
+                ];
+
+                Document::create($insert);
+
+                return response()->json([
+                    'message'   => 'Berhasil cetak Akseptasi',
+                ], 200);
+            } elseif ($transaksi->id_status < 3) {
+                abort(403, "Belum disetujui oleh asuransi");
+            } else {
+                abort(404);
             }
         } else {
             abort(404);

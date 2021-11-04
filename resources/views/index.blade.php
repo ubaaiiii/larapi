@@ -12,70 +12,49 @@
                         <h2 class="text-lg font-medium truncate mr-5">
                             Laporan Status<br>
                         </h2>
-                        <a href="" class="ml-auto flex items-center text-theme-1 dark:text-theme-10"> <i
-                                data-feather="refresh-ccw" class="w-4 h-4 mr-3"></i> Segarkan Data </a>
+                        <a id="segarkan" class="ml-auto flex items-center text-theme-1 dark:text-theme-10 cursor-pointer"> <i class="fa fa-sync-alt w-4 h-4 mr-3"></i> Segarkan Data </a>
                     </div>
                     <div class="grid grid-cols-12 gap-6 mt-5">
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="redirectInquiry('pengajuan')">
+                                <div class="box p-5" onclick="filterInquiry('pengajuan')">
                                     <div class="flex">
                                         <i data-feather="square" class="report-box__icon text-theme-10"></i>
-                                        <div class="ml-auto">
-                                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"
-                                                title="33% Higher than last month"> 33% <i data-feather="chevron-up"
-                                                    class="w-4 h-4 ml-0.5"></i> </div>
-                                        </div>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6">4.710</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengajuan"></div>
                                     <div class="text-base text-gray-600 mt-1">Data Pengajuan</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="redirectInquiry('approval')">
+                                <div class="box p-5" onclick="filterInquiry('approval')">
                                     <div class="flex">
                                         <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
-                                        <div class="ml-auto">
-                                            <div class="report-box__indicator bg-theme-6 tooltip cursor-pointer"
-                                                title="2% Lower than last month"> 2% <i data-feather="chevron-down"
-                                                    class="w-4 h-4 ml-0.5"></i> </div>
-                                        </div>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6">3.721</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval"></div>
                                     <div class="text-base text-gray-600 mt-1">Data Approval</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="redirectInquiry('dibayar')">
+                                <div class="box p-5" onclick="filterInquiry('dibayar')">
                                     <div class="flex">
                                         <i data-feather="circle" class="report-box__icon text-theme-12"></i>
-                                        <div class="ml-auto">
-                                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"
-                                                title="12% Higher than last month"> 12% <i data-feather="chevron-up"
-                                                    class="w-4 h-4 ml-0.5"></i> </div>
-                                        </div>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6">2.149</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar"></div>
                                     <div class="text-base text-gray-600 mt-1">Data Dibayar</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="redirectInquiry('polis siap')">
+                                <div class="box p-5" onclick="filterInquiry('polis siap')">
                                     <div class="flex">
                                         <i data-feather="check-circle" class="report-box__icon text-theme-9"></i>
-                                        <div class="ml-auto">
-                                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"
-                                                title="22% Higher than last month"> 22% <i data-feather="chevron-up"
-                                                    class="w-4 h-4 ml-0.5"></i> </div>
-                                        </div>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6">152.040</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-polis"></div>
                                     <div class="text-base text-gray-600 mt-1">Data Polis SIAP</div>
                                 </div>
                             </div>
@@ -83,7 +62,7 @@
                     </div>
                 </div>
                 <!-- END: General Report -->
-                <!-- BEGIN: Sales Report -->
+                {{-- <!-- BEGIN: Sales Report -->
                 <div class="col-span-12 lg:col-span-6 mt-8">
                     <div class="intro-y block sm:flex items-center h-10">
                         <h2 class="text-lg font-medium truncate mr-5">
@@ -207,10 +186,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- END: Sales Report -->
+                <!-- END: Sales Report --> --}}
             </div>
         </div>
-        <div class="col-span-12 2xl:col-span-3">
+        {{-- <div class="col-span-12 2xl:col-span-3">
             <div class="2xl:border-l border-theme-5 -mb-10 pb-10">
                 <div class="2xl:pl-6 grid grid-cols-12 gap-6">
                     <!-- BEGIN: Transactions -->
@@ -538,7 +517,7 @@
                     <!-- END: Schedules -->
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
     <form id="frm" method="GET">
         <input type="hidden" id="frm-data" name="data">
@@ -547,13 +526,45 @@
 
 @section('script')
     <script>
-        function redirectInquiry(type) {
+        function filterInquiry(type) {
             console.log(type);
             $('#frm-data').val(type);
             $('#frm').attr('action','{{ url('inquiry') }}').submit();
         }
+        function reloadDashboard() {
+            $.ajax({
+                url : "{{ url('api/datadashboard') }}",
+                type: "GET",
+                data: {"id":123},
+                headers: {
+                    'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                },
+                success: function(d) {
+                    $('#angka-pengajuan').text(d.Pengajuan);
+                    $('#angka-approval').text(d.Approval);
+                    $('#angka-dibayar').text(d.Dibayar);
+                    $('#angka-polis').text(d.Polis);
+                    // console.log('success: ',d);
+                },
+                error: function(d) {
+                    console.log('error: ',d);
+                },
+            });
+        }
+
         $(document).ready(function() {
-            
+            reloadDashboard();
+            $('#segarkan').click(function(e){
+                $('#segarkan i').toggleClass('fa-spin');
+                e.preventDefault();
+                $.when( reloadDashboard() ).done(function() {
+                    console.log('segarkan');
+                    $('#segarkan i').toggleClass('fa-spin');
+                });
+            });
+            $(window).focus(function(){
+                reloadDashboard();
+            });
         });
     </script>
 @endsection

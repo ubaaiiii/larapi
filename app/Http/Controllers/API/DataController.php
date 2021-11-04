@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class DataController extends Controller
 {
@@ -194,6 +195,80 @@ class DataController extends Controller
         // ], 200);
     }
 
+    public function dataDashboard(Request $request)
+    {
+        $customWhere    = "WHERE 1";
+        $user           = Auth::user()->getRoleNames()[0];
+
+        switch ($user) {
+            case 'ao':
+                $statPengajuan  = "0";
+                $statApproval   = "4";
+                $statDibayar    = "7";
+                $statPolis      = "10";
+                $customWhere    .= " AND created_by = ". Auth::user()->id;
+                break;
+            case 'checker':
+                $statPengajuan  = "0";
+                $statApproval   = "4";
+                $statDibayar    = "7";
+                $statPolis      = "10";
+                $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                break;
+            case 'approver':
+                $statPengajuan  = "1";
+                $statApproval   = "4";
+                $statDibayar    = "7";
+                $statPolis      = "10";
+                $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                break;
+            case 'broker':
+                $statPengajuan  = "2";
+                $statApproval   = "5";
+                $statDibayar    = "8";
+                $statPolis      = "10";
+                $customWhere    = "";
+                break;
+            case 'insurance':
+                $statPengajuan  = "3";
+                $statApproval   = "7";
+                $statDibayar    = "7";
+                $statPolis      = "10";
+                $customWhere    .= " AND id_asuransi = " . Auth::user()->id_asuransi;
+                break;
+            case 'finance':
+                $statPengajuan  = "3";
+                $statApproval   = "5";
+                $statDibayar    = "8,10";
+                $statPolis      = "10";
+                $customWhere    = "";
+                break;
+            case 'adm':
+                $statPengajuan  = "1";
+                $statApproval   = "1";
+                $statDibayar    = "1";
+                $statPolis      = "10";
+                $customWhere    = "";
+                break;
+            
+            default:
+                $statPengajuan  = "0";
+                $statApproval   = "0";
+                $statDibayar    = "0";
+                $statPolis      = "0";
+                break;
+        }
+        $query = "  SELECT
+                        IFNULL(SUM(case when id_status IN ($statPengajuan) then 1 else 0 end), 0) as Pengajuan,
+                        IFNULL(SUM(case when id_status IN ($statApproval) then 1 else 0 end), 0) as Approval,
+                        IFNULL(SUM(case when id_status IN ($statDibayar) then 1 else 0 end), 0) as Dibayar,
+                        IFNULL(SUM(case when id_status IN ($statPolis) then 1 else 0 end), 0) as Polis
+                    FROM `transaksi`
+                    $customWhere ";
+        $result = (object) DB::select($query)[0];
+        return $result;
+    }
+
     public function dataTransaksi(Request $request)
     {
         // sorting column datatables
@@ -291,7 +366,7 @@ class DataController extends Controller
                             break;
 
                         case 'adm':
-                            // wherenya administrator
+                            
                             break;
 
                         default:
@@ -376,27 +451,27 @@ class DataController extends Controller
                 case 'polis siap':
                     switch ($user) {
                         case 'ao':
-                            $table->where('id_status', "9");
+                            $table->where('id_status', "10");
                             break;
 
                         case 'checker':
-                            $table->where('id_status', "9");
+                            $table->where('id_status', "10");
                             break;
 
                         case 'approver':
-                            $table->where('id_status', "9");
+                            $table->where('id_status', "10");
                             break;
 
                         case 'broker':
-                            $table->where('id_status', "9");
+                            $table->where('id_status', "10");
                             break;
 
                         case 'insurance':
-                            $table->where('id_status', "9");
+                            $table->where('id_status', "10");
                             break;
 
                         case 'finance':
-                            $table->where('id_status', "9");
+                            $table->where('id_status', "10");
                             break;
 
                         case 'adm':
@@ -582,7 +657,7 @@ class DataController extends Controller
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
-            if ($row->jenis_file == 'POLIS') {
+            if ($row->jenis_file !== null) {
                 if ($role == 'insurance') {
                     $nestedData[] = '<a style="cursor:pointer" onClick="hapusDokumen(' . $row->id . ')" class="flex items-center text-theme-6 block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md">
                                         <i data-feather="trash-2" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
@@ -678,7 +753,34 @@ class DataController extends Controller
         ], 200);
     }
 
-    public function cariTransaksi(Request $request){
+    public function dataNotifikasi(Request $request) {
+        // DB::enableQueryLog();
+        // $user = User::find($request->id);
+        // $notif = $user->notifications->where('type', 'App\Notifications\PushNotification')->sortBy('created_by');
+        // if (!empty($request->search)) {
+        //     $notif->where('notifications.data','like', '%'. $request->search. '%');
+        // }
+        // if (!empty($request->limit)) {
+        //     $notif->take($request->limit);
+        // }
+        // return $request->search;
+        // return DB::getQueryLog();
+        $notif = DB::table('notifications')
+            ->where('notifiable_id',$request->id)
+            ->where('type', 'App\Notifications\PushNotification');
+        if (!empty($request->search)) {
+            $notif->where('data','like', '%'. $request->search. '%');
+        }
+        if (!empty($request->skip)) {
+            $notif->skip($request->skip);
+        }
+        if (!empty($request->limit)) {
+            $notif->take($request->limit);
+        }
+        return $notif->get();
+    }
+
+    public function cariTransaksi(Request $request) {
         $data = [
             'transaksi' => Transaksi::find($request->transid),
             'pricing'   => Pricing::where('id_transaksi',$request->transid)->orderBy('id_kodetrans','ASC')->get(),

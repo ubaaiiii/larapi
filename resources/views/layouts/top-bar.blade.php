@@ -9,13 +9,13 @@
     <div class="intro-x relative mr-3 sm:mr-6 <?= empty($search) ? '' : $search ?>">
         <div class="search">
             <input id="text-search" type="search" class="search__input form-control border-transparent placeholder-theme-13"
-                placeholder="Search Inquiry..." name="search">
+                placeholder="Cari di Inquiry..." name="search">
             <i id="icon-search" data-feather="search" class="search__icon dark:text-gray-300"></i>
         </div>
     </div>
     <script>
         function redirectInquiry($q) {
-            window.location.href = "{{ url('inquiry') }}/"+$q;
+            window.location.href = "{{ url('inquiry') }}?q="+$q;
         }
         $(document).ready(function(){
             $('#text-search').on('keypress',function(e){
@@ -30,6 +30,119 @@
             })
         })
     </script>
+    <!-- BEGIN: Notifications -->
+    <div class="intro-x dropdown mr-auto sm:mr-6">
+        <div class="dropdown-toggle notification cursor-pointer" role="button" aria-expanded="false">
+            <i data-feather="bell" class="notification__icon dark:text-gray-300"></i> </div>
+        <div class="notification-content pt-2 dropdown-menu">
+            <div class="notification-content__box dropdown-menu__content box dark:bg-dark-6">
+                <div class="notification-content__title">Pemberitahuan</div>
+                <div id="notif-content">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function reloadNotif() {
+            $.ajax({
+                url:"{{ url('api/notifikasi') }}",
+                headers: {
+                    'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                },
+                type: "GET",
+                data: {"id":"{{ Auth::user()->id }}","limit":6},
+                success: function(d) {
+                    // console.log('d',d.length);
+                    var konten  = $('#notif-content'),
+                        baru = false;
+                    if (d.length > 0) {
+                        var notif = "",
+                            users = {!! json_encode(App\Models\User::select('id','name','username')->get()) !!},
+                            i = 0,
+                            text = "";
+
+                        for (i=0; i<d.length; i++) {
+                            var datte = new Date(d[i].created_at),
+                                datee = new Date(),
+                                diff = (datee.getTime() + datee.getTimezoneOffset() * 60000 - datte.getTime()) / 1000;
+                            console.log(Math.floor(diff / 86400));
+                            var data = JSON.parse(d[i].data);
+                            if (i < 5) {
+                                var id          = d[i].id,
+                                    icon        = data.icon,
+                                    newBadge    = "",
+                                    text        = data.text
+                                    name        = $.map(users, function(j) {
+                                        if (j.id == d[i].data['user']) {
+                                            return j.name;
+                                        }
+                                    });
+
+                                if (d[i].read_at == null) {
+                                    if (baru == false) {
+                                        baru = true;
+                                    }
+                                    newBadge = `  <div class="w-6 absolute right-0 bottom-0"><span class="text-xs px-1 rounded-full bg-theme-9 text-white mr-1">baru</span></div>`;
+                                    text = `<b>`+text+`</b>`;
+                                }
+
+                                notif += `  <div class="cursor-pointer relative flex items-center mb-3 zoom-in" id="`+ id +`">
+                                                <div class="w-12 h-12 flex-none image-fit mr-1">
+                                                    <i data-feather="`+ icon +`" class="w-12 h-12"></i>`+newBadge+`
+                                                </div>
+                                                <div class="ml-2 overflow-hidden">
+                                                    <div class="flex items-center">
+                                                        <a href="javascript:;" class="font-medium truncate mr-5">`+name+`</a>
+                                                        <div class="text-xs text-gray-500 ml-auto whitespace-nowrap">`+prettyDate(d[i].created_at)+`</div>
+                                                    </div>
+                                                    <div class="w-full truncate text-gray-600 mt-0.5 tooltip" data-theme="light" title="`+ data.text +`">`+ text +`</div>
+                                                </div>
+                                            </div>`;
+                            }
+                        }
+                        if (d.length > 5) {
+                            notif += `  <div class="cursor-pointer relative flex items-center mt-5" onClick="window.location.href='{{ url('notifikasi') }}';">
+                                            <div class="ml-2 overflow-hidden">
+                                                <div class="flex items-center">
+                                                    <a href="javascript:;" class="font-medium truncate mr-5"><i data-feather="inbox" class="mr-2"></i> Lihat
+                                                        Semua..</a>
+                                                </div>
+                                            </div>
+                                        </div>`;
+                        }
+                    } else {
+                        notif = `<div class="relative flex items-center mt-5">
+                                    <div class="ml-2 overflow-hidden">
+                                        <div class="flex items-center">
+                                            <div class="text-xs text-gray-500 ml-auto whitespace-nowrap"><i data-feather="alert-circle"
+                                                    class="w-4 h-4 mr-2"></i> Belum ada pemberitahuan</div>
+                                        </div>
+                                    </div>
+                                </div>`;    
+                    }
+                    if (baru) {
+                        $('.notification').addClass('notification--bullet');
+                    } else {
+                        $('.notification').removeClass('notification--bullet');
+                    }
+                    konten.empty();
+                    konten.append(notif);
+                    feather.replace();
+                },
+                error: function(d) {
+                    console.log('d',d);
+                },
+            });
+        }
+        $(document).ready(function(){
+            reloadNotif();
+            $(window).focus(function(){
+                reloadNotif();
+            });
+        });
+    </script>
+    <!-- END: Notifications -->
     <!-- BEGIN: Account Menu -->
     <div class="intro-x dropdown w-8 h-8">
         <div class="dropdown-toggle w-8 h-8 rounded-full overflow-hidden shadow-lg image-fit zoom-in" role="button"

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CetakController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,11 +49,16 @@ Route::get('mode/{value}', [AuthController::class, 'DarkMode']);
 Route::post('register', [AuthController::class, 'register']);
 
 // Cek Invoice
-Route::get('test/{any}', [CetakController::class, 'cetakCoverNote']);
+Route::get('test/{any}', [CetakController::class, 'cetakAkseptasi']);
 Route::get('cek_invoice/{any}', [CetakController::class, 'cekInvoice']);
 Route::get('cek_covernote/{any}', [CetakController::class, 'cekCoverNote']);
 
+// Notifikasi
+Route::get('/notification/{any}', [NotificationController::class, 'index']);
+
 Route::group(['middleware' => 'auth'], function () {
+  // Pemberitahuan
+  Route::get('/send-notification', [NotificationController::class, 'sendPushNotif']);
 
   Route::get('home', [PageController::class, 'dashboard'])->name('home');
   Route::get('profile', [PageController::class, 'profile'])->name('profile');
@@ -68,6 +74,9 @@ Route::group(['middleware' => 'auth'], function () {
   // inquiry
   Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
   Route::get('inquiry/{any}', [PageController::class, 'inquiry'])->name('inquiry');
+  
+  // notifikasi
+  Route::get('notifikasi', [PageController::class, 'notifikasi'])->name('notifikasi');
 
   // pembayaran
   Route::get('pembayaran', [PageController::class, 'pembayaran'])->name('pembayaran');

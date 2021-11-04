@@ -15,17 +15,7 @@
   <main>
     <table>
       <tr>
-        <td align="center" style="font-size:20"><strong>COVER NOTE</strong></td>
-      </tr>
-      <tr>
-        <td align="center" style="font-size:12"><strong><u>{{ $data['covernote']; }}</strong></u></td>
-      </tr>
-      <tr>
-        <?php
-          $date = date_create($data['tgl_aktif']->created_at);
-          date_add($date,date_interval_create_from_date_string("30 days"));
-        ?>
-        <td align="center" style="font-size:8; border-bottom: 1px solid black !important;">*Masa berlaku Cover Note ini 30 hari dari tanggal persetujuan asuransi<br>menunggu pembayaran hingga {{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }}</td>
+        <td align="center" style="font-size:20; border-bottom: 1px solid black !important;"><strong>AKSEPTASI ASURANSI</strong></td>
       </tr>
     </table>
     <table style="font-size:10pt" class="main">
@@ -35,9 +25,9 @@
         <td width="67%">{{ $data['transaksi']->transid }}</td>
       </tr>
       <tr valign="top">
-        <td width="32%">Nama Tertanggung</td>
-        <td width="1%">:</td>
-        <td width="67%">PT. BANK KB BUKOPIN, TBK. CAB. {{ $data['cabang']->nama_cabang }} QQ {{ $data['tertanggung']->nama_insured }}</td>
+        <td>Nama Tertanggung</td>
+        <td>:</td>
+        <td>PT. BANK KB BUKOPIN, TBK. CAB. {{ $data['cabang']->nama_cabang }} QQ {{ $data['tertanggung']->nama_insured }}</td>
       </tr>
       <tr valign="top">
         <td>Alamat Pengiriman Polis</td>
@@ -58,6 +48,11 @@
         <td>Jangka Waktu</td>
         <td>:</td>
         <td>{{ $data['transaksi']->masa }} hari / {{ $data['transaksi']->masa/365 }} tahun</td>
+      </tr>
+      <tr valign="top">
+        <td>Objek Pertanggungan</td>
+        <td>:</td>
+        <td>{{ $data['transaksi']->object }}</td>
       </tr>
       <tr valign="top">
         <td>Lokasi Objek Pertanggungan</td>
@@ -142,29 +137,6 @@
         <td></td>
       </tr>
     </table>
-    <br>
-    <br>
-    <div style="font-size: 10pt">
-      Demikian cover note ini dibuat, sementara polis asuransi <i>original</i> sedang dibuat dan menunggu pembayaran.
-    </div>
-    <br>
-    <table style="font-size: 10pt">
-      <tr>
-        <td width="70%"></td>
-        <td align="center">JAKARTA, {{ FunctionsHelp::tgl_indo($data['tgl_aktif']->created_at->format('Y-m-d')) }}</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td align="center"><img src="data:image/png;base64, {!! $qrcode !!}"></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td align="center">{{ $data['asuransi']->nama_asuransi }}</td>
-      </tr>
-    </table>
-    {{-- <div style="font-size: 10pt">
-      {!! $data['transaksi']->klausula !!}
-    </div> --}}
   </main>
 </body>
 </html>

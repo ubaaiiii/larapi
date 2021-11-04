@@ -17,7 +17,16 @@
             @endif
             @if ($method == 'approve' && !empty($data))
                 @role('checker|ao')
+                @if($data->id_status == 0)
                 <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
+                @endif
+                @if($data->id_status == 4)
+                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
+                <?php 
+                    $status_rollback = "TERTUNDA";
+                ?>
+                @endif
                 @endrole
                 @role('approver')
                 <button class="btn btn-sm btn-success btn-approve">Setujui</button>
@@ -32,7 +41,7 @@
                 ?>
                 @endrole
                 @role('insurance')
-                <button class="btn btn-sm btn-success btn-approve">Aktifkan</button>
+                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
                 <?php 
                     $status_rollback = "DIVERIFIKASI";
                 ?>
@@ -155,12 +164,12 @@
                             @endif
                             <div class="form-inline mt-5">
                                 <label for="nik_insured" class="form-label sm:w-20">NIK Tertanggung</label>
-                                <input type="text" id="nik_insured" class="form-control" required name="nik_insured"
+                                <input type="text" id="nik_insured" class="form-control" name="nik_insured"
                                     @if (!empty($data->nik_insured)) value="{{ $data->nik_insured }}" @endif>
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="npwp_insured" class="form-label sm:w-20">NPWP Tertanggung</label>
-                                <input type="text" id="npwp_insured" class="form-control masked" required
+                                <input type="text" id="npwp_insured" class="form-control masked"
                                     @if (!empty($data->npwp_insured)) value="{{ $data->npwp_insured }}" @endif>
                                 <input type="hidden" name="npwp_insured" @if (!empty($data->npwp_insured)) value="{{ $data->npwp_insured }}" @endif>
                             </div>
@@ -271,10 +280,10 @@
                                 <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
                                 <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
                             </div>
-                            {{-- <div class="form-inline mt-5">
+                            <div class="form-inline mt-5">
                                 <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
                                 <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->object)){{ $data->object }}@endif</textarea>
-                            </div> --}}
+                            </div>
                             <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
                                 <select id="kodepos" style="width:100%" name="kodepos" required>
@@ -444,6 +453,7 @@
                             });
                             Dropzone.autoDiscover = false;
                             $("#frm-document").dropzone({
+                                acceptedFiles: "image/jpeg,image/png,application/pdf",
                                 url: "{{ url('api/dokumen') }}",
                                 method: "POST",
                                 init: function() {

@@ -50,6 +50,18 @@
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ajukan
                                 </a>
+                                <a 
+                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
+                                    style="cursor:pointer">
+                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Setujui
+                                </a>
+                                <a id="ps-rollback"
+                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
+                                    style="cursor:pointer">
+                                    <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Batal Mengajukan
+                                </a>
                             @endrole
                             @role('approver|adm')
                                 <a 
@@ -73,7 +85,7 @@
                                     Verifikasi
                                 </a>
                                 <a
-                                    class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
+                                    class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
                                     style="cursor:pointer">
                                     <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Input Pembayaran
@@ -90,10 +102,10 @@
                                     class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Aktifkan
+                                    Setujui
                                 </a>
                                 <a 
-                                    class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-6"
+                                    class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
                                     style="cursor:pointer">
                                     <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Upload E-Polis
@@ -115,7 +127,7 @@
                             @endrole
                         </div>
                         @role('checker|ao|broker|adm')
-                        <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-4">
+                        <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 text-theme-9">
                             <a id="ps-invoice"
                                 class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                 style="cursor:pointer">
@@ -249,11 +261,11 @@
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="e-polis" class="form-label">Upload E-Polis</label>
-                            <input id="e-polis" type="file" class="form-control" required>
+                            <input id="e-polis" type="file" name="polis" class="form-control" accept="application/pdf" required>
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="invoice" class="form-label">Upload Invoice</label>
-                            <input id="invoice" type="file" class="form-control" required>
+                            <input id="invoice" type="file" name="invoice" class="form-control" accept="application/pdf" required>
                         </div>
                     </div>
                     <!-- END: Modal Body -->
@@ -379,10 +391,17 @@
 
             $(window).focus(function(){
                 reloadTable();
-            })
+            });
 
             $('#filterSearch').on('keypress', function(e) {
                 if (e.which == 13) {
+                    reloadTable();
+                }
+            });
+            $('#filterSearch').keyup(function() {
+                if ($(this).val().length) {
+                    return false;
+                } else {
                     reloadTable();
                 }
             });
@@ -534,6 +553,38 @@
                         'error'
                     );
                 }
+            });
+
+            $('#frm-polis').submit(function(e){
+                e.preventDefault();
+                var data = $(this).serializeArray();
+                data.push({ name: "method", value: "store" });
+                $.ajax({
+                    url: "{{ url('api/polis') }}",
+                    data: data,
+                    type: "POST",
+                    success: function(d) {
+                        console.log(d);
+                        // Swal.fire(
+                        //     'Berhasil!',
+                        //     d.message,
+                        //     'success'
+                        // );
+                        // $(':input','#frm-bayar')
+                        //     .not(':button, :submit, :reset, :hidden')
+                        //     .val('');
+                        // $('#tgl_bayar').val("{{ date('Y-m-d') }}");
+                        // cash('#modal-bayar').modal('hide');
+                    },
+                    error: function(d) {
+                        console.log(d);
+                        // Swal.fire(
+                        //     'Gagal!',
+                        //     d.message,
+                        //     'error'
+                        // );
+                    },
+                });
             })
             
             $('#ps-hapus').click(function(e) {

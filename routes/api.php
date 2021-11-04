@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/selectokupasi', 'API\DataController@selectOkupasi');
     Route::get('/selectinstype', 'API\DataController@selectInstype');
     Route::get('/selectasuransi', 'API\DataController@selectAsuransi');
+    Route::get('/datadashboard', 'API\DataController@dataDashboard');
 
     // data table
     Route::post('/datatransaksi', 'API\DataController@dataTransaksi');
@@ -43,6 +44,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // cari data
     Route::get('/caritransaksi', 'API\DataController@cariTransaksi');
     
+    // data notif
+    Route::get('/notifikasi', 'API\DataController@dataNotifikasi');
     
     // proses data
     Route::post('/user', 'API\ProcessController@user');
@@ -50,6 +53,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/dokumen/{any}', 'API\ProcessController@dokumen');
     Route::post('/pengajuan', 'API\ProcessController@pengajuan');
     Route::post('/pembayaran', 'API\ProcessController@pembayaran');
+    Route::post('/polis', 'API\ProcessController@polis');
 
 });
 

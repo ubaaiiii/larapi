@@ -71,6 +71,15 @@ class PageController extends Controller
         return view('pengajuan', $data);
     }
 
+    function notifikasi($transid = null, Request $request)
+    {
+        $data = [
+            
+        ];
+        
+        return view('notifikasi', $data);
+    }
+
     function laporan(Request $request)
     {
         // $role = Role::create(['name' => 'finance']);
