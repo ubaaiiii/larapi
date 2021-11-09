@@ -35,10 +35,17 @@
                 ?>
                 @endrole
                 @role('broker')
+                @if ($data->id_status == 1)
                 <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
                 <?php 
                     $status_rollback = "DISETUJUI";
                 ?>
+                @elseif ($data->id_status == 8)
+                <button class="btn btn-sm btn-success btn-approve">Polis Sesuai</button>
+                <?php 
+                    $status_rollback = "MENUNGGU POLIS";
+                ?>
+                @endif
                 @endrole
                 @role('insurance')
                 <button class="btn btn-sm btn-success btn-approve">Setujui</button>
@@ -429,6 +436,9 @@
                     </div>
                     <div id="multiple-file-upload" class="p-5">
                         <div class="preview">
+                            <div class="alert alert-primary-soft show flex items-center mb-2" role="alert">
+                                <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Kompresi dokumen dapat dilakukan pada web berikut: &nbsp;&nbsp;<a href="https://www.ilovepdf.com/compress_pdf" target="_blank"><img src="https://www.ilovepdf.com/img/ilovepdf.svg" width="70px"></a>
+                            </div>
                             <form id="frm-document" action="{{ url('api/dokumen') }}" class="dropzone" method="post">
                                 @csrf
                                 <input name="transid" type="hidden" value="{{ $data->transid }}"/>
@@ -453,6 +463,7 @@
                             });
                             Dropzone.autoDiscover = false;
                             $("#frm-document").dropzone({
+                                headers: { 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
                                 acceptedFiles: "image/jpeg,image/png,application/pdf",
                                 url: "{{ url('api/dokumen') }}",
                                 method: "POST",
@@ -467,7 +478,18 @@
                                         $('#tb-dokumen').DataTable().ajax.reload();
                                         $('#tb-aktifitas').DataTable().ajax.reload();
                                     });
+                                    this.on('error', function(file, response) {
+                                        $(file.previewElement).find('.dz-error-message').text(response.file);
+                                    });
+                                    this.on("complete", function(file, xhr) {
+                                        if (file.size > 20*1024*1024) { // 20 MB
+
+                                        }
+                                    });
                                 },
+                                error: function(file, response) {
+                                    $(file.previewElement).addClass("dz-error").find('.dz-error-message').text(response.errors.file);
+                                }
                             });
                         });
                     </script>

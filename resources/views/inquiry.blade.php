@@ -90,6 +90,12 @@
                                     <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Input Pembayaran
                                 </a>
+                                <a
+                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-8"
+                                    style="cursor:pointer">
+                                    <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Cek Polis
+                                </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
                                     style="cursor:pointer">
@@ -557,32 +563,38 @@
 
             $('#frm-polis').submit(function(e){
                 e.preventDefault();
-                var data = $(this).serializeArray();
-                data.push({ name: "method", value: "store" });
+                var data = new FormData(this);
+                data.append("method", "store");
+                console.log('data',data);
                 $.ajax({
                     url: "{{ url('api/polis') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    },
                     data: data,
                     type: "POST",
+                    cache:false,
+                    contentType: false,
+                    processData: false,
                     success: function(d) {
+                        reloadTable();
+                        $('#frm-polis').trigger('reset');
                         console.log(d);
-                        // Swal.fire(
-                        //     'Berhasil!',
-                        //     d.message,
-                        //     'success'
-                        // );
-                        // $(':input','#frm-bayar')
-                        //     .not(':button, :submit, :reset, :hidden')
-                        //     .val('');
-                        // $('#tgl_bayar').val("{{ date('Y-m-d') }}");
-                        // cash('#modal-bayar').modal('hide');
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        ).then(function(){
+                            cash('#modal-polis').modal('hide');
+                        });
                     },
                     error: function(d) {
                         console.log(d);
-                        // Swal.fire(
-                        //     'Gagal!',
-                        //     d.message,
-                        //     'error'
-                        // );
+                        Swal.fire(
+                            'Gagal!',
+                            d.message,
+                            'error'
+                        );
                     },
                 });
             })

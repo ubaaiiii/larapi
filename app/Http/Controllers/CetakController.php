@@ -88,8 +88,8 @@ class CetakController extends Controller
                 if (!is_dir($path)) {
                     mkdir($path, 0777, TRUE);
                 }
-                file_put_contents($path . "Invoice-$transid.pdf", $output);
-                return redirect($path . "Invoice-$transid.pdf");
+                file_put_contents($path . "Invoice_BDS-$transid.pdf", $output);
+                return redirect($path . "Invoice_BDS-$transid.pdf");
             } elseif ($transaksi->id_status < 5) {
                 abort(403, "Belum disetujui oleh asuransi");
             } else {
@@ -164,7 +164,7 @@ class CetakController extends Controller
                     'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
                     'lokasi_file'   => $path . $filename,
                     'jenis_file'    => "COVERNOTE",
-                    'created_by'    => Auth::user()->id,
+                    'created_by'    => 1,
                 ];
 
                 Document::create($insert);
@@ -234,7 +234,7 @@ class CetakController extends Controller
                     'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
                     'lokasi_file'   => $path . $filename,
                     'jenis_file'    => "AKSEPTASI",
-                    'created_by'    => Auth::user()->id,
+                    'created_by'    => 1,
                 ];
 
                 Document::create($insert);

@@ -74,36 +74,60 @@
                                                     value="{{ Auth::user()->notelp }}" required>
                                             </div>
                                         </div>
-                                        <div class="mt-3">
-                                            <label for="cabang" class="form-label">Cabang</label>
-                                            <select id="cabang" data-search="true" class="tom-select w-full" name="cabang"
-                                                required @unlessrole('adm|broker') readonly @endunlessrole>
-                                                @foreach ($cabang as $cab)
-                                                    <option value="{{ $cab->id }}" @if ($cab->id === Auth::user()->cabang) selected="true" @endif>
-                                                        {{ $cab->nama_cabang }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="mt-3">
-                                            <label for="level" class="form-label">Level</label>
-                                            <select id="level" data-search="true" class="tom-select w-full" name="level"
-                                                required @unlessrole('adm|broker') readonly @endunlessrole>
-                                                @foreach ($level as $lvl)
-                                                    <option value="{{ $lvl->msid }}" @if ($lvl->msid === Auth::user()->level) selected="true" @endif>
-                                                        {{ $lvl->msdesc }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="mt-3">
-                                            <label for="parent" class="form-label">Parent</label>
-                                            <select id="parent" data-search="true" class="tom-select w-full" name="parent"
-                                                required @unlessrole('adm|broker') readonly @endunlessrole>
-                                                @foreach ($parent as $prt)
-                                                    <option value="{{ $prt->id }}" @if ($prt->id === Auth::user()->parent_id) selected="true" @endif>
-                                                        {{ $prt->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                        @if(in_array(Auth::user()->getRoleNames()[0],['broker','adm']))
+                                            <div class="mt-3">
+                                                <label for="cabang" class="form-label">Cabang</label>
+                                                <select id="cabang" data-search="true" class="tom-select w-full" name="cabang"
+                                                    required @unlessrole('adm|broker') readonly @endunlessrole>
+                                                    @foreach ($cabang as $cab)
+                                                        <option value="{{ $cab->id }}" @if ($cab->id === Auth::user()->cabang) selected="true" @endif>
+                                                            {{ $cab->nama_cabang }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="mt-3">
+                                                <label for="level" class="form-label">Level</label>
+                                                <select id="level" data-search="true" class="tom-select w-full" name="level"
+                                                    required @unlessrole('adm|broker') readonly @endunlessrole>
+                                                    @foreach ($level as $lvl)
+                                                        <option value="{{ $lvl->msid }}" @if ($lvl->msid === Auth::user()->level) selected="true" @endif>
+                                                            {{ $lvl->msdesc }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="mt-3">
+                                                <label for="parent" class="form-label">Parent</label>
+                                                <select id="parent" data-search="true" class="tom-select w-full" name="parent"
+                                                    required @unlessrole('adm|broker') readonly @endunlessrole>
+                                                    @foreach ($parent as $prt)
+                                                        <option value="{{ $prt->id }}" @if ($prt->id === Auth::user()->parent_id) selected="true" @endif>
+                                                            {{ $prt->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        @else
+                                            <div class="mt-3">
+                                                <label for="cabang" class="form-label">Cabang</label>
+                                                <input id="cabang" type="text" class="form-control" placeholder="Cabang"
+                                                    value="{{ $cabang->filter(function($item) {
+                                                        return $item->id == Auth::user()->id_cabang;
+                                                    })->first()->nama_cabang; }}" disabled>
+                                            </div>
+                                            <div class="mt-3">
+                                                <label for="level" class="form-label">Level</label>
+                                                <input id="level" type="text" class="form-control" placeholder="Level"
+                                                    value="{{ $level->filter(function($item) {
+                                                        return $item->msid == Auth::user()->getRoleNames()[0];
+                                                    })->first()->msdesc; }}" disabled>
+                                            </div>
+                                            <div class="mt-3">
+                                                <label for="parent" class="form-label">Parent</label>
+                                                <input id="parent" type="text" class="form-control" placeholder="Parent"
+                                                    value="{{ $parent->filter(function($item) {
+                                                        return $item->id == Auth::user()->id_parent;
+                                                    })->first()->name; }}" disabled>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                                 <button type="button" class="btn btn-primary w-20 mt-3">Simpan</button>

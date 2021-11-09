@@ -233,7 +233,7 @@ class DataController extends Controller
                 $statPengajuan  = "3";
                 $statApproval   = "7";
                 $statDibayar    = "7";
-                $statPolis      = "10";
+                $statPolis      = "8,9,10";
                 $customWhere    .= " AND id_asuransi = " . Auth::user()->id_asuransi;
                 break;
             case 'finance':
@@ -467,7 +467,7 @@ class DataController extends Controller
                             break;
 
                         case 'insurance':
-                            $table->where('id_status', "10");
+                            $table->whereIn('id_status', [8,9,10]);
                             break;
 
                         case 'finance':
@@ -495,6 +495,102 @@ class DataController extends Controller
             ['instype', 'id_instype = instype.id'],
             ['asuransi', 'id_asuransi = asuransi.id'],
             ['masters as sts', ['id_status = sts.msid', "sts.mstype = status"]],
+            ['cabang', 'id_cabang = cabang.id'],
+            ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+            ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+        ];
+
+        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+
+        $data = array();
+        foreach ($query[0] as $row) {
+            $nestedData = array();
+            $nestedData[] = $row->transid;
+            $nestedData[] = $row->nama_asuransi;
+            $nestedData[] = $row->instype_name;
+            $nestedData[] = $row->cabang;
+            $nestedData[] = $row->tertanggung;
+            $nestedData[] = $row->policy_no;
+            $nestedData[] = $row->cover_note;
+            $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
+            $nestedData[] = $row->tgl_dibuat;
+            $nestedData[] = number_format($row->tsi, 2);
+            $nestedData[] = number_format($row->premi, 2);
+            $nestedData[] = $row->statusnya;
+
+            // hidden
+            $nestedData[] = $row->id_status;
+
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => intval($query[1]),
+            "recordsFiltered" => intval($query[2]),
+            "data"            => $data,
+            "sql"             => $query[3]
+        ], 200);
+    }
+
+    public function dataBelumDibayar(Request $request)
+    {
+        // sorting column datatables
+        $columns = [
+            'transid',
+            'nama_asuransi',
+            'instype_name',
+            'cabang.nama_cabang',
+            'insured.nama_insured',
+            'policy_no',
+            'cover_note',
+            'polis_start',
+            'transaksi.created_at',
+            'tsi.value',
+            'premi.value',
+            'sts.msdesc',
+        ];
+
+        $select = [
+            'transaksi.*',
+            'nama_asuransi',
+            'instype_name',
+            'insured.nama_insured as tertanggung',
+            'transaksi.created_at as tgl_dibuat',
+            'tsi.value as tsi',
+            'premi.value as premi',
+            'sts.msdesc as statusnya',
+            'cabang.nama_cabang as cabang',
+            'cabang.alamat_cabang',
+        ];
+
+        $table = DB::table("transaksi")->whereNull('transaksi.deleted_at');
+
+        $user = Auth::user()->getRoleNames()[0];
+        switch ($user) {
+            case 'broker':
+                // wherenya broker
+                break;
+
+            case 'finance':
+
+                break;
+
+            case 'adm':
+                // wherenya administrator
+                break;
+
+            default:
+                return redirect()->route('logout');
+                break;
+        }
+
+        $joins = [
+            ['insured', 'id_insured = insured.id'],
+            ['instype', 'id_instype = instype.id'],
+            ['asuransi', 'id_asuransi = asuransi.id'],
+            ['masters as sts', ['id_status = sts.msid', "sts.mstype = status"]],
+            ['cabang', 'id_cabang = cabang.id'],
             ['cabang', 'id_cabang = cabang.id'],
             ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
@@ -656,6 +752,9 @@ class DataController extends Controller
 
         $data = array();
         foreach ($query[0] as $row) {
+            if (!empty($row->visible_by) && !in_array($role,explode(",",$row->visible_by))) {
+                continue;
+            }
             $nestedData = array();
             if ($row->jenis_file !== null) {
                 if ($role == 'insurance') {

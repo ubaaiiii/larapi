@@ -138,6 +138,8 @@ class ProcessController extends Controller
                 $request->validate([
                     'transid'   => 'required|',
                     'file'      => 'required|mimes:xlsx,xls,pdf,doc,docx,jpg,png,jpeg|max:40960', // 20 MB
+                ],[
+                    'file.max'  => 'Ukuran dokumen tidak boleh melebihi 20 MB.'
                 ]);
 
                 $file = $request->file('file');
@@ -275,23 +277,59 @@ class ProcessController extends Controller
         switch ($request->method) {
             case 'store':
                 $request->validate([
-                    'cover_note'    => 'required',
-                    'nopolis'       => 'required',
-                    'transid'       => 'required',
-                    'polis'         => 'required|mimes:pdf|max:81920', // 40MB
-                    'invoice'       => 'required|mimes:pdf|max:81920', // 40MB
+                    'cover_note' => 'required',
+                    'nopolis'    => 'required',
+                    'transid'    => 'required',
+                    'polis'      => 'required|mimes:pdf|max:20480',
+                    'invoice'    => 'required|mimes:pdf|max:20480',
                 ]);
+                $transaksi  = Transaksi::find($request->transid);
+                $asuransi   = Asuransi::find($transaksi->id_asuransi);
+                $update = [
+                    'policy_no' => $request->nopolis,
+                    'id_status' => 8
+                ];
 
-                $asuransi   = Asuransi::find($request->transid);
-
-                $polis      = $request->file('polis');
-                $invoice    = $request->file('invoice');
-                $path       = 'public/files/' . $request->transid;
+                $polis       = $request->file('polis');
+                $invoice     = $request->file('invoice');
+                $polisExt    = $polis->extension();
+                $invoiceExt  = $invoice->extension();
+                $polisSize   = $polis->getSize();
+                $invoiceSize = $invoice->getSize();
+                $filePolis   = "E-Polis_" . $asuransi->akronim . "-" . $request->transid;
+                $fileInvoice = "Invoice_Asuransi_" . $asuransi->akronim . "-" . $request->transid;
+                $path        = 'public/files/' . $request->transid;
                 if (!is_dir($path)) {
                     mkdir($path, 0777, TRUE);
                 }
-                $pathPolis   = $polis->move($path, "E_POLIS-");
-                $pathInvoice = $invoice->move($path, $name);
+
+                $pathPolis   = $polis->move($path, $filePolis .".". $polisExt);
+                $pathInvoice = $invoice->move($path, $fileInvoice . "." . $invoiceExt);
+                Document::create([
+                    'id_transaksi'  => $request->transid,
+                    'nama_file'     => $filePolis,
+                    'tipe_file'     => $polisExt,
+                    'jenis_file'    => "POLIS",
+                    'ukuran_file'   => $polisSize / 1000000,
+                    'lokasi_file'   => $pathPolis,
+                    'created_by'    => Auth::user()->id,
+                ]);
+                Document::create([
+                    'id_transaksi'  => $request->transid,
+                    'nama_file'     => $fileInvoice,
+                    'tipe_file'     => $invoiceExt,
+                    'jenis_file'    => "INVOICE ASURANSI",
+                    'visible_by'    => '{"broker","insurance","finance"}',
+                    'ukuran_file'   => $invoiceSize / 1000000,
+                    'lokasi_file'   => $pathInvoice,
+                    'created_by'    => Auth::user()->id,
+                ]);
+
+                $transaksi->update($update);
+                $this->aktifitas($request->transid, '8', 'Asuransi mengunggah E-Polis');
+                return response()->json([
+                    'message'   => 'E-Polis dan Invoice berhasil diunggah',
+                ], 200);
                 break;
             
             default:
@@ -347,6 +385,7 @@ class ProcessController extends Controller
                 
                 if (empty($request->transid) || !isset($request->transid)) {
                     $nourut     = DB::table('transaksi')->whereYear('created_at','=',date('Y'))->whereMonth('created_at','=',date('m'))->count();
+                    if ($nourut == 0) $nourut ++;
                     $sequential = Sequential::where('seqdesc', 'transid')->first();
                     $transid    = $sequential->seqlead.date($sequential->seqformat).str_pad($nourut, $sequential->seqlen, '0', STR_PAD_LEFT);
                     $request->merge(['transid' => $transid]);
@@ -557,24 +596,29 @@ class ProcessController extends Controller
                         break;
 
                     case 'broker':
-                        $status = 3;
-                        $string = "verifikasi";
-                        
-                        $request->validate([
-                            'asuransi'          => 'required|string',
-                            'okupasi'           => 'required|numeric',
-                            'kodepos'           => 'required|numeric',
-                            'lokasi_okupasi'    => 'required|string',
-                            'objek_okupasi'     => 'required|string',
-                        ]);
-                        
-                        $update = [
-                            'id_asuransi'   => $request->asuransi,
-                            'id_okupasi'    => $request->okupasi,
-                            'id_kodepos'    => $request->kodepos,
-                            'location'      => $request->lokasi_okupasi,
-                            'object'        => $request->objek_okupasi,
-                        ];
+                        if ($transaksi->id_status == 2) {
+                            $status = 3;
+                            $string = "verifikasi";
+                            
+                            $request->validate([
+                                'asuransi'          => 'required|string',
+                                'okupasi'           => 'required|numeric',
+                                'kodepos'           => 'required|numeric',
+                                'lokasi_okupasi'    => 'required|string',
+                                'objek_okupasi'     => 'required|string',
+                            ]);
+                            
+                            $update = [
+                                'id_asuransi'   => $request->asuransi,
+                                'id_okupasi'    => $request->okupasi,
+                                'id_kodepos'    => $request->kodepos,
+                                'location'      => $request->lokasi_okupasi,
+                                'object'        => $request->objek_okupasi,
+                            ];
+                        } else if ($transaksi->id_status == 8) {
+                            $status = 10;
+                            $string = "cek kebenaran polisnya";
+                        }
 
                         break;
                         
