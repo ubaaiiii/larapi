@@ -35,7 +35,7 @@
                 ?>
                 @endrole
                 @role('broker')
-                @if ($data->id_status == 1)
+                @if ($data->id_status == 2)
                 <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
                 <?php 
                     $status_rollback = "DISETUJUI";
