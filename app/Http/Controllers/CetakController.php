@@ -9,6 +9,7 @@ use App\Models\Cabang;
 use App\Models\Document;
 use App\Models\Instype;
 use App\Models\Insured;
+use App\Models\KodePos;
 use App\Models\Okupasi;
 use App\Models\Pricing;
 use App\Models\Sequential;
@@ -116,6 +117,7 @@ class CetakController extends Controller
                     'tertanggung' => Insured::find($transaksi->id_insured),
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
+                    'kodepos'     => KodePos::find($transaksi->id_kodepos),
                     'pricing'     => Pricing::where('id_transaksi',$transaksi->transid)
                         ->join('transaksi_kode as tk','transaksi_pricing.id_kodetrans','=','tk.kodetrans_id')
                         ->orderBy('id_kodetrans','ASC')
@@ -145,8 +147,8 @@ class CetakController extends Controller
                 // return $pdf->download('pdf_file.pdf');
 
                 // Streaming PDF, not saved on local
-                // return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
-                // exit(0);
+                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                exit(0);
 
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
@@ -264,12 +266,12 @@ class CetakController extends Controller
         ->join('insured', 'insured.id', '=', 'transaksi.id_insured')
         ->join('cabang', 'cabang.id', '=', 'transaksi.id_cabang')
         ->first();
-        DB::enableQueryLog();
+        // DB::enableQueryLog();
         if ($transaksi->id_status >= 4) {
             $data['data']    = $transaksi;
             $data['pricing'] = Pricing::where('id_transaksi',$transaksi->transid)->orderBy('id_kodetrans','ASC')->get();
         }
-        return DB::getQueryLog();
+        // return DB::getQueryLog();
 
         // dd($data['pricing']);
 

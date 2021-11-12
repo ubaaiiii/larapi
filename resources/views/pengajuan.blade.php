@@ -17,44 +17,44 @@
             @endif
             @if ($method == 'approve' && !empty($data))
                 @role('checker|ao')
-                @if($data->id_status == 0)
-                <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
-                @endif
-                @if($data->id_status == 4)
-                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
-                <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
-                <?php 
-                    $status_rollback = "TERTUNDA";
-                ?>
-                @endif
+                    @if($data->id_status == 0)
+                        <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
+                    @endif
+                    @if($data->id_status == 4)
+                        <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                        <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
+                        <?php 
+                            $status_rollback = "TERTUNDA";
+                        ?>
+                    @endif
                 @endrole
                 @role('approver')
-                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
-                <?php 
-                    $status_rollback = "TERTUNDA";
-                ?>
+                    <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                    <?php 
+                        $status_rollback = "TERTUNDA";
+                    ?>
                 @endrole
                 @role('broker')
-                @if ($data->id_status == 2)
-                <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
-                <?php 
-                    $status_rollback = "DISETUJUI";
-                ?>
-                @elseif ($data->id_status == 8)
-                <button class="btn btn-sm btn-success btn-approve">Polis Sesuai</button>
-                <?php 
-                    $status_rollback = "MENUNGGU POLIS";
-                ?>
-                @endif
+                    @if ($data->id_status == 2)
+                        <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
+                        <?php 
+                            $status_rollback = "DISETUJUI";
+                        ?>
+                    @elseif ($data->id_status == 8)
+                        <button class="btn btn-sm btn-success btn-approve">Polis Sesuai</button>
+                        <?php 
+                            $status_rollback = "MENUNGGU POLIS";
+                        ?>
+                    @endif
                 @endrole
                 @role('insurance')
-                <button class="btn btn-sm btn-success btn-approve">Setujui</button>
-                <?php 
-                    $status_rollback = "DIVERIFIKASI";
-                ?>
+                    <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                    <?php 
+                        $status_rollback = "DIVERIFIKASI";
+                    ?>
                 @endrole
                 @role('approver|broker|insurance|adm')
-                <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
+                    <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
                 @endrole
             @endif
             @if (empty($method) && !empty($data))
@@ -217,14 +217,14 @@
                                     id="cover_note" value="@if (!empty($data->cover_note)){{ $data->cover_note }}@endif">
                             </div>
                             @if (!empty($data->policy_parent))
-                            <div class="form-inline mt-5">
-                                <label for="nopolis_lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
-                                <div class="input-group w-full">
-                                    <input type="text" class="form-control" placeholder="Nomor Polis Lama" name="nopolis_lama"
-                                        id="nopolis_lama" value="{{ $data->policy_parent }}">
-                                    <div id="nopolis_lama" class="input-group-text">Jika Renewal.</div>
+                                <div class="form-inline mt-5">
+                                    <label for="nopolis_lama" class="ml-3 form-label sm:w-20">Nopolis Lama</label>
+                                    <div class="input-group w-full">
+                                        <input type="text" class="form-control" placeholder="Nomor Polis Lama" name="nopolis_lama"
+                                            id="nopolis_lama" value="{{ $data->policy_parent }}">
+                                        <div id="nopolis_lama" class="input-group-text">Jika Renewal.</div>
+                                    </div>
                                 </div>
-                            </div>
                             @endif
                             <div class="form-inline mt-5">
                                 <label for="periode-polis" class="form-label sm:w-20">Periode Polis</label>
@@ -269,43 +269,43 @@
                                     id="no_jaminan" value="@if (!empty($data->no_jaminan)){{ $data->no_jaminan }}@endif">
                             </div>
                             @if (!empty($data) && $data->id_status >= 2)
-                            <div class="form-inline mt-5">
-                                <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
-                                <select id="okupasi" style="width:100%" name="okupasi">
-                                    {{-- @foreach ($okupasi as $val)
-                                        <option value="{{ $val->id }}" @if (!empty($data->id_okupasi) && $val->id === $data->id_okupasi) selected="true" @endif>
-                                            {{ $val->kode_okupasi . ' - (' . $val->rate . ' ‰) ' . $val->nama_okupasi }}
-                                        </option>
-                                    @endforeach --}}
-                                </select>
-                            </div>
-                            <div class="form-inline mt-1 extended-clause" style="display:none">
-                                <label class="form-label sm:w-20"></label>
-                                <label>Sudah Termasuk: RSMDCC, TSFWD, Others</label>
-                            </div>
-                            <div class="form-inline mt-5">
-                                <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
-                                <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
-                            </div>
-                            <div class="form-inline mt-5">
-                                <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
-                                <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->object)){{ $data->object }}@endif</textarea>
-                            </div>
-                            <div class="form-inline mt-5">
-                                <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
-                                <select id="kodepos" style="width:100%" name="kodepos" required>
-                                </select>
-                            </div>
-                            @if (!empty($data->id_kodepos))
-                            <script>
-                                var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
-                                {{ $data->id_kodepos }}, false, false);
-                                $('#kodepos').append(newOption).trigger('change');
-                            </script>
-                            @endif
+                                <div class="form-inline mt-5">
+                                    <label for="okupasi" class="ml-3 form-label sm:w-20">Okupasi</label>
+                                    <select id="okupasi" style="width:100%" name="okupasi">
+                                        {{-- @foreach ($okupasi as $val)
+                                            <option value="{{ $val->id }}" @if (!empty($data->id_okupasi) && $val->id === $data->id_okupasi) selected="true" @endif>
+                                                {{ $val->kode_okupasi . ' - (' . $val->rate . ' ‰) ' . $val->nama_okupasi }}
+                                            </option>
+                                        @endforeach --}}
+                                    </select>
+                                </div>
+                                <div class="form-inline mt-1 extended-clause" style="display:none">
+                                    <label class="form-label sm:w-20"></label>
+                                    <label>Sudah Termasuk: RSMDCC, TSFWD, Others</label>
+                                </div>
+                                <div class="form-inline mt-5">
+                                    <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
+                                    <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
+                                </div>
+                                <div class="form-inline mt-5">
+                                    <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
+                                    <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->object)){{ $data->object }}@endif</textarea>
+                                </div>
+                                <div class="form-inline mt-5">
+                                    <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
+                                    <select id="kodepos" style="width:100%" name="kodepos" required>
+                                    </select>
+                                </div>
+                                @if (!empty($data->id_kodepos))
+                                    <script>
+                                        var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
+                                        {{ $data->id_kodepos }}, false, false);
+                                        $('#kodepos').append(newOption).trigger('change');
+                                    </script>
+                                @endif
                             @endif
                             @if (!empty($data->transid))
-                            <input type="hidden" class="form-control" required name="transid" value="{{ $data->transid }}" readonly>
+                                <input type="hidden" class="form-control" required name="transid" value="{{ $data->transid }}" readonly>
                             @endif
                         </div>
                     </form>
@@ -380,20 +380,15 @@
                                 <input id="kodetrans_value[11]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[11]->value)){{ $pricing[11]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[11]">
                             </div>
-                            <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
-                                <label for="kodetrans_value[12]" class="form-label">Biaya Admin</label>
-                                <input id="kodetrans_value[12]" d-input="ADMIN" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Admin" aria-describedby="Biaya Admin" value="@if (!empty($pricing[12]->value)){{ $pricing[12]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[12]">
-                            </div>
                         </div>
                     </div>
                 </form>
             </div>
-                @role('adm|broker|insurance')
+            @role('adm|broker|insurance')
                 <div class="intro-y box mt-5">
-                @else
+            @else
                 <div class="intro-y box mt-5" style="display: none">
-                @endrole
+            @endrole
                 <div class="intro-y box p-5">
                     <div>
                         <form class="formnya">
@@ -482,8 +477,8 @@
                                         $(file.previewElement).find('.dz-error-message').text(response.file);
                                     });
                                     this.on("complete", function(file, xhr) {
-                                        if (file.size > 20*1024*1024) { // 20 MB
-
+                                        if (file.size > 50*1024*1024) { // 50 MB
+                                            alert('Harap melakukan kompresi dokumen terlebih dahulu, karena file lebih besar dari 50MB');
                                         }
                                     });
                                 },
@@ -539,7 +534,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         @endif
     </div>
@@ -547,21 +541,53 @@
 
 @section('script')
     <script>
-        var RATE = null;
+        var RATE    = null,
+            TSFWD   = null,
+            RSMDCC  = null,
+            OTHERS  = null,
+            maxPeriode = null,
+            maxTSI  = null;
+        
+        @if (!empty($data->id_kodepos))
+            TSFWD = {{ $data->rate_TSFWD }};
+            RSMDCC = {{ $data->rate_RSMDCC }};
+            OTHERS = {{ $data->rate_OTHERS }};
+        @endif
+
+        function totalRate() {
+            console.log('RATE',RATE);
+            console.log('TSFWD',TSFWD);
+            console.log('RSMDCC',RSMDCC);
+            console.log('OTHERS',OTHERS);
+            if (isNaN(RATE) || isNaN(TSFWD) || isNaN(RSMDCC)|| isNaN(OTHERS)) {
+                return null;
+            }
+
+            var instype = $("#type_insurance").val(),
+                total = parseFloat(RATE);
+            console.log('total',total);
+            
+            if (instype == "PAR") {
+                total += parseFloat(TSFWD) + parseFloat(RSMDCC) + parseFloat(OTHERS);
+            }
+            return total;
+        }
+
         function reloadTable() {
             $('#tb-dokumen').DataTable().ajax.reload();
         }
 
         function hitung() {
-            var OKUPASI = $('#okupasi').val();
+            var OKUPASI = $('#okupasi').val(),
+                _RATE = totalRate();
             
             @foreach ($value as $row)
             var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val());
             @endforeach
-            if (RATE == null || OKUPASI == null || TSI == null) {
-                // console.log('Rate: ',RATE);
-                // console.log('Okupasi: ',OKUPASI);
-                // console.log('TSI: ',TSI);
+            if (_RATE == null || OKUPASI == null || TSI == null) {
+                console.log('Rate: ',_RATE);
+                console.log('Okupasi: ',OKUPASI);
+                console.log('TSI: ',TSI);
                 return false;
             }
             
@@ -573,15 +599,14 @@
                 $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }});
             @endforeach
 
-            // @foreach ($formula as $row)
-            //     console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
-            // @endforeach
-            // console.log('TSI: ', TSI);
-            // console.log('Premium: ', PREMI);
-            // console.log("Rate: ", RATE);
-            // console.log("Admin: ", ADMIN);
-            // console.log("Materai: ", MATERAI);
-            // console.log("Biaya Lain: ", LAIN);
+            @foreach ($formula as $row)
+                console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+            @endforeach
+            console.log('TSI: ', TSI);
+            console.log('Premium: ', PREMI);
+            console.log("Rate: ", RATE);
+            console.log("Materai: ", MATERAI);
+            console.log("Biaya Lain: ", LAIN);
             $('.masked').trigger('keyup');
         }
 
@@ -797,12 +822,22 @@
                 {{ $data->id_asuransi }}, false, false);
                 $('#asuransi').append(newOption).trigger('change');
             @endif
+            @if(!empty($data->polis_start) && !empty($data->polis_end))
+                var startPolis = moment("{{ $data->polis_start }}","YYYY-MM-DD");
+                var endPolis = moment("{{ $data->polis_end }}","YYYY-MM-DD");
+            @else 
+                var startPolis = moment();
+                var endPolis = moment().add(1, 'year');
+            @endif
+            
             function cekType() {
                 if ($("#type_insurance").val() === "PAR") {
                     $('.extended-clause').removeAttr('style');
                 } else {
                     $('.extended-clause').css('display', 'none');
                 }
+                cekPeriode(startPolis, endPolis);
+                cekTSI();
 
                 $("#okupasi").val("").trigger('change');
                 $("#okupasi option").remove();
@@ -918,6 +953,14 @@
                 hitung();
             });
 
+            $('#kodepos').on('select2:select', function(e) {
+                var data = e.params.data;
+                TSFWD  = parseFloat(data.rate_TSFWD);
+                RSMDCC = parseFloat(data.rate_RSMDCC);
+                OTHERS = parseFloat(data.rate_OTHERS);
+                hitung();
+            });
+
             $('#insured').on('select2:select', function(e) {
                 var data = e.params.data;
                 // console.log('data:',data);
@@ -953,6 +996,15 @@
                 if (data.brokerage_percent !== undefined) {
                     $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
                 }
+                if (data.max_tsi !== undefined) {
+                    maxTSI = parseFloat(data.max_tsi);
+                }
+                if (data.max_periode_tahun !== undefined) {
+                    maxPeriode = data.max_periode_tahun;
+                }
+                console.log('cek periode');
+                cekPeriode(startPolis,endPolis);
+                cekTSI();
             });
 
             $('#cabang').change(function() {
@@ -992,13 +1044,51 @@
 
             kjpp(startKJPP,endKJPP);
 
-            @if(!empty($data->polis_start) && !empty($data->polis_end))
-                var startPolis = moment("{{ $data->polis_start }}","YYYY-MM-DD");
-                var endPolis = moment("{{ $data->polis_end }}","YYYY-MM-DD");
-            @else 
-                var startPolis = moment();
-                var endPolis = moment().add(1, 'year');
-            @endif
+            function cekPeriode(startPolis,endPolis) {
+                if (maxPeriode !== null) {
+                    var years = endPolis.diff(startPolis,"year");
+                    startPolis.add(years,'years');
+                    var months = endPolis.diff(startPolis,"months");
+                    startPolis.add(months,'months');
+                    var days = endPolis.diff(startPolis,"days");
+                    if (years > maxPeriode || (years >= maxPeriode && (months > 0 || days > 0))) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Perhatian!',
+                            text: 'Harap cek kembali periode polis',
+                            footer: "Maksimal periode untuk tipe asuransi "+$('#type_insurance option:selected').text()+" adalah "+maxPeriode+" tahun"
+                        });
+                        $('#btn-add').prop('disabled',true);
+                    } else {
+                        $('#btn-add').prop('disabled',false);
+                    }
+                }
+            }
+
+            function cekTSI() {
+                console.log('cekTSI',maxTSI);
+                var TSI = parseFloat($('[d-input="TSI"]').inputmask("unmaskedvalue"));
+                console.log('TSI',TSI);
+                if (maxTSI !== null) {
+                    if (TSI > maxTSI) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Perhatian!',
+                            text: 'Harap cek kembali TSI',
+                            footer: "Maksimal TSI untuk tipe asuransi "+$('#type_insurance option:selected').text()+" adalah RP. "+parseFloat(maxTSI).toLocaleString()
+                        });
+                        $('#btn-add').prop('disabled',true);
+                        $('.tsi').val(0);
+                        return false;
+                    } else {
+                        $('#btn-add').prop('disabled',false);
+                    }
+                }
+            }
+
+            $('.tsi').keyup(function(){
+                cekTSI();
+            });
 
             function polis(startPolis, endPolis) {
                 console.log(endPolis.format('DD/MM/YYYY'));
@@ -1006,6 +1096,9 @@
                 $('#masa').val(Math.round(moment.duration(endPolis.diff(startPolis)).asDays()));
                 $('[name="polis_start"]').val(startPolis.format('YYYY-MM-DD'));
                 $('[name="polis_end"]').val(endPolis.format('YYYY-MM-DD'));
+                if (maxPeriode !== null) {
+                    cekPeriode(startPolis,endPolis);
+                }
             }
 
             $('#periode-polis').daterangepicker({
@@ -1019,38 +1112,6 @@
             }, polis);
 
             polis(startPolis,endPolis);
-
-            // $('#periode-kjpp').daterangepicker({
-            //     autoApply: true,
-            //     showDropdowns: true,
-            //     locale: {
-            //         format: 'DD/MM/YYYY'
-            //     },
-            // }, function(start,end,label){
-            //     $('[name="kjpp_start"]').val(start.format('YYYY-MM-DD'));
-            //     $('[name="kjpp_end"]').val(end.format('YYYY-MM-DD'));
-            // });
-
-            // $('#periode-polis').daterangepicker({
-            //     autoApply: true,
-            //     showDropdowns: true,
-            //     @if(!empty($data->polis_start) && !empty($data->polis_end))
-            //         startDate: "{{ date_format(date_create($data->polis_start), 'd/m/Y') }}",
-            //         endDate: "{{ date_format(date_create($data->polis_end), 'd/m/Y') }}",
-            //     @endif
-            //     locale: {
-            //         format: 'DD/MM/YYYY'
-            //     },
-            // }, function(start, end, label) {
-            //     console.log('start: ',start);
-            //     console.log('end: ',end);
-            //     startPolis = start
-            //     endPolis = end;
-            //     $('#masa').val(Math.round(moment.duration(end.diff(start)).asDays()));
-            //     $('[name="polis_start"]').val(start.format('YYYY-MM-DD'));
-            //     $('[name="polis_end"]').val(end.format('YYYY-MM-DD'));
-            //     // $('#periode_end').data('daterangepicker').setStartDate(start.add($('#masa').val(), 'month'));
-            // });
 
             $('#masa').keyup(function(){
                 endPolis = startPolis.add($(this).val(), 'days').format('DD/MM/YYYY');

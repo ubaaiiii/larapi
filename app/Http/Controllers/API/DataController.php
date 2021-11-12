@@ -31,7 +31,7 @@ class DataController extends Controller
     public function selectKodepos(Request $request)
     {
         // DB::enableQueryLog();
-        $provinsi = KodePos::select('id', 'kecamatan', 'kelurahan', 'kodepos')->distinct();
+        $provinsi = KodePos::select('id', 'kecamatan', 'kelurahan', 'kodepos', 'rate_TSFWD', 'rate_RSMDCC', 'rate_OTHERS')->distinct();
         if (!empty($request->search)) {
             $provinsi->cariKecamatan($request->search)->orWhere->cariKelurahan($request->search)->orWhere->cariKodePos($request->search);
         }
@@ -42,6 +42,9 @@ class DataController extends Controller
         foreach ($provinsi as $row) {
             $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['kecamatan'] . " / " . $row['kelurahan'] . " / " . $row['kodepos'];
+            $list[$key]['rate_TSFWD'] = $row['rate_TSFWD'];
+            $list[$key]['rate_RSMDCC'] = $row['rate_RSMDCC'];
+            $list[$key]['rate_OTHERS'] = $row['rate_OTHERS'];
             $key++;
         }
         return response()->json($list);
@@ -49,7 +52,7 @@ class DataController extends Controller
 
     public function selectInstype(Request $request)
     {
-        $instype = Instype::select('id', 'instype_name', 'brokerage_percent', 'klausula_template');
+        $instype = Instype::select('id', 'instype_name', 'brokerage_percent', 'klausula_template', 'max_tsi', 'max_periode_tahun');
         if (!empty($request->search)) {
             $instype->where('id', 'like', '%' . $request->search . '%')
                 ->orWhere('instype_name', 'like', '%' . $request->search . '%');
@@ -62,6 +65,8 @@ class DataController extends Controller
             $list[$key]['text'] = $row['instype_name'];
             $list[$key]['brokerage_percent'] = $row['brokerage_percent'];
             $list[$key]['klausula_template'] = $row['klausula_template'];
+            $list[$key]['max_tsi'] = $row['max_tsi'];
+            $list[$key]['max_periode_tahun'] = $row['max_periode_tahun'];
             $key++;
         }
         return response()->json($list);
@@ -91,8 +96,8 @@ class DataController extends Controller
     public function selectOkupasi(Request $request)
     {
         // return $request->all();
-        $okupasi = Okupasi::select('id', 'kode_okupasi', 'nama_okupasi', 'rate')
-            ->where('instype', $request->instype);
+        $okupasi = Okupasi::select('id', 'kode_okupasi', 'nama_okupasi', 'rate');
+            // ->where('instype', $request->instype);
         if (!empty($request->search)) {
             $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
                 ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
@@ -225,7 +230,7 @@ class DataController extends Controller
             case 'broker':
                 $statPengajuan  = "2";
                 $statApproval   = "5";
-                $statDibayar    = "8";
+                $statDibayar    = "6,7,8";
                 $statPolis      = "10";
                 $customWhere    = "";
                 break;
@@ -646,6 +651,9 @@ class DataController extends Controller
             'kecamatan',
             'kelurahan',
             'kodepos',
+            'rate_TSFWD',
+            'rate_RSMDCC',
+            'rate_OTHERS',
             'instype_name',
         ];
         $data = DB::table('transaksi')
@@ -748,12 +756,18 @@ class DataController extends Controller
         $query = $this->generateQuery($request, $table, $columns, $select, $joins);
         // return $query;
 
+        $transaksi = Transaksi::find($request->transid);
         $role = Auth::user()->getRoleNames()[0];
 
         $data = array();
         foreach ($query[0] as $row) {
             if (!empty($row->visible_by) && !in_array($role,explode(",",$row->visible_by))) {
                 continue;
+            }
+            if (in_array($role,['ao','checker','approver'])) {
+                if ($transaksi->id_status <= 8 && $row->jenis_file == 'POLIS') {
+                    continue;
+                }
             }
             $nestedData = array();
             if ($row->jenis_file !== null) {

@@ -3,7 +3,7 @@
     <!-- BEGIN: Breadcrumb -->
     <div class="-intro-x breadcrumb mr-auto hidden sm:flex">
         <a href="{{ url('') }}">Application</a> <i data-feather="chevron-right" class="breadcrumb__icon"></i>
-        <a href="" class="breadcrumb--active">@yield('breadcrumb')</a>
+        <a href="@yield('link')" class="breadcrumb--active">@yield('breadcrumb')</a>
     </div>
     <!-- END: Breadcrumb -->
     <div class="intro-x relative mr-3 sm:mr-6 <?= empty($search) ? '' : $search ?>">

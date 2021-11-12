@@ -137,9 +137,9 @@ class ProcessController extends Controller
             case 'store':
                 $request->validate([
                     'transid'   => 'required|',
-                    'file'      => 'required|mimes:xlsx,xls,pdf,doc,docx,jpg,png,jpeg|max:40960', // 20 MB
+                    'file'      => 'required|mimes:xlsx,xls,pdf,doc,docx,jpg,png,jpeg|max:52428', // 50 MB
                 ],[
-                    'file.max'  => 'Ukuran dokumen tidak boleh melebihi 20 MB.'
+                    'file.max'  => 'Ukuran dokumen tidak boleh melebihi 50 MB.'
                 ]);
 
                 $file = $request->file('file');
@@ -217,7 +217,7 @@ class ProcessController extends Controller
             }
             $pricing = Pricing::updateOrCreate(
                 ['id_transaksi' => $request->transid, 'id_kodetrans' => $key],
-                ['value' => $value, 'deskripsi' => $remarks]
+                ['value' => $value, 'deskripsi' => $remarks],
             );
         }
         
@@ -615,6 +615,8 @@ class ProcessController extends Controller
                                 'location'      => $request->lokasi_okupasi,
                                 'object'        => $request->objek_okupasi,
                             ];
+                        } else if ($transaksi->id_status == 5) {
+                            
                         } else if ($transaksi->id_status == 8) {
                             $status = 10;
                             $string = "cek kebenaran polisnya";

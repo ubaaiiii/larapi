@@ -1,6 +1,7 @@
 @extends('layouts.master')
 @section('title', 'Inquiry')
 @section('breadcrumb', 'Inquiry')
+@section('link', url('inquiry'))
 @section('menu', 'Inquiry')
 
 @section('content')
@@ -542,6 +543,7 @@
                                 .val('');
                             $('#tgl_bayar').val("{{ date('Y-m-d') }}");
                             cash('#modal-bayar').modal('hide');
+                            reloadTable();
                         },
                         error: function(d) {
                             console.log(d);
