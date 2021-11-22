@@ -1,17 +1,53 @@
 <html>
+
 <head>
   <style>
-    @page { margin: 100px 25px; }
-    body { font-family: Arial, Helvetica, sans-serif; margin:20px 20px;}
-    header { text-align:center; position: fixed; top: -60px; left: 0px; right: 0px; background-color: lightblue; height: 50px; }
-    footer { text-align:center; position: fixed; bottom: -60px; left: 0px; right: 0px; background-color: lightblue; height: 50px; }
-    table { width: 100%; }
-    table.main td { padding: 4px; }
-    li {list-style-type: 'square'; padding-inline-start: 1ch;}
+    @page {
+      margin: 100px 25px;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 20px 20px;
+    }
+
+    header {
+      text-align: center;
+      position: fixed;
+      top: -60px;
+      left: 0px;
+      right: 0px;
+      background-color: lightblue;
+      height: 50px;
+    }
+
+    footer {
+      text-align: center;
+      position: fixed;
+      bottom: -60px;
+      left: 0px;
+      right: 0px;
+      background-color: lightblue;
+      height: 50px;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    table.main td {
+      padding: 4px;
+    }
+
+    li {
+      list-style-type: 'square';
+      padding-inline-start: 1ch;
+    }
   </style>
 </head>
+
 <body>
-  <header>Header Asuransi</header>
+  <header><img src="{{ url('public/dist/images/Header') }}/Header-KB.jpg"></header>
   <footer>Footer Asuransi</footer>
   <main>
     <table>
@@ -23,8 +59,8 @@
       </tr>
       <tr>
         <?php
-          $date = date_create($data['tgl_aktif']->created_at);
-          date_add($date,date_interval_create_from_date_string("30 days"));
+        $date = date_create($data['tgl_aktif']->created_at);
+        date_add($date, date_interval_create_from_date_string("30 days"));
         ?>
         <td align="center" style="font-size:8; border-bottom: 1px solid black !important;">*Masa berlaku Cover Note ini 30 hari dari tanggal persetujuan asuransi<br>menunggu pembayaran hingga {{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }}</td>
       </tr>
@@ -104,12 +140,12 @@
         <td>Interest Insured</td>
         <td>:</td>
         <td style="text-align: justify;">Semua properti nyata dan pribadi dalam bentuk apa pun, sifat dan deskripsi dalam/atau
-        tentang tempat yang dikenal sebagai bangunan tersebut di atas, termasuk bahan di tanah dan semua perlengkapan
-        struktural, perbaikan, peningkatan, perlengkapan, peralatan, terikat dan termasuk di sini dan dinding luar, gerbang, pagar
-        (termasuk struktur pendukung dan pelindung), perabotan lunak, mebel, perlengkapan dan peralatan, mesin dari
-        setiap uraian, persediaan, Inventaris yang dimiliki oleh Tertanggung atau yang mungkin menjadi tanggung jawab
-        Tertanggung atau akan menanggung tanggung jawab dan semua isi lainnya, yang dipegang oleh mereka dalam kepercayaan atau
-        komisi atau yang menjadi tanggung jawab mereka. (Sesuai yang dinyatakan pada Uang Pertanggungan)</td>
+          tentang tempat yang dikenal sebagai bangunan tersebut di atas, termasuk bahan di tanah dan semua perlengkapan
+          struktural, perbaikan, peningkatan, perlengkapan, peralatan, terikat dan termasuk di sini dan dinding luar, gerbang, pagar
+          (termasuk struktur pendukung dan pelindung), perabotan lunak, mebel, perlengkapan dan peralatan, mesin dari
+          setiap uraian, persediaan, Inventaris yang dimiliki oleh Tertanggung atau yang mungkin menjadi tanggung jawab
+          Tertanggung atau akan menanggung tanggung jawab dan semua isi lainnya, yang dipegang oleh mereka dalam kepercayaan atau
+          komisi atau yang menjadi tanggung jawab mereka. (Sesuai yang dinyatakan pada Uang Pertanggungan)</td>
       </tr>
       <tr valign="top">
         <td>Deductibles</td>
@@ -128,106 +164,106 @@
               <td>-</td>
               <td>Typhoon, Storm, Flood & Water Damage (including landslide and subsidience); 10% of claim min IDR 10.000.000,- a.o.a.</td>
             </tr valign="top">
-              <td>-</td>
-              <td>Other Looses ; IDR 1.000.000,00 any one accident</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr valign="top">
-        <td><strong>Total Nilai Pertanggungan</strong></td>
-        <td>:</td>
-        <td><strong>Maksimal Rp. {{ number_format($data['instype']->max_tsi,2) }}</strong></td>
-      </tr>
-      <?php $i = 1 ?>
-      @foreach ($data['tsi'] as $tsi)
-      <tr valign="middle">
-        <td>- {{ $tsi->kodetrans_nama }}</td>
-        <td>:</td>
-        <td>
-          <table>
-            <tr valign="top">
-              <td>Rp.</td>
-              <td>{{ number_format($tsi->value,2) }}</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      @endforeach
-      <tr valign="middle">
-        <td align="right"><strong>TOTAL</strong></td>
-        <td><strong>:</strong></td>
-        <td>
-          <table>
-            <tr>
-              <td><strong>Rp.</strong></td>
-              <td><strong>{{ number_format($data['pricing'][0]->value,2) }}</strong></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr valign="top">
-        <td><strong>Klausa</strong></td>
-        <td>:</td>
-        <td></td>
+            <td>-</td>
+            <td>Other Looses ; IDR 1.000.000,00 any one accident</td>
       </tr>
     </table>
+    </td>
+    </tr>
+    <tr valign="top">
+      <td><strong>Total Nilai Pertanggungan</strong></td>
+      <td>:</td>
+      <td><strong>Maksimal Rp. {{ number_format($data['instype']->max_tsi,2) }}</strong></td>
+    </tr>
+    <?php $i = 1 ?>
+    @foreach ($data['tsi'] as $tsi)
+    <tr valign="middle">
+      <td>- {{ $tsi->kodetrans_nama }}</td>
+      <td>:</td>
+      <td>
+        <table>
+          <tr valign="top">
+            <td>Rp.</td>
+            <td>{{ number_format($tsi->value,2) }}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    @endforeach
+    <tr valign="middle">
+      <td align="right"><strong>TOTAL</strong></td>
+      <td><strong>:</strong></td>
+      <td>
+        <table>
+          <tr>
+            <td><strong>Rp.</strong></td>
+            <td><strong>{{ number_format($data['pricing'][0]->value,2) }}</strong></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td><strong>Klausa</strong></td>
+      <td>:</td>
+      <td></td>
+    </tr>
+    </table>
     <p style="font-size:10pt">
-    - Klausul 72 Jam; hanya untuk Gempa, Letusan Gunung Berapi dan Tsunami<br>
-    - Klausul Perubahan & Perbaikan; dalam 30 hari<br>
-    - Semua Klausul Konten Lainnya; IDR 10.000.000/item & agregat IDR 250.000.000<br>
-    - Klausul Penilaian; limit 5% dari Total Uang Pertanggungan<br>
-    - Biaya Arsitek, Surveyor, dan Engineer (5% dari Uang Pertanggungan)<br>
-    - Pengembalian Otomatis Klausul Uang Pertanggungan;<br>
-    - Klausul Bantuan Rata-rata; 85%<br>
-    - Tenda, Tirai, Tanda atau Perlengkapan Luar Ruangan Lainnya atau Klausul Pemasangan; batas Rp. 100.000.000,- a.o.a<br>
-    - Klausul Bankir; i.f.o PT BANK KB BUKOPIN, TBK.<br>
-    - Klausul Pembatalan (prorata); 30 hari<br>
-    - Klausul Otoritas Sipil;<br>
-    - Klausul Persiapan Klaim; Batasi 10% dari klaim<br>
-    - Klausul Catatan Komputer; Limit Rp100.000.000,-<br>
-    - Biaya Klausul Re-Erection; Batasi 10% dari klaim<br>
-    - Klausul Biaya Penulisan Ulang Catatan; Batasi 10% dari klaim<br>
-    - Klausul Mata Uang<br>
-    - Klausul Pengecualian Risiko Cyber ​​NMA 2915<br>
-    - Klausul Sengketa<br>
-    - Klausul Kesalahan & Kelalaian;<br>
-    - Klausul Pengecualian Kewajiban Kontrak Ekstra<br>
-    - Klausul Pengenalan Tanggal Elektronik<br>
-    - Klausul Retribusi Pemadam Kebakaran jika kurang dari Rp 50.000.000,- Tidak Perlu Tagihan<br>
-    - Klausul Biaya Pemadaman Kebakaran; Limit Rp 50.000.000,- a.o.a<br>
-    - Pengesahan Kerusakan Air Badai Angin Topan Banjir<br>
-    - Klausul Kepentingan Umum;<br>
-    - Dampak oleh Klausul Kendaraan Sendiri;<br>
-    - Klausul Penghapusan Internal;<br>
-    - Perjanjian Klarifikasi TI<br>
-    - Klausul Klarifikasi Bahaya Teknologi Informasi NMA 2912<br>
-    - Klausul Properti yang Disewakan<br>
-    - Klausul Pemberitahuan Kerugian; 30 hari<br>
-    - Perubahan Kecil dan Klausul Perbaikan;<br>
-    - Klausul Non Pembatalan<br>
-    - Klausul Pemberitahuan;<br>
-    - Klausul Pengecualian Risiko Energi Nuklir<br>
-    - Klausul Bangunan Luar;<br>
-    - Pembayaran Pada Klausul Rekening; 25% dari klaim yang diajukan oleh tertanggung<br>
-    - Klausul Klarifikasi Kerusakan Properti<br>
-    - Klausul Otoritas Publik;<br>
-    - Kerusuhan, Pemogokan, Kerusakan Berbahaya 4.1B/2007/AAUI Pengesahan; sesuai kata-kata DAI<br>
-    - Klausul Layanan<br>
-    - Klausul Kebocoran Sprinkler;<br>
-    - Klausul Perubahan Struktural;<br>
-    - Klausul Penghapusan Sementara;<br>
-    - Klausul Pengecualian Jalur Transmisi dan Distribusi<br>
-    - Pengesampingan Subrogasi; terhadap anak perusahaan saja<br>
-    - Klausul Pembayaran Garansi (30 hari)<br>
-    - Klausul Pekerja;<br>
-    - Klausul Pengecualian Perang dan Perang Saudara<br>
-    - Klausul Pengatur Kerugian yang Dinominasikan;<br>
+      - Klausul 72 Jam; hanya untuk Gempa, Letusan Gunung Berapi dan Tsunami<br>
+      - Klausul Perubahan & Perbaikan; dalam 30 hari<br>
+      - Semua Klausul Konten Lainnya; IDR 10.000.000/item & agregat IDR 250.000.000<br>
+      - Klausul Penilaian; limit 5% dari Total Uang Pertanggungan<br>
+      - Biaya Arsitek, Surveyor, dan Engineer (5% dari Uang Pertanggungan)<br>
+      - Pengembalian Otomatis Klausul Uang Pertanggungan;<br>
+      - Klausul Bantuan Rata-rata; 85%<br>
+      - Tenda, Tirai, Tanda atau Perlengkapan Luar Ruangan Lainnya atau Klausul Pemasangan; batas Rp. 100.000.000,- a.o.a<br>
+      - Klausul Bankir; i.f.o PT BANK KB BUKOPIN, TBK.<br>
+      - Klausul Pembatalan (prorata); 30 hari<br>
+      - Klausul Otoritas Sipil;<br>
+      - Klausul Persiapan Klaim; Batasi 10% dari klaim<br>
+      - Klausul Catatan Komputer; Limit Rp100.000.000,-<br>
+      - Biaya Klausul Re-Erection; Batasi 10% dari klaim<br>
+      - Klausul Biaya Penulisan Ulang Catatan; Batasi 10% dari klaim<br>
+      - Klausul Mata Uang<br>
+      - Klausul Pengecualian Risiko Cyber ​​NMA 2915<br>
+      - Klausul Sengketa<br>
+      - Klausul Kesalahan & Kelalaian;<br>
+      - Klausul Pengecualian Kewajiban Kontrak Ekstra<br>
+      - Klausul Pengenalan Tanggal Elektronik<br>
+      - Klausul Retribusi Pemadam Kebakaran jika kurang dari Rp 50.000.000,- Tidak Perlu Tagihan<br>
+      - Klausul Biaya Pemadaman Kebakaran; Limit Rp 50.000.000,- a.o.a<br>
+      - Pengesahan Kerusakan Air Badai Angin Topan Banjir<br>
+      - Klausul Kepentingan Umum;<br>
+      - Dampak oleh Klausul Kendaraan Sendiri;<br>
+      - Klausul Penghapusan Internal;<br>
+      - Perjanjian Klarifikasi TI<br>
+      - Klausul Klarifikasi Bahaya Teknologi Informasi NMA 2912<br>
+      - Klausul Properti yang Disewakan<br>
+      - Klausul Pemberitahuan Kerugian; 30 hari<br>
+      - Perubahan Kecil dan Klausul Perbaikan;<br>
+      - Klausul Non Pembatalan<br>
+      - Klausul Pemberitahuan;<br>
+      - Klausul Pengecualian Risiko Energi Nuklir<br>
+      - Klausul Bangunan Luar;<br>
+      - Pembayaran Pada Klausul Rekening; 25% dari klaim yang diajukan oleh tertanggung<br>
+      - Klausul Klarifikasi Kerusakan Properti<br>
+      - Klausul Otoritas Publik;<br>
+      - Kerusuhan, Pemogokan, Kerusakan Berbahaya 4.1B/2007/AAUI Pengesahan; sesuai kata-kata DAI<br>
+      - Klausul Layanan<br>
+      - Klausul Kebocoran Sprinkler;<br>
+      - Klausul Perubahan Struktural;<br>
+      - Klausul Penghapusan Sementara;<br>
+      - Klausul Pengecualian Jalur Transmisi dan Distribusi<br>
+      - Pengesampingan Subrogasi; terhadap anak perusahaan saja<br>
+      - Klausul Pembayaran Garansi (30 hari)<br>
+      - Klausul Pekerja;<br>
+      - Klausul Pengecualian Perang dan Perang Saudara<br>
+      - Klausul Pengatur Kerugian yang Dinominasikan;<br>
       PT. Bahtera Arung Persada<br>
       PT. Radhita Hutama Internusa<br>
       PT. Bahtera Arung Persada<br>
       PT. Penyetel Primayasa Vaisha<br>
-    - Pengecualian Terorisme & Sabotase Pengesahan NMA 2920
+      - Pengecualian Terorisme & Sabotase Pengesahan NMA 2920
     </p>
     <table style="font-size: 10pt">
       <tr valign="top">
@@ -330,4 +366,5 @@
     </div> --}}
   </main>
 </body>
+
 </html>

@@ -186,6 +186,8 @@ return [
 
         App\Providers\FunctionsServiceProvider::class,
 
+        Barryvdh\DomPDF\ServiceProvider::class,
+
     ],
 
     /*
@@ -241,6 +243,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         'FunctionsHelp' => App\Helpers\Functions::class,
+        'PDF' => Barryvdh\DomPDF\Facade::class,
 
     ],
 

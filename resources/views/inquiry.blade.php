@@ -43,25 +43,32 @@
                                     <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ubah
                                 </a>
-                            @endrole
-                            @role('ao|checker|adm')
-                                <a 
-                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ajukan
                                 </a>
-                                <a 
-                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
+                                </a>
+                                <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-9"
+                                    style="cursor:pointer">
+                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Perpanjang
                                 </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
                                     style="cursor:pointer">
                                     <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Batal Mengajukan
+                                </a>
+                                <a id="ps-hapus"
+                                    class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                    style="cursor:pointer">
+                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Hapus
                                 </a>
                             @endrole
                             @role('approver|adm')
@@ -79,20 +86,17 @@
                                 </a>
                             @endrole
                             @role('broker|adm')
-                                <a
-                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Verifikasi
                                 </a>
-                                <a
-                                    class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
+                                <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
                                     style="cursor:pointer">
                                     <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Input Pembayaran
                                 </a>
-                                <a
-                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-8"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-8"
                                     style="cursor:pointer">
                                     <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Cek Polis
@@ -105,14 +109,12 @@
                                 </a>
                             @endrole
                             @role('insurance|adm')
-                                <a 
-                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
-                                <a 
-                                    class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
+                                <a class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
                                     style="cursor:pointer">
                                     <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Upload E-Polis
@@ -123,14 +125,6 @@
                                     <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
                                 </a>
-                            @endrole
-                            @role('ao|checker|adm')
-                            <a id="ps-hapus"
-                                class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
-                                style="cursor:pointer">
-                                <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                Hapus
-                            </a>
                             @endrole
                         </div>
                         @role('checker|ao|broker|adm')
@@ -451,6 +445,13 @@
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[0];
                 $('#frm-method').val('approve');
+                $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
+            });
+
+            $('.ps-renewal').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[0];
+                $('#frm-method').val('renewal');
                 $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
             });
             

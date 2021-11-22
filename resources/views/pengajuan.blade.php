@@ -57,14 +57,6 @@
                     <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
                 @endrole
             @endif
-            @if (empty($method) && !empty($data))
-                @if ($data->id_status == 1)
-                @role('approver')
-                    <button class="btn btn-sm btn-success btn-approve">Setujui</button>
-                    <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
-                @endrole
-                @endif
-            @endif
         </h2>
     </div>
     <div class="grid grid-cols-12 gap-6 mt-5">
@@ -181,7 +173,7 @@
                                 <input type="hidden" name="npwp_insured" @if (!empty($data->npwp_insured)) value="{{ $data->npwp_insured }}" @endif>
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="nohp_insured" class="form-label sm:w-20">No. HP Tertanggung</label>
+                                <label for="nohp_insured" class="form-label sm:w-20">Kontak Tertanggung</label>
                                 <div class="input-group w-full">
                                     <div class="input-group-text">+62</div>
                                     <input type="text" class="form-control" name="nohp_insured" id="nohp_insured"

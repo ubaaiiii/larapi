@@ -10,7 +10,7 @@
   </style>
 </head>
 <body>
-  <header>Header Asuransi</header>
+  <header><img src="{{ url('public/dist/images/Header') }}/Header-KB.jpg"></header>
   <footer>Footer Asuransi</footer>
   <main>
     <table>
