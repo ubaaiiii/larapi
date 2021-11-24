@@ -127,6 +127,7 @@ class CetakController extends Controller
                         ->where('transaksi_pricing.value','<>',0)
                         ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
                 ];
+                // dd($data['pricing']);
                 $data['covernote'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen)."/CN/".$data['asuransi']->akronim."/".Functions::angka_romawi(date('m'))."/".date('Y');
                 $transaksi->update(['cover_note'=>$data['covernote']]);
                 $parameter = [
@@ -147,8 +148,8 @@ class CetakController extends Controller
                 // return $pdf->download('pdf_file.pdf');
 
                 // Streaming PDF, not saved on local
-                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
-                exit(0);
+                // return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                // exit(0);
 
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();

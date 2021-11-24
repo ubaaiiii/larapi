@@ -240,8 +240,8 @@
                                 <input type="hidden" name="kjpp_end" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="agunan_kjpp" class="form-label sm:w-20">Nilai Agunan KJPP</label>
-                                <input type="text" class="form-control allow-decimal currency masked" placeholder="Nilai Agunan KJPP"
+                                <label for="agunan_kjpp" class="form-label sm:w-20">Nilai Pasar KJPP</label>
+                                <input type="text" class="form-control allow-decimal currency masked" placeholder="Nilai Pasar KJPP"
                                 id="agunan_kjpp" value="@if (!empty($data->agunan_kjpp)){{ $data->agunan_kjpp }}@endif">
                                 <input type="hidden" name="agunan_kjpp" @if (!empty($data->agunan_kjpp)) value="{{ $data->agunan_kjpp }}" @endif>
                             </div>

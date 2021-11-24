@@ -123,9 +123,9 @@
       <tr>
         <td></td>
         <td></td>
-        <td>Biaya Materai + Admin + Polis</td>
+        <td>Biaya Materai + Polis</td>
         <td align="right">= Rp.</td>
-        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][9]->value+$data['pricing'][10]->value+$data['pricing'][11]->value,2) }}</td>
+        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][9]->value+$data['pricing'][10]->value,2) }}</td>
         <td>+</td>
       </tr>
       <tr>
@@ -133,7 +133,7 @@
         <td></td>
         <td>Total Premi</td>
         <td align="right">= Rp.</td>
-        <td align="right">{{ number_format($data['pricing'][18]->value,2) }}</td>
+        <td align="right">{{ number_format($data['pricing'][17]->value,2) }}</td>
         <td></td>
       </tr>
     </table>
