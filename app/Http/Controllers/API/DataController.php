@@ -303,6 +303,7 @@ class DataController extends Controller
             'sts.msdesc as statusnya',
             'cabang.nama_cabang as cabang',
             'cabang.alamat_cabang',
+            'docs.lokasi_file'
         ];
 
         $table = DB::table("transaksi")->whereNull('transaksi.deleted_at');
@@ -501,6 +502,7 @@ class DataController extends Controller
             ['asuransi', 'id_asuransi = asuransi.id'],
             ['masters as sts', ['id_status = sts.msid', "sts.mstype = status"]],
             ['cabang', 'id_cabang = cabang.id'],
+            ['documents as docs', ['transid = docs.id_transaksi', 'docs.jenis_file = COVERNOTE']],
             ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
@@ -516,7 +518,7 @@ class DataController extends Controller
             $nestedData[] = $row->cabang;
             $nestedData[] = $row->tertanggung;
             $nestedData[] = $row->policy_no;
-            $nestedData[] = $row->cover_note;
+            $nestedData[] = "<a href='$row->lokasi_file' target='covernote'>$row->cover_note</a>";
             $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
             $nestedData[] = $row->tgl_dibuat;
             $nestedData[] = number_format($row->tsi, 2);
@@ -761,6 +763,7 @@ class DataController extends Controller
 
         $data = array();
         foreach ($query[0] as $row) {
+            dd(explode(",", $row->visible_by));
             if (!empty($row->visible_by) && !in_array($role,explode(",",$row->visible_by))) {
                 continue;
             }
