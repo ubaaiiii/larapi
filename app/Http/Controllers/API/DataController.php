@@ -539,6 +539,272 @@ class DataController extends Controller
             "sql"             => $query[3]
         ], 200);
     }
+    
+    public function dataPembayaran(Request $request)
+    {
+        // sorting column datatables
+        $columns = [
+            'transid',
+            'nama_asuransi',
+            'instype_name',
+            'cabang.nama_cabang',
+            'insured.nama_insured',
+            'policy_no',
+            'cover_note',
+            'polis_start',
+            'transaksi.created_at',
+            'tsi.value',
+            'premi.value',
+            'sts.msdesc',
+        ];
+
+        $select = [
+            'transaksi.*',
+            'nama_asuransi',
+            'instype_name',
+            'insured.nama_insured as tertanggung',
+            'transaksi.created_at as tgl_dibuat',
+            'tsi.value as tsi',
+            'premi.value as premi',
+            'sts.msdesc as statusnya',
+            'cabang.nama_cabang as cabang',
+            'cabang.alamat_cabang',
+            'docs.lokasi_file'
+        ];
+
+        $table = DB::table("transaksi")->whereNull('transaksi.deleted_at');
+
+        $user = Auth::user()->getRoleNames()[0];
+        switch ($user) {
+            case 'ao':
+                $table->where('transaksi.created_by', Auth::user()->id);
+                break;
+
+            case 'checker':
+                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                break;
+
+            case 'approver':
+                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                break;
+                
+            case 'broker':
+                // wherenya broker
+                break;
+
+            case 'insurance':
+                $table->where('transaksi.id_asuransi', Auth::user()->id_asuransi);
+                break;
+
+            case 'finance':
+                // wherenya finance
+                break;
+
+            case 'adm':
+                // wherenya administrator
+                break;
+
+            default:
+                return redirect()->route('logout');
+                break;
+        }
+
+        if (!empty($request->data)) {
+            switch ($request->data) {
+                case 'pengajuan':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "0");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "0");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "1");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "2");
+                            break;
+
+                        case 'insurance':
+                            $table->where('id_status', "3");
+                            break;
+
+                        case 'finance':
+                            
+                            break;
+
+                        case 'adm':
+                            
+                            break;
+
+                        default:
+                            return redirect()->route('logout');
+                            break;
+                    }
+                    break;
+
+                case 'approval':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "4");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "4");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "4");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "5");
+                            break;
+
+                        case 'insurance':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'finance':
+                            $table->where('id_status', "5");
+                            break;
+
+                        case 'adm':
+                            // wherenya administrator
+                            break;
+                    }
+                    break;
+
+                case 'dibayar':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "8");
+                            break;
+
+                        case 'insurance':
+                            $table->where('id_status', "7");
+                            break;
+
+                        case 'finance':
+                            $table->leftJoin('activities pmby', function ($q) use ($user) {
+                                $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                                ->where('pmby.id_status', '=', "9");
+                            });
+                            $table->whereNull('pmby.id_transaksi');
+                            $table->whereIn('transaksi.id_status', ["8","10"]);
+                            break;
+
+                        case 'adm':
+                            // wherenya administrator
+                            break;
+
+                        default:
+                            return redirect()->route('logout');
+                            break;
+                    }
+                    break;
+
+                case 'polis siap':
+                    switch ($user) {
+                        case 'ao':
+                            $table->where('id_status', "10");
+                            break;
+
+                        case 'checker':
+                            $table->where('id_status', "10");
+                            break;
+
+                        case 'approver':
+                            $table->where('id_status', "10");
+                            break;
+
+                        case 'broker':
+                            $table->where('id_status', "10");
+                            break;
+
+                        case 'insurance':
+                            $table->whereIn('id_status', [8,9,10]);
+                            break;
+
+                        case 'finance':
+                            $table->where('id_status', "10");
+                            break;
+
+                        case 'adm':
+                            // wherenya administrator
+                            break;
+
+                        default:
+                            return redirect()->route('logout');
+                            break;
+                    }
+                    break;
+
+                default:
+                    return redirect()->route('logout');
+                    break;
+            }
+        }
+
+        $joins = [
+            ['insured', 'id_insured = insured.id'],
+            ['instype', 'id_instype = instype.id'],
+            ['asuransi', 'id_asuransi = asuransi.id'],
+            ['masters as sts', ['id_status = sts.msid', "sts.mstype = status"]],
+            ['cabang', 'id_cabang = cabang.id'],
+            ['documents as docs', ['transid = docs.id_transaksi', 'docs.jenis_file = COVERNOTE']],
+            ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+            ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+        ];
+
+        $query = $this->generateQuery($request, $table, $columns, $select, $joins);
+
+        $data = array();
+        foreach ($query[0] as $row) {
+            $nestedData = array();
+            $nestedData[] = $row->transid;
+            $nestedData[] = $row->nama_asuransi;
+            $nestedData[] = $row->instype_name;
+            $nestedData[] = $row->cabang;
+            $nestedData[] = $row->tertanggung;
+            $nestedData[] = $row->policy_no;
+            $nestedData[] = "<a href='$row->lokasi_file' target='covernote'>$row->cover_note</a>";
+            $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
+            $nestedData[] = $row->tgl_dibuat;
+            $nestedData[] = number_format($row->tsi, 2);
+            $nestedData[] = number_format($row->premi, 2);
+            $nestedData[] = $row->statusnya;
+
+            // hidden
+            $nestedData[] = $row->id_status;
+
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            "draw"            => intval($request->draw),
+            "recordsTotal"    => intval($query[1]),
+            "recordsFiltered" => intval($query[2]),
+            "data"            => $data,
+            "sql"             => $query[3]
+        ], 200);
+    }
 
     public function dataBelumDibayar(Request $request)
     {
