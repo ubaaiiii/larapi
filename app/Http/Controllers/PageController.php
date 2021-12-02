@@ -31,7 +31,7 @@ class PageController extends Controller
     function profile()
     {
         $data = [
-            'cabang'    => Cabang::all(),
+            'cabang'    => Cabang::withTrashed()->get(),
             'level'     => Master::where('mstype', 'level')->get(),
             'parent'    => User::all(),
         ];

@@ -45,6 +45,7 @@
                     <form id="frm-data">
                         @csrf
                         <input type="hidden" name="id" value="{{ Auth::user()->id }}">
+                        <input type="hidden" name="method" value="update">
                         <div class="flex flex-col-reverse xl:flex-row flex-col">
                             <div class="flex-1 mt-6 xl:mt-0">
                                 <div class="grid grid-cols-12 gap-x-5">
@@ -130,7 +131,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-primary w-20 mt-3">Simpan</button>
+                                <button type="submit" class="btn btn-primary w-20 mt-3">Simpan</button>
                             </div>
                         </div>
                     </form>
@@ -145,28 +146,40 @@
                     </h2>
                 </div>
                 <div class="p-5">
-                    <div class="grid grid-cols-12 gap-x-5">
-                        <div class="col-span-12 xl:col-span-6">
-                            <div>
-                                <label for="update-profile-form-6" class="form-label">Katasandi Lama</label>
-                                <input id="update-profile-form-6" type="password" class="form-control"
-                                    placeholder="Katasandi Lama">
-                            </div>
-                            <div class="mt-3">
-                                <label for="update-profile-form-7" class="form-label">Katasandi Baru</label>
-                                <input id="update-profile-form-7" type="password" class="form-control"
-                                    placeholder="Katasandi Baru">
-                            </div>
-                            <div class="mt-3">
-                                <label for="update-profile-form-7" class="form-label">Ulangi Katasandi Baru</label>
-                                <input id="update-profile-form-7" type="password" class="form-control"
-                                    placeholder="Ulangi Katasandi Baru">
+                    <form id="frm-password">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ Auth::user()->id }}">
+                        <input type="hidden" name="method" value="update">
+                        <input type="checkbox" name="update_pw" checked hidden>
+                        <div class="grid grid-cols-12 gap-x-5">
+                            <div class="col-span-12 xl:col-span-6">
+                                <div>
+                                    <label for="update-profile-form-6" class="form-label">Katasandi Lama</label>
+                                    <div class="input-group">
+                                        <input id="update-profile-form-6" name="old_password" type="password" class="form-control" required placeholder="Katasandi Lama">
+                                        <div class="input-group-text"><button tabindex="-1" type="button" class="form-control toggle-password"><i class="fa fa-eye"></i></button></div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <label for="update-profile-form-7" class="form-label">Katasandi Baru</label>
+                                    <div class="input-group">
+                                        <input id="update-profile-form-7" name="new_password" type="password" class="form-control" required placeholder="Katasandi Baru">
+                                        <div class="input-group-text"><button tabindex="-1" type="button" class="form-control toggle-password"><i class="fa fa-eye"></i></button></div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <label for="update-profile-form-7" class="form-label">Ulangi Katasandi Baru</label>
+                                    <div class="input-group">
+                                        <input id="update-profile-form-7" name="new_password_1" type="password" class="form-control" required placeholder="Ulangi Katasandi Baru">
+                                        <div class="input-group-text"><button tabindex="-1" type="button" class="form-control toggle-password"><i class="fa fa-eye"></i></button></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex justify-end mt-4">
-                        <button type="button" class="btn btn-primary w-20 mr-auto">Simpan</button>
-                    </div>
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" class="btn btn-primary w-20 mr-auto">Simpan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <!-- END: Personal Information -->
@@ -177,13 +190,119 @@
 @section('script')
     <script>
         $(document).ready(function() {
+
+            $('.toggle-password').click(function(){
+                var icon = $(this).children('i');
+                icon.toggleClass('fa-eye fa-eye-slash');
+
+                if (icon.attr('class').indexOf("slash") >= 0) {
+                    var tipe = "text";
+                } else {
+                    var tipe = "password";
+                }
+
+                $(this).parent().parent().find('input').attr('type',tipe);
+            });
+
             $('.link-profile').click(function() {
                 $('.link-profile').removeClass('text-theme-1 dark:text-theme-10 font-medium');
                 $(this).addClass('text-theme-1 dark:text-theme-10 font-medium');
 
                 $('.card-profile').css('display', 'none');
                 $($(this).attr('data-target')).removeAttr('style');
-            })
+            });
+
+            $('#frm-data').submit(function(e){
+                e.preventDefault();
+                var data = $(this).serializeArray();
+                console.log('data',data);
+                $.ajax({
+                    type: "post",
+                    url: "{{ url('api/user') }}",
+                    data: data,
+                    success: function (d) {
+                        console.log('d',d);
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        ).then(function() {
+                            Swal.fire(
+                                'Perhatian',
+                                'Halaman web akan direfresh untuk memperbaharui data',
+                                'info'
+                            ).then(function() {
+                                location.reload(true);
+                            });
+                        });
+                    },
+                    error: function (d) {
+                        var message = "";
+                        $.each(d.responseJSON.errors, function (i, v) { 
+                             $.each(v, function (n, m) { 
+                                  $.each(m, function (o, p) { 
+                                       message += p+"<br>";
+                                  });
+                             });
+                        });
+                        Swal.fire(
+                            'Gagal!',
+                            message,
+                            'error'
+                        );
+                    },
+                });
+            });
+
+            $('#frm-password').submit(function(e){
+                e.preventDefault();
+                var data = $(this).serializeArray();
+                if (data[5].value !== data[6].value) {
+                    Swal.fire(
+                        'Gagal!',
+                        'Katasandi baru tidak sama',
+                        'error'
+                    );
+                } else {
+                    data['update_pw'] = true;
+                    $.ajax({
+                        type: "post",
+                        url: "{{ url('api/user') }}",
+                        data: data,
+                        success: function (d) {
+                            console.log('d',d);
+                            Swal.fire(
+                                'Berhasil!',
+                                d.message,
+                                'success'
+                            ).then(function() {
+                                Swal.fire(
+                                    'Perhatian',
+                                    'Harap melakukan login kembali untuk melihat perubahan',
+                                    'info'
+                                ).then(function() {
+                                    location.href="{{ url('logout') }}";
+                                })
+                            });
+                        },
+                        error: function (d) {
+                            var message = "";
+                            $.each(d.responseJSON.errors, function (i, v) { 
+                                 $.each(v, function (n, m) { 
+                                      $.each(m, function (o, p) { 
+                                           message += p+"<br>";
+                                      });
+                                 });
+                            });
+                            Swal.fire(
+                                'Gagal!',
+                                message,
+                                'error'
+                            )
+                        },
+                    });
+                }
+            });
         });
     </script>
 @endsection

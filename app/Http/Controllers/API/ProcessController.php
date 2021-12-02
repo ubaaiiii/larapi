@@ -21,7 +21,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class ProcessController extends Controller
 {
@@ -34,7 +33,7 @@ class ProcessController extends Controller
 
     public function user(Request $request)
     {
-        // return $request->all();
+        $role   = Auth::user()->getRoleNames()[0];
         switch ($request->method) {
             case 'create':
                 $request->validate([
@@ -77,32 +76,86 @@ class ProcessController extends Controller
                 $user = User::find($request->id);
 
                 $request->validate([
-                    'name'          => 'required|string|max:60',
-                    'username'      => 'required|unique:users|alpha_dash|max:16',
-                    'email'         => 'required|email',
-                    'notelp'        => 'required|regex:/(0)[0-9]{9}/',
-                    'password'      => 'required|alpha_dash',
-                    'id_cabang'     => 'required|numeric',
-                    'id_parent'     => 'required|numeric',
-                    'id_asuransi'   => 'nullable|numeric',
+                    'name'          => 'string|max:60',
+                    'username'      => 'alpha_dash|max:16',
+                    'email'         => 'email',
+                    'notelp'        => 'numeric',
+                    'old_password'  => 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
+                    'new_password'  => 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
+                    'id_cabang'     => 'numeric',
+                    'id_parent'     => 'numeric',
+                    'id_asuransi'   => 'numeric',
                 ]);
 
-                $user = $user->update([
-                    'name'          => $request->name,
-                    'username'      => $request->username,
-                    'email'         => $request->email,
-                    'notelp'        => $request->notelp,
-                    'password'      => Hash::make($request->password),
-                    'unpass'        => $request->password,
-                    'id_cabang'     => $request->id_cabang,
-                    'id_parent'     => $request->id_parent,
-                    'id_asuransi'   => 'nullable|numeric',
-                ]);
+                $errors = [];
+                $ada_error = false;
 
-                $user->syncRoles($request->level);
+                if ($request->username !== $user->username) {
+                    $cekUsername = User::where('username',$request->username)->get();
+                    if ($cekUsername->count() > 0) {
+                        $ada_error = true;
+                        $errors[] = [
+                            'username'  => [
+                                'Username ' . $request->username . ' telah digunakan, harap menggunakan username lain',
+                                ]
+                            ];
+                    }
+                }
+                
+                if ($request->email !== $user->email) {
+                    $cekemail = User::where('email',$request->email)->get();
+                    if ($cekemail->count() > 0) {
+                        $ada_error = true;
+                        $errors[] = [
+                            'email'  => [
+                                'email ' . $request->email . ' telah digunakan, harap menggunakan email lain',
+                                ]
+                        ];
+                    }
+                }
+                
+                $dataUpdate = [];
+                
+                if ($request->update_pw === "on") {
+                    if ($user->unpass !== $request->old_password) {
+                        $ada_error = true;
+                        $errors[] = [
+                            'password'  => [
+                                'Katasandi lama tidak sesuai',
+                            ]
+                        ];
+                    }
+                    $dataUpdate = [
+                        'password'      => Hash::make($request->new_password),
+                        'unpass'        => $request->new_password,
+                    ];
+                } else {
+                    $dataUpdate = [
+                        'name'          => $request->name,
+                        'username'      => $request->username,
+                        'email'         => $request->email,
+                        'notelp'        => $request->notelp,
+                    ];
+                    
+                    if (in_array($role,['admin','broker'])) {
+                        array_merge($dataUpdate, [
+                            'id_cabang'     => $request->id_cabang,
+                            'id_parent'     => $request->id_parent,
+                            'id_asuransi'   => 'numeric',
+                        ]);
+                    }
+                }
 
-                // $student = Student::where('id', $student->id)->first();
-
+                if ($ada_error) {
+                    return response()->json(['errors' => $errors], 422);
+                }
+                
+                $user = $user->update($dataUpdate);
+                
+                if (!empty($request->level)) {
+                    $user->syncRoles($request->level);
+                }
+                
                 return response()->json([
                     'message'   => 'User ' . $request->name . ' Berhasil Diubah',
                     'data'      => $user,
@@ -133,6 +186,7 @@ class ProcessController extends Controller
 
     public function dokumen(Request $request, $jenis_file = null)
     {
+        $role   = Auth::user()->getRoleNames()[0];
         switch ($request->method) {
             case 'store':
                 $request->validate([
@@ -177,7 +231,6 @@ class ProcessController extends Controller
             case 'delete':
                 DB::enableQueryLog();
                 $data   = Document::find($request->id);
-                $role   = Auth::user()->getRoleNames()[0];
                 if ($data->jenis_file == "POLIS" || $data->jenis_file == 'COVERNOTE') {
                     if ($role !== 'insurance') {
                         return response()->json([
@@ -875,5 +928,10 @@ class ProcessController extends Controller
         }
 
         return $cabang;
+    }
+
+    public function profil(Request $request)
+    {
+        return $request->all();
     }
 }
