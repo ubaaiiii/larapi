@@ -57,17 +57,10 @@
   <main>
     <table>
       <tr>
-        <td align="center" style="font-size:20"><strong>COVER NOTE</strong></td>
+        <td align="center" style="font-size:20"><strong>PLACING SLIP</strong></td>
       </tr>
       <tr>
-        <td align="center" style="font-size:12"><strong><u>{{ $data['covernote']; }}</strong></u></td>
-      </tr>
-      <tr>
-        <?php
-        $date = date_create($data['tgl_aktif']->created_at);
-        date_add($date, date_interval_create_from_date_string("30 days"));
-        ?>
-        <td align="center" style="font-size:8; border-bottom: 1px solid black !important;">*Masa berlaku Cover Note ini 30 hari dari tanggal persetujuan asuransi<br>menunggu pembayaran hingga {{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }}</td>
+        <td align="center" style="font-size:8; border-bottom: 1px solid black !important;"></td>
       </tr>
     </table>
     <table style="font-size:10pt" class="main" CELLSPACING=0>
@@ -309,11 +302,13 @@
     <table style="font-size: 10pt">
       <tr>
         <td width="70%"></td>
-        <td align="center">JAKARTA, {{ FunctionsHelp::tgl_indo($data['tgl_aktif']->created_at->format('Y-m-d')) }}</td>
+        <td align="center">JAKARTA, ____________________</td>
       </tr>
       <tr>
         <td></td>
-        <td align="center"><img src="data:image/png;base64, {!! $qrcode !!}"></td>
+        <td align="center">
+          <br><br><br><br><br><br><br><br>
+        </td>
       </tr>
       <tr>
         <td></td>

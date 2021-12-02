@@ -49,6 +49,7 @@
                 @endrole
                 @role('insurance')
                     <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                    <button class="btn btn-sm btn-success" onclick="location.href='{{}} ">Placing</button>
                     <?php 
                         $status_rollback = "DIVERIFIKASI";
                     ?>
@@ -622,8 +623,8 @@
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
                     success: function(d) {
-                        console.log(d);
-                        console.log('id:',id);
+                        // console.log(d);
+                        // console.log('id:',id);
                         Swal.fire(
                             'Berhasil!',
                             d.message,

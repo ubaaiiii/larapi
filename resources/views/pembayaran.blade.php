@@ -148,13 +148,13 @@
             <div class="w-56 relative text-gray-700 dark:text-gray-300">
                 <input type="text" id="filterSearch" class="form-control w-56 box pr-10 placeholder-theme-13"
                     placeholder="Search..." value="{{ (empty($_GET['q'])) ? $qsearch : $_GET['q'] }}">
-                <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-feather="search"></i>
+                <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-feather="search" onclick="reloadTable()"></i>
             </div>
         </div>
     </div>
     <!-- BEGIN: Data List -->
     <div class="intro-y col-span-12 overflow-auto lg:overflow-auto">
-        <table id="tb-inquiry" class="hover table mt-2 table-report table-report--tabulator">
+        <table id="tb-pembayaran" class="hover table mt-2 table-report table-report--tabulator">
             <thead>
                 <tr>
                     <th class="whitespace-nowrap">No. App</th>
@@ -162,13 +162,12 @@
                     <th class="whitespace-nowrap">Tipe Asuransi</th>
                     <th class="whitespace-nowrap">Cabang</th>
                     <th class="whitespace-nowrap">Tertanggung</th>
-                    <th class="whitespace-nowrap">No. Polis</th>
-                    <th class="whitespace-nowrap">Cover Note</th>
-                    <th class="whitespace-nowrap">Periode Polis</th>
-                    <th class="whitespace-nowrap">Tanggal Dibuat</th>
-                    <th class="whitespace-nowrap">Nilai Pertanggungan</th>
-                    <th class="whitespace-nowrap">Premium</th>
-                    <th class="whitespace-nowrap">Status</th>
+                    <th class="whitespace-nowrap">D/C</th>
+                    <th class="whitespace-nowrap">Nominal</th>
+                    <th class="whitespace-nowrap">Tgl Bayar</th>
+                    <th class="whitespace-nowrap">Oleh</th>
+                    <th class="whitespace-nowrap">Deskripsi</th>
+                    <th class="whitespace-nowrap">Tombol</th>
                 </tr>
             </thead>
             <tbody>
@@ -236,60 +235,9 @@
     </div>
 </div>
 
-<div id="modal-polis" class="modal" data-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <!-- BEGIN: Modal Header -->
-            <form id="frm-polis">
-                @csrf
-                <div class="modal-header">
-                    <h2 class="font-medium text-base mr-auto">
-                        Input Polis
-                    </h2>
-                </div>
-                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
-                    <div class="col-span-12 sm:col-span-6">
-                        <label for="transid" class="form-label">Nomor Transaksi</label>
-                        <input id="transid" type="text" class="form-control" readonly>
-                        <input type="hidden" name="transid" readonly>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6">
-                        <label for="nama_insured" class="form-label">Nama Tertanggung</label>
-                        <input id="nama_insured" name="nama_insured" type="text" class="form-control" readonly>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6">
-                        <label for="cover_note" class="form-label">Cover Note</label>
-                        <input id="cover_note" name="cover_note" type="text" class="form-control" readonly>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6">
-                        <label for="nopolis" class="form-label">Nomor Polis</label>
-                        <input id="nopolis" required name="nopolis" type="text" class="form-control">
-                    </div>
-                    <div class="col-span-12 sm:col-span-6">
-                        <label for="e-polis" class="form-label">Upload E-Polis</label>
-                        <input id="e-polis" type="file" name="polis" class="form-control" accept="application/pdf"
-                            required>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6">
-                        <label for="invoice" class="form-label">Upload Invoice</label>
-                        <input id="invoice" type="file" name="invoice" class="form-control" accept="application/pdf"
-                            required>
-                    </div>
-                </div>
-                <!-- END: Modal Body -->
-                <!-- BEGIN: Modal Footer -->
-                <div class="modal-footer text-right">
-                    <button type="button" data-dismiss="modal"
-                        class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
-                    <button type="submit" class="btn btn-primary w-20">Send</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <div id="modal-import" class="modal" tabindex="-1" data-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog modal-xl" style="width: 1300px !important">
-        <div class="modal-content">
+    <div class="modal-dialog modal-xl">
+    <div class="modal-content">
             <!-- BEGIN: Modal Header -->
             <div class="modal-header">
                 <h2 class="font-medium text-base mr-auto">
@@ -298,7 +246,7 @@
                 <form id="frm-import">
                     @csrf
                     <div class="input-group mt-2">
-                        <input type="file" class="form-control" name="file-import" aria-describedby="file-import">
+                        <input id="file-import" type="file" class="form-control" name="file-import" aria-describedby="file-import">
                         <button class="btn btn-outline-primary input-group-text">
                             <i data-feather="upload" class="w-4 h-4 mr-2"></i>Upload
                         </button>
@@ -307,24 +255,26 @@
             </div>
             <!-- END: Modal Header -->
             <!-- BEGIN: Modal Body -->
-            <div class="modal-body overflow-auto">
-                <table id="tb-import" class="hover table mt-2 table-report table-report--tabulator whitespace-nowrap">
-                    <thead>
-                        <tr>
-                            <th class="whitespace-nowrap">Import</th>
-                            <th class="whitespace-nowrap">No.</th>
-                            <th class="whitespace-nowrap">Tgl Bayar</th>
-                            <th class="whitespace-nowrap">ID Transaksi</th>
-                            <th class="whitespace-nowrap">Tertanggung</th>
-                            <th class="whitespace-nowrap">Debit</th>
-                            <th class="whitespace-nowrap">Credit</th>
-                            <th class="whitespace-nowrap">Saldo</th>
-                            <th class="whitespace-nowrap">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+            <div class="modal-body">
+                <div class="overflow-auto">
+                    <table id="tb-import" class="hover table mt-2 table-report table-report--tabulator whitespace-nowrap">
+                        <thead>
+                            <tr>
+                                <th class="whitespace-nowrap">Import</th>
+                                <th class="whitespace-nowrap">No.</th>
+                                <th class="whitespace-nowrap">Tgl Bayar</th>
+                                <th class="whitespace-nowrap">ID Transaksi</th>
+                                <th class="whitespace-nowrap">Tertanggung</th>
+                                <th class="whitespace-nowrap">Debit</th>
+                                <th class="whitespace-nowrap">Credit</th>
+                                <th class="whitespace-nowrap">Saldo</th>
+                                <th class="whitespace-nowrap">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <!-- BEGIN: Pagination -->
             <div class="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
@@ -337,7 +287,7 @@
             <div class="modal-footer text-right">
                 <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1"
                     onclick="tutupModal('modal-import')">Batal</button>
-                <button type="button" class="btn btn-primary w-20">Import</button>
+                <button id="btn-import" type="button" class="btn btn-primary w-20">Import</button>
             </div>
             <!-- END: Modal Footer -->
         </div>
@@ -355,19 +305,19 @@
 <script>
     function reloadTable()
     {
-            $('#tb-inquiry').DataTable().ajax.reload();
+            $('#tb-pembayaran').DataTable().ajax.reload();
         }
 
         function changelen() {
-            $('#tb-inquiry').DataTable().page.len($('#filterlength').val()).draw();
+            $('#tb-pembayaran').DataTable().page.len($('#filterlength').val()).draw();
         }
 
         function tutupModal(id) {
-            $('#'+id).find('form')[0].reset
+            $('#'+id).find('form')[0].reset();
         }
 
         $(document).ready(function() {
-            var tablenya = $('#tb-inquiry').DataTable({
+            var tablenya = $('#tb-pembayaran').DataTable({
                 "dom": "Bti",
                 "select": "single",
                 "processing": true,
@@ -399,7 +349,7 @@
                     },
                     {
                         "bSortable": true,
-                        "className": "border-b",
+                        "className": "border-b text-right",
                     },
                     {
                         "bSortable": true,
@@ -411,23 +361,14 @@
                     },
                     {
                         "bSortable": true,
-                        "className": "border-b text-right"
+                        "className": "border-b"
                     },
                     {
-                        "bSortable": true,
-                        "className": "border-b text-right"
-                    },
-                    {
-                        "bSortable": true,
-                        "className": "border-b",
-                    },
-                    {
-                        "visible": false,
-                        "className": "border-b",
+                        "visible": false
                     },
                 ],
                 "ajax": {
-                    url: "{{ url('api/datatransaksi') }}",
+                    url: "{{ url('api/datapembayaran') }}",
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
@@ -485,12 +426,12 @@
                     gotoPage($(this),tablenya);
                 });
 
-                $('#tb-inquiry > tbody > tr').each(function() {
+                $('#tb-pembayaran > tbody > tr').each(function() {
                     $(this).addClass('dark:hover:bg-dark-2');
                 });
             });
 
-            $('#tb-inquiry').on('click', 'tbody > tr', function() {
+            $('#tb-pembayaran').on('click', 'tbody > tr', function() {
                 setTimeout(() => {
                     if ($('.selected')[0]) {
                         $('.dropdown-toggle').attr('disabled', false);
@@ -669,13 +610,64 @@
                 });
             });
 
-            var tableImport = $('#tb-import').DataTable();
+            var tableImport = $('#tb-import').DataTable({
+                select: {
+                    style: 'multi',
+                    selector: 'td:first-child'
+                },
+                "aoColumns": [{
+                        "bSortable": true,
+                        "className": "border-b select-checkbox",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b text-right",
+                        render: $.fn.dataTable.render.number(',', '.', 2, ''),
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b text-right",
+                        render: $.fn.dataTable.render.number(',', '.', 2, ''),
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b text-right",
+                        render: $.fn.dataTable.render.number(',', '.', 2, ''),
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                ],
+            });
             tableImport.on('draw',function(){
                 paginatioon(tableImport,$('#tb-import_paginate .pagination'));
                 feather.replace();
                 
                 $('.gotoPage').click(function() {
                     gotoPage($(this),tableImport);
+                });
+
+                tableImport.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    if (this.data()[0].indexOf("checked") >= 0) {
+                        this.select();
+                    }
                 });
             });
             tableImport.draw();
@@ -685,7 +677,7 @@
                 var data = new FormData(this);
                 console.log('data',data);
                 $.ajax({
-                    url: "{{ url('api/importPembayaran') }}",
+                    url: "{{ url('api/importpembayaran') }}",
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}",
                     },
@@ -695,20 +687,9 @@
                     contentType: false,
                     processData: false,
                     success: function(d) {
-                        console.log(d);
                         tableImport.clear();
                         tableImport.rows.add(d);
                         tableImport.draw();
-                        // reloadTable();
-                        // $('#frm-polis').trigger('reset');
-                        // console.log(d);
-                        // Swal.fire(
-                        //     'Berhasil!',
-                        //     d.message,
-                        //     'success'
-                        // ).then(function(){
-                        //     cash('#modal-polis').modal('hide');
-                        // });
                     },
                     error: function(d) {
                         console.log(d);
@@ -718,6 +699,49 @@
                             'error'
                         );
                     },
+                });
+            });
+
+            $('#btn-import').click(function(){
+                var data  = tableImport.rows('.selected').data().toArray();
+                var total  = tableImport.rows('.selected').count();
+                console.log('data',data);
+                Swal.fire({
+                    title: 'Apakah Anda Yakin?',
+                    html: "Total "+total+" data akan diimport pembayarannya ke sistem.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Import!',
+                    cancelButtonText: 'Tidak!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ url('api/simpanimport') }}",
+                            headers: {
+                                'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            },
+                            data: {data},
+                            dataType: "json",
+                            success: function (d) {
+                                console.log('success',d);
+                                Swal.fire(
+                                    'Berhasil!',
+                                    d.message,
+                                    'success'
+                                ).then(function() {
+                                    tableImport.clear();
+                                    reloadTable();
+                                    $('#frm-import').trigger('reset');
+                                    cash('#modal-import').modal('hide');
+                                });
+
+                            },
+                            error: function (d) {
+                                console.log('error: ',d);
+                            },
+                        });
+                    }
                 });
             });
             

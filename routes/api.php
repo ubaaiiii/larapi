@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // data table
     Route::post('/datatransaksi', 'API\DataController@dataTransaksi');
+    Route::post('/datapembayaran', 'API\DataController@dataPembayaran');
     Route::post('/datadokumen', 'API\DataController@dataDokumen');
     Route::post('/datadokumen/{any}', 'API\DataController@dataDokumen');
     Route::post('/dataaktifitas', 'API\DataController@dataAktifitas');
@@ -54,8 +55,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/pengajuan', 'API\ProcessController@pengajuan');
     Route::post('/pembayaran', 'API\ProcessController@pembayaran');
     Route::post('/polis', 'API\ProcessController@polis');
-    Route::post('/importPembayaran', 'API\ImportController@importPembayaran');
 
+    // import
+    Route::post('/importpembayaran', 'API\ImportController@importPembayaran');
+    Route::post('/simpanimport', 'API\ImportController@simpanImport');
 });
 
 Route::post('/login', 'API\AuthController@login');
