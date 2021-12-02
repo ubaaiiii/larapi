@@ -24,7 +24,6 @@ class PageController extends Controller
 {
     function dashboard()
     {
-        // abort(404);
         return view('index');
     }
 
