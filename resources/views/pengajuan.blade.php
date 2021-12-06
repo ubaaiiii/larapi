@@ -16,7 +16,7 @@
                 <button class="btn btn-sm btn-primary" id="btn-perpanjang">Perpanjang</button>
             @endif
             @if ($method == 'approve' && !empty($data))
-                @role('checker|ao')
+                @role('checker|maker')
                     @if($data->id_status == 0)
                         <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
                     @endif
@@ -49,7 +49,6 @@
                 @endrole
                 @role('insurance')
                     <button class="btn btn-sm btn-success btn-approve">Setujui</button>
-                    <button class="btn btn-sm btn-success" onclick="location.href='{{}} ">Placing</button>
                     <?php 
                         $status_rollback = "DIVERIFIKASI";
                     ?>
@@ -72,7 +71,8 @@
                         @endif
                     </h2>
                     @role('broker|insurance|adm')
-                    <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2">Klausula</a>
+                    <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2"><i class="fa fa-file-alt mr-2"></i>Klausula</a>
+                    <a class="btn btn-success mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i> Placing</a>
                     @endrole
                 </div>
                 <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
@@ -185,7 +185,7 @@
                                 <label for="alamat_insured" class="form-label sm:w-20">Alamat Tertanggung</label>
                                 <textarea id="alamat_insured" name="alamat_insured" class="form-control" required @if (!empty($data->alamat_insured)) @endif>@if (!empty($data->alamat_insured)){{ $data->alamat_insured }}@endif</textarea>
                             </div>
-                            @role('ao|checker|broker|approver|adm')
+                            @role('maker|checker|broker|approver|adm')
                             <div class="form-inline mt-5">
                                 <label for="plafond_kredit" class="form-label sm:w-20">Plafond Kredit</label>
                                 <input type="text" class="form-control allow-decimal currency masked" placeholder="Plafond Kredit"
@@ -233,7 +233,7 @@
                                     <div id="masa" class="input-group-text">Hari</div>
                                 </div>
                             </div>
-                            @role('ao|checker|broker|approver|adm')
+                            @role('maker|checker|broker|approver|adm')
                             <div class="form-inline mt-5">
                                 <label for="periode-kjpp" class="form-label sm:w-20">Periode KJPP</label>
                                 <input id="periode-kjpp" class="form-control w-full block mx-auto range-periode" required>
@@ -1223,7 +1223,7 @@
                             'success'
                         ).then(function() {
                             if (d.method == 'create') {
-                                window.location = "{{ url('inquiry') }}";
+                                window.location = "{{ url('inquiry') }}?data=pengajuan";
                             } else {
                                 window.top.close();
                             }

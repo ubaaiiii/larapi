@@ -39,7 +39,7 @@
                         <div class="intro-y col-span-12 sm:col-span-6">
                             <label for="asuransi" class="form-label">Asuransi</label>
                             <select id="asuransi" name="asuransi" required style="width:100%" class="pilih">
-                                @role('ao|checker|broker|approver|adm|finance')
+                                @role('maker|checker|broker|approver|adm|finance')
                                 <option value="ALL" selected>Semua Asuransi</option>
                                 @endrole
                                 @foreach ($asuransi as $val)

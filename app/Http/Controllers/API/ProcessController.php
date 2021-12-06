@@ -165,8 +165,8 @@ class ProcessController extends Controller
             case 'delete':
                 $user = User::find($request->id);
 
-                $user->syncRoles('ao');
-                $user->removeRole('ao');
+                $user->syncRoles('maker');
+                $user->removeRole('maker');
 
                 $user->delete();
 
@@ -546,7 +546,7 @@ class ProcessController extends Controller
             case 'approve':
                 $transaksi = Transaksi::find($request->transid);
                 switch ($role) {
-                    case 'ao':
+                    case 'maker':
                         if ($transaksi->id_status == 0) {
                             $status     = 1;
                             $string     = "ajukan";
@@ -713,7 +713,7 @@ class ProcessController extends Controller
             case 'rollback':
                 $transaksi = Transaksi::find($request->transid);
                 switch ($role) {
-                    case 'ao':
+                    case 'maker':
                         $status = 0;
                         if ($transaksi->id_status == 4) {
                             $update = [
@@ -777,7 +777,7 @@ class ProcessController extends Controller
             case 'renewal':
                 $transaksi = Transaksi::find($request->transid);
                 switch ($role) {
-                    case 'ao':
+                    case 'maker':
                         $status = 0;
                         if ($transaksi->id_status == 4) {
                             $update = [

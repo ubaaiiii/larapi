@@ -89,7 +89,7 @@ class ImportController extends Controller
             'data.*.1'  => 'required|numeric',
             'data.*.2'  => 'required|date',
             'data.*.3'  => 'required|alpha_num',
-            'data.*.4'  => 'required|regex:/^[\pL\s\-]+$/u',
+            'data.*.4'  => 'required|string',
             'data.*.5'  => 'required|numeric',
             'data.*.6'  => 'required|numeric',
             'data.*.7'  => 'required|numeric',

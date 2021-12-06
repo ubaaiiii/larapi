@@ -206,7 +206,7 @@ class DataController extends Controller
         $customJoin     = "";
 
         switch ($user) {
-            case 'ao':
+            case 'maker':
                 $statPengajuan  = "0";
                 $statApproval   = "4";
                 $statDibayar    = "7,8";
@@ -315,7 +315,7 @@ class DataController extends Controller
 
         $user = Auth::user()->getRoleNames()[0];
         switch ($user) {
-            case 'ao':
+            case 'maker':
                 $table->where('transaksi.created_by', Auth::user()->id);
                 break;
 
@@ -352,7 +352,7 @@ class DataController extends Controller
             switch ($request->data) {
                 case 'pengajuan':
                     switch ($user) {
-                        case 'ao':
+                        case 'maker':
                             $table->where('id_status', "0");
                             break;
 
@@ -388,7 +388,7 @@ class DataController extends Controller
 
                 case 'approval':
                     switch ($user) {
-                        case 'ao':
+                        case 'maker':
                             $table->where('id_status', "4");
                             break;
 
@@ -420,7 +420,7 @@ class DataController extends Controller
 
                 case 'dibayar':
                     switch ($user) {
-                        case 'ao':
+                        case 'maker':
                             $table->where('id_status', "7");
                             break;
 
@@ -465,7 +465,7 @@ class DataController extends Controller
 
                 case 'polis siap':
                     switch ($user) {
-                        case 'ao':
+                        case 'maker':
                             $table->where('id_status', "10");
                             break;
 
@@ -845,7 +845,7 @@ class DataController extends Controller
 
         $data = array();
         foreach ($query[0] as $row) {
-            if (in_array($role,['ao','checker','approver'])) {
+            if (in_array($role,['maker','checker','approver'])) {
                 if ($transaksi->id_status <= 8 && $row->jenis_file == 'POLIS') {
                     continue;
                 }

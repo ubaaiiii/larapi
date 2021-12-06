@@ -91,7 +91,7 @@ class PageController extends Controller
             $cabang = Cabang::all();
             $asuransi = Asuransi::all();
             switch ($level) {
-                case 'ao':
+                case 'maker':
                     $cabang = Cabang::where('id',Auth::user()->id_cabang)->get();
                     break;
 

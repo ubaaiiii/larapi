@@ -69,8 +69,8 @@ Route::group(['middleware' => 'auth'], function () {
   Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 
   // Cetak
-  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('invoice')->middleware('role:ao|checker|adm|broker');
-  Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:ao|checker|adm|broker');
+  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('invoice')->middleware('role:maker|checker|adm|broker');
+  Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:maker|checker|adm|broker');
   Route::get('cetak_placing/{any}', [CetakController::class, 'cetakPlacing'])->name('placing')->middleware('role:insurance|adm|broker');
 
   // inquiry
@@ -85,7 +85,7 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('pembayaran/{any}', [PageController::class, 'pembayaran'])->name('pembayaran');
 
   // pengajuan
-  Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:ao|checker|adm');
+  Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:maker|checker|adm');
   Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
   Route::post('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
 

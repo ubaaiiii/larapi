@@ -41,7 +41,7 @@
                             <i data-feather="search" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                             Lihat
                         </a>
-                        @role('ao|checker|adm')
+                        @role('maker|checker|adm')
                         <a id="ps-ubah"
                             class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                             style="cursor:pointer">
@@ -131,7 +131,7 @@
                         </a>
                         @endrole
                     </div>
-                    @role('checker|ao|broker|adm')
+                    @role('checker|maker|broker|adm')
                     <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 text-theme-9">
                         <a id="ps-invoice"
                             class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
@@ -286,7 +286,7 @@
             <!-- BEGIN: Modal Footer -->
             <div class="modal-footer text-right">
                 <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1"
-                    onclick="tutupModal('modal-import')">Batal</button>
+                    onclick="tutupModal('modal-import');$('#tb-import').DataTable().clear();$('#tb-import').DataTable().draw();">Batal</button>
                 <button id="btn-import" type="button" class="btn btn-primary w-20">Import</button>
             </div>
             <!-- END: Modal Footer -->
@@ -731,6 +731,7 @@
                                     'success'
                                 ).then(function() {
                                     tableImport.clear();
+                                    tableImport.draw();
                                     reloadTable();
                                     $('#frm-import').trigger('reset');
                                     cash('#modal-import').modal('hide');
