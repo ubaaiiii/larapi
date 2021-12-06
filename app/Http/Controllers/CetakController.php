@@ -156,9 +156,15 @@ class CetakController extends Controller
                 $output = $pdf->setpaper('a4', 'portrait')->output();
                 $path   = "public/files/$transid/";
                 $filename = "Cover_Note-$transid.pdf";
-                if (!is_dir($path)) {
-                    mkdir($path, 0777, TRUE);
+                if (!is_dir(public_path($path))) {
+                    mkdir(public_path($path), 0777, TRUE);
                 }
+
+                $eksis = false;
+                if (file_exists(public_path($path . $filename))) {
+                    $eksis = true;
+                }
+
                 file_put_contents($path . $filename, $output);
                 // return redirect($path . $filename);
                 $insert = [
@@ -170,8 +176,10 @@ class CetakController extends Controller
                     'jenis_file'    => "COVERNOTE",
                     'created_by'    => 1,
                 ];
-
-                Document::create($insert);
+                
+                if (!$eksis) {
+                    Document::create($insert);
+                }
 
                 return $data['covernote'];
             } elseif ($transaksi->id_status < 4) {
@@ -307,9 +315,15 @@ class CetakController extends Controller
                 $output = $pdf->setpaper('a4', 'portrait')->output();
                 $path   = "public/files/$transid/";
                 $filename = "Akseptasi_".$asuransi->akronim."-$transid.pdf";
-                if (!is_dir($path)) {
-                    mkdir($path, 0777, TRUE);
+                if (!is_dir(public_path($path))) {
+                    mkdir(public_path($path), 0777, TRUE);
                 }
+                
+                $eksis = false;
+                if (file_exists(public_path($path . $filename))) {
+                    $eksis = true;
+                }
+
                 file_put_contents($path . $filename, $output);
                 // return redirect($path . $filename);
                 $insert = [
@@ -322,7 +336,9 @@ class CetakController extends Controller
                     'created_by'    => 1,
                 ];
 
-                Document::create($insert);
+                if (!$eksis) {
+                    Document::create($insert);
+                }
 
                 return response()->json([
                     'message'   => 'Berhasil cetak Akseptasi',
