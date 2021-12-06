@@ -254,7 +254,7 @@ class CetakController extends Controller
 
                 // return redirect($path . $filename);
 
-                return Redirect::to(public_path($path.$filename));
+                return Redirect::to(url('public/'.$path.$filename));
             } elseif ($transaksi->id_status < 3) {
                 abort(403, "Belum Diverifikasi oleh Broker");
             } else {
