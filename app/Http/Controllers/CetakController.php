@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Redirect;
 
 class CetakController extends Controller
 {
@@ -188,7 +189,7 @@ class CetakController extends Controller
         // DB::enableQueryLog();
         $transaksi = Transaksi::find($transid);
         if (!empty($transaksi)) {
-            if ($transaksi->id_status >= 4) {
+            if ($transaksi->id_status >= 3) {
                 // return $transaksi->billing_at;
                 $data = [
                     'transaksi'   => $transaksi,
@@ -209,54 +210,53 @@ class CetakController extends Controller
                         ->where('transaksi_pricing.value', '<>', 0)
                         ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
                 ];
-                // dd($data['pricing']);
-                $data['covernote'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "/CN/" . $data['asuransi']->akronim . "/" . Functions::angka_romawi(date('m')) . "/" . date('Y');
-                $transaksi->update(['cover_note' => $data['covernote']]);
-                $parameter = [
-                    'id' => $data['covernote'],
-                ];
-                $parameter = Crypt::encrypt($parameter);
-                $url = url('cek_covernote') . "/" . $parameter;
-                // return $data['tsi'];
 
-                $qrcode = base64_encode(QrCode::format('svg')->size(100)->errorCorrection('H')->generate($url));
                 // share data to view
                 // view()->share('employee', $data);
                 $pdf = PDF::loadView('prints/placing', compact(
                     'data',
-                    'qrcode'
                 ));
                 // Download PDF without viewing
                 // return $pdf->download('pdf_file.pdf');
 
                 // Streaming PDF, not saved on local
-                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
-                exit(0);
+                // return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                // exit(0);
 
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
-                $path   = "public/files/$transid/";
-                $filename = "Cover_Note-$transid.pdf";
-                if (!is_dir($path)) {
-                    mkdir($path, 0777, TRUE);
+                $path   = "files/$transid/";
+                $filename = "Placing_Slip_Format-$transid.pdf";
+                if (!is_dir(public_path($path))) {
+                    mkdir(public_path($path), 0777, TRUE);
                 }
-                file_put_contents($path . $filename, $output);
-                // return redirect($path . $filename);
+
+                $eksis = false;
+                if (file_exists(public_path($path . $filename))) {
+                    $eksis = true;
+                }
+
+                file_put_contents(public_path($path . $filename), $output);
                 $insert = [
                     'id_transaksi'  => $transaksi->transid,
                     'nama_file'     => $filename,
                     'tipe_file'     => "pdf",
-                    'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
+                    'visible_by'    => 'broker,insurance,adm',
+                    'ukuran_file'   => File::size(public_path($path . $filename)) / 1024000,
                     'lokasi_file'   => $path . $filename,
-                    'jenis_file'    => "COVERNOTE",
+                    'jenis_file'    => "PLACING",
                     'created_by'    => 1,
                 ];
+                
+                if (!$eksis) {
+                    Document::create($insert);
+                }
 
-                Document::create($insert);
+                // return redirect($path . $filename);
 
-                return $data['covernote'];
-            } elseif ($transaksi->id_status < 4) {
-                abort(403, "Belum disetujui oleh asuransi");
+                return Redirect::to(url($path.$filename));
+            } elseif ($transaksi->id_status < 3) {
+                abort(403, "Belum Diverifikasi oleh Broker");
             } else {
                 abort(404);
             }

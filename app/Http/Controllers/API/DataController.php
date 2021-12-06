@@ -209,21 +209,21 @@ class DataController extends Controller
             case 'ao':
                 $statPengajuan  = "0";
                 $statApproval   = "4";
-                $statDibayar    = "7";
+                $statDibayar    = "7,8";
                 $statPolis      = "10";
                 $customWhere    .= " AND created_by = ". Auth::user()->id;
                 break;
             case 'checker':
                 $statPengajuan  = "0";
                 $statApproval   = "4";
-                $statDibayar    = "7";
+                $statDibayar    = "7,8";
                 $statPolis      = "10";
                 $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
                 break;
             case 'approver':
                 $statPengajuan  = "1";
                 $statApproval   = "4";
-                $statDibayar    = "7";
+                $statDibayar    = "7,8";
                 $statPolis      = "10";
                 $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
                 break;
@@ -545,7 +545,7 @@ class DataController extends Controller
             "recordsTotal"    => intval($query[1]),
             "recordsFiltered" => intval($query[2]),
             "data"            => $data,
-            // "sql"             => $query[3]
+            "sql"             => $query[3]
         ], 200);
     }
     

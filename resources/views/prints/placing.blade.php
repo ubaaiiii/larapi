@@ -65,7 +65,7 @@
     </table>
     <table style="font-size:10pt" class="main" CELLSPACING=0>
       <tr valign="top">
-        <td width="32%">ID Transaksi</td>
+        <td width="32%">ID Aplikasi SIAP</td>
         <td width="1%">:</td>
         <td width="67%">{{ $data['transaksi']->transid }}</td>
       </tr>
@@ -141,6 +141,7 @@
       <tr valign="top">
         <td>Interest Insured</td>
         <td>:</td>
+        @if($data['instype']->id == "PAR")
         <td style="text-align: justify;">All real and personal property of any kind, nature and description in or
           about the premises known as the above mentioned building, including materials on the ground and all structural
           appurtunances, improvements, fixtures, fittings, attached and belonging here to and external wall, gates, fences
@@ -148,6 +149,11 @@
           every description, stock, Inventory owned by the Insured or which the Insured may be liable or shall have assumed
           liability and all other contents, held by them in trust or on commission or for which they are responsible. (as per declare Sum Insured)
         </td>
+        @else
+        <td style="text-align: justify;">
+          Building (class 1)
+        </td>
+        @endif
       </tr>
       <tr valign="top">
         <td>Deductibles</td>
@@ -216,7 +222,7 @@
         <td></td>
       </tr>
     </table>
-    <div style="margin-left:15px !important">
+    <div style="margin-left:15px !important" class="ql-editor">
       {!! $data['transaksi']->klausula !!}
     </div>
     <br>
@@ -295,19 +301,15 @@
     </table>
     <br>
     <br>
-    <div style="font-size: 10pt">
-      Demikian cover note ini dibuat, sementara polis asuransi <i>original</i> sedang dibuat dan menunggu pembayaran.
-    </div>
-    <br>
     <table style="font-size: 10pt">
       <tr>
         <td width="70%"></td>
-        <td align="center">JAKARTA, ____________________</td>
+        <td align="center">JAKARTA, _______________</td>
       </tr>
       <tr>
         <td></td>
         <td align="center">
-          <br><br><br><br><br><br><br><br>
+          <br><br><br><br><br><br>
         </td>
       </tr>
       <tr>

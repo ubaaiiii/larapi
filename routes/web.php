@@ -71,7 +71,7 @@ Route::group(['middleware' => 'auth'], function () {
   // Cetak
   Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('invoice')->middleware('role:ao|checker|adm|broker');
   Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:ao|checker|adm|broker');
-  Route::get('cetak_placing/{any}', [CetakController::class, 'cetakPlacing'])->name('placing')->middleware('role:ao|checker|adm|broker');
+  Route::get('cetak_placing/{any}', [CetakController::class, 'cetakPlacing'])->name('placing')->middleware('role:insurance|adm|broker');
 
   // inquiry
   Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
