@@ -70,6 +70,39 @@ class PageController extends Controller
         return view('pengajuan', $data);
     }
 
+    function perpanjangan($transid = null, Request $request)
+    {
+        $data = [
+            'cabang'    => Cabang::orderBy('nama_cabang','asc')->get(),
+            'asuransi'  => Asuransi::all(),
+            'okupasi'   => Okupasi::all(),
+            'instype'   => Instype::all(),
+            'jaminan'   => Master::where('mstype', 'jaminan')->get(),
+            'act'       => 'add',
+            'price'     => KodeTrans::where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'formula'   => KodeTrans::whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'value'     => KodeTrans::whereNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'hitung'    => KodeTrans::where('hitung', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'transid'   => Sequential::where('seqdesc', 'transid')->first(),
+            'method'    => $request->method,
+        ];
+        // echo $data['transid']->seqno;
+        // die;
+        // dd($data['hitung']);
+        if (!empty($transid)) {
+            $dataController     = new DataController;
+            $transaksi = $dataController->dataPengajuan($transid);
+            $data['act']        = 'edit';
+            $data['data']       = $transaksi;
+            $data['pricing']    = $dataController->dataPricing($transid);
+            $data['status']     = Master::where('msid', $transaksi->id_status)->where('mstype','status')->first();
+            // dd($data['document']);
+        } else {
+            Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);
+        }
+        return view('pengajuan', $data);
+    }
+
     function notifikasi($transid = null, Request $request)
     {
         $data = [

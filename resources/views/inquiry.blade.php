@@ -5,13 +5,14 @@
 @section('menu', 'Inquiry')
 
 @section('content')
-<style>
-    .swal2-container {
-        z-index: 99999;
-    }
-</style>
+    <style>
+        .swal2-container {
+            z-index: 99999;
+        }
+
+    </style>
     <h2 class="intro-y text-lg font-medium mt-5" id="text-inquiry">
-        Inquiry {{ (!empty($_GET['data']))?(ucwords($_GET['data'])):("") }}
+        Data {{ !empty($_GET['data']) ? ucwords($_GET['data']) : 'Pengajuan Asuransi' }}
     </h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
@@ -24,8 +25,8 @@
                 </select>
             </div>
             <div class="dropdown ml-3 mt-3 sm:mt-0 sm:ml-auto md:ml-3 mr-3">
-                <button id="btn-proses" class="dropdown-toggle btn btn-primary" aria-expanded="false" disabled><i data-feather="settings"
-                        class="w-4 h-4 dark:text-gray-300 mr-2"></i>
+                <button id="btn-proses" class="dropdown-toggle btn btn-primary" aria-expanded="false" disabled><i
+                        data-feather="settings" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
                     Proses</button>
                 <div class="proses dropdown-menu w-56">
                     <div class="dropdown-menu__content box dark:bg-dark-1">
@@ -53,9 +54,9 @@
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
-                                <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-9"
+                                <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-10"
                                     style="cursor:pointer">
-                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i data-feather="refresh-cw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Perpanjang
                                 </a>
                                 <a id="ps-rollback"
@@ -72,8 +73,7 @@
                                 </a>
                             @endrole
                             @role('approver|adm')
-                                <a 
-                                    class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
@@ -128,14 +128,14 @@
                             @endrole
                         </div>
                         @role('checker|maker|broker|adm')
-                        <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 text-theme-9">
-                            <a id="ps-invoice"
-                                class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
-                                style="cursor:pointer">
-                                <i data-feather="file-text" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                Invoice
-                            </a>
-                        </div>
+                            <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 text-theme-9">
+                                <a id="ps-invoice"
+                                    class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
+                                    style="cursor:pointer">
+                                    <i data-feather="file-text" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Invoice
+                                </a>
+                            </div>
                         @endrole
                     </div>
                 </div>
@@ -143,7 +143,7 @@
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-gray-700 dark:text-gray-300">
                     <input type="text" id="filterSearch" class="form-control w-56 box pr-10 placeholder-theme-13"
-                        placeholder="Search..." value="{{ (empty($_GET['q'])) ? $qsearch : $_GET['q'] }}">
+                        placeholder="Search..." value="{{ empty($_GET['q']) ? $qsearch : $_GET['q'] }}">
                     <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-feather="search"></i>
                 </div>
             </div>
@@ -223,7 +223,8 @@
                     <!-- END: Modal Body -->
                     <!-- BEGIN: Modal Footer -->
                     <div class="modal-footer text-right">
-                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
+                        <button type="button" data-dismiss="modal"
+                            class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
                         <button type="submit" class="btn btn-primary w-20">Send</button>
                     </div>
                 </form>
@@ -262,17 +263,20 @@
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="e-polis" class="form-label">Upload E-Polis</label>
-                            <input id="e-polis" type="file" name="polis" class="form-control" accept="application/pdf" required>
+                            <input id="e-polis" type="file" name="polis" class="form-control" accept="application/pdf"
+                                required>
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="invoice" class="form-label">Upload Invoice</label>
-                            <input id="invoice" type="file" name="invoice" class="form-control" accept="application/pdf" required>
+                            <input id="invoice" type="file" name="invoice" class="form-control" accept="application/pdf"
+                                required>
                         </div>
                     </div>
                     <!-- END: Modal Body -->
                     <!-- BEGIN: Modal Footer -->
                     <div class="modal-footer text-right">
-                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
+                        <button type="button" data-dismiss="modal"
+                            class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
                         <button type="submit" class="btn btn-primary w-20">Send</button>
                     </div>
                 </form>
@@ -280,7 +284,7 @@
         </div>
     </div>
 
-    <form id="frm" method="POST" target="_blank">
+    <form id="frm" method="POST" target="new_page">
         @csrf
         <input type="hidden" id="frm-method" name="method">
     </form>
@@ -390,7 +394,7 @@
                 }
             });
 
-            $(window).focus(function(){
+            $(window).focus(function() {
                 reloadTable();
             });
 
@@ -408,12 +412,12 @@
             });
 
             tablenya.on('draw', function() {
-                paginatioon(tablenya,$('ul.pagination'));
+                paginatioon(tablenya, $('ul.pagination'));
 
                 feather.replace();
 
                 $('.gotoPage').click(function() {
-                    gotoPage($(this),tablenya);
+                    gotoPage($(this), tablenya);
                 });
 
                 $('#tb-inquiry > tbody > tr').each(function() {
@@ -437,41 +441,57 @@
 
             $('#ps-lihat').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                window.open("{{ url('pengajuan') }}/"+transid);
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
+                window.open("{{ url('pengajuan') }}/" + transid);
+            });
+
+            $('#frm').submit(function() {
+                // window.open('about:blank','new_page');
             });
 
             $('.ps-approve').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
                 $('#frm-method').val('approve');
-                $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
+                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
             });
 
             $('.ps-renewal').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
                 $('#frm-method').val('renewal');
-                $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
+                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
             });
-            
+
             $('#ps-ubah').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
                 $('#frm-method').val('update');
-                $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
+                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
             });
 
             $('.ps-bayar').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
                 $.ajax({
-                    url:"{{ url('api/caritransaksi') }}",
+                    url: "{{ url('api/caritransaksi') }}",
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
                     type: "GET",
-                    data: {transid},
+                    data: {
+                        transid
+                    },
                     success: function(d) {
                         $('#frm-bayar #transid').val(d.transaksi.transid);
                         $('#frm-bayar [name="transid"]').val(d.transaksi.transid);
@@ -482,31 +502,37 @@
                         cash('#modal-bayar').modal('show');
                     },
                     error: function(d) {
-                        console.log('d',d);
+                        console.log('d', d);
                     },
                 });
             });
 
             $('.ps-polis').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
+
             });
 
-            cash('#modal-bayar').on('hidden.bs.modal',function() {
+            cash('#modal-bayar').on('hidden.bs.modal', function() {
                 console.log('tutup');
             });
 
             $('.ps-polis').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
                 $.ajax({
-                    url:"{{ url('api/caritransaksi') }}",
+                    url: "{{ url('api/caritransaksi') }}",
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
                     type: "GET",
-                    data: {transid},
+                    data: {
+                        transid
+                    },
                     success: function(d) {
                         $('#frm-polis #transid').val(d.transaksi.transid);
                         $('#frm-polis [name="transid"]').val(d.transaksi.transid);
@@ -515,7 +541,7 @@
                         cash('#modal-polis').modal('show');
                     },
                     error: function(d) {
-                        console.log('d',d);
+                        console.log('d', d);
                     },
                 });
             })
@@ -525,7 +551,10 @@
                 var data = $(this).serializeArray(),
                     paid = data[6].value,
                     tagihan = data[5].value;
-                data.push({ name: "method", value: "store" });
+                data.push({
+                    name: "method",
+                    value: "store"
+                });
                 console.log(data);
                 if (paid == tagihan) {
                     $.ajax({
@@ -539,7 +568,7 @@
                                 d.message,
                                 'success'
                             );
-                            $(':input','#frm-bayar')
+                            $(':input', '#frm-bayar')
                                 .not(':button, :submit, :reset, :hidden')
                                 .val('');
                             $('#tgl_bayar').val("{{ date('Y-m-d') }}");
@@ -564,11 +593,11 @@
                 }
             });
 
-            $('#frm-polis').submit(function(e){
+            $('#frm-polis').submit(function(e) {
                 e.preventDefault();
                 var data = new FormData(this);
                 data.append("method", "store");
-                console.log('data',data);
+                console.log('data', data);
                 $.ajax({
                     url: "{{ url('api/polis') }}",
                     headers: {
@@ -576,7 +605,7 @@
                     },
                     data: data,
                     type: "POST",
-                    cache:false,
+                    cache: false,
                     contentType: false,
                     processData: false,
                     success: function(d) {
@@ -587,7 +616,7 @@
                             'Berhasil!',
                             d.message,
                             'success'
-                        ).then(function(){
+                        ).then(function() {
                             cash('#modal-polis').modal('hide');
                         });
                     },
@@ -601,15 +630,17 @@
                     },
                 });
             })
-            
+
             $('#ps-hapus').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0],
-                    _token  = "{{ csrf_token() }}",
-                    method  = "delete";
+                var transid = tablenya.row({
+                        selected: true
+                    }).data()[0],
+                    _token = "{{ csrf_token() }}",
+                    method = "delete";
                 Swal.fire({
                     title: 'Yakin ingin hapus?',
-                    html: "Data <b>"+transid+"</b> tidak akan dapat dikembalikan.",
+                    html: "Data <b>" + transid + "</b> tidak akan dapat dikembalikan.",
                     icon: 'warning',
                     showCancelButton: true,
                     // confirmButtonColor: '#1C3FAA',
@@ -632,10 +663,15 @@
                                 }
                                 $.ajax({
                                     url: "{{ url('api/pengajuan') }}",
-                                    data: {transid,_token,method,catatan},
+                                    data: {
+                                        transid,
+                                        _token,
+                                        method,
+                                        catatan
+                                    },
                                     type: "POST",
-                                    success: function(d){
-                                        console.log('response :',d);
+                                    success: function(d) {
+                                        console.log('response :', d);
                                         d = d.responseJSON;
                                         Swal.fire(
                                             'Berhasil!',
@@ -645,8 +681,8 @@
                                             reloadTable();
                                         });
                                     },
-                                    error:function(d){
-                                        console.log('response :',d);
+                                    error: function(d) {
+                                        console.log('response :', d);
                                         d = d.responseJSON;
                                         Swal.fire(
                                             'Gagal!',
@@ -663,12 +699,14 @@
 
             $('#ps-rollback').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0],
-                    _token  = "{{ csrf_token() }}",
-                    method  = "rollback";
+                var transid = tablenya.row({
+                        selected: true
+                    }).data()[0],
+                    _token = "{{ csrf_token() }}",
+                    method = "rollback";
                 Swal.fire({
                     title: 'Apakah Anda Yakin?',
-                    html: "Data <b>"+transid+"</b> akan dikembalikan ke status sebelumnya.",
+                    html: "Data <b>" + transid + "</b> akan dikembalikan ke status sebelumnya.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Ya, Kembalikan!',
@@ -689,10 +727,15 @@
                                 }
                                 $.ajax({
                                     url: "{{ url('api/pengajuan') }}",
-                                    data: {transid,_token,method,catatan},
+                                    data: {
+                                        transid,
+                                        _token,
+                                        method,
+                                        catatan
+                                    },
                                     type: "POST",
-                                    success: function(d){
-                                        console.log('response :',d);
+                                    success: function(d) {
+                                        console.log('response :', d);
                                         Swal.fire(
                                             'Berhasil!',
                                             d.message,
@@ -701,8 +744,8 @@
                                             reloadTable();
                                         });
                                     },
-                                    error:function(d){
-                                        console.log('response :',d);
+                                    error: function(d) {
+                                        console.log('response :', d);
                                         Swal.fire(
                                             'Gagal!',
                                             d.message,
@@ -715,11 +758,13 @@
                     }
                 });
             });
-            
+
             $('#ps-invoice').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                window.open("{{ url('cetak_invoice') }}/"+transid);
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[0];
+                window.open("{{ url('cetak_invoice') }}/" + transid);
             });
 
             $('a').click(function() {

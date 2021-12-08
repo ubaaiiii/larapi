@@ -222,10 +222,17 @@ class ProcessController extends Controller
 
                 $save = Document::create($data);
 
-                return response()->json([
-                    'message'   => 'Dokumen <strong>' . $name . '</strong> berhasil diunggah',
-                    'data'      => $file,
-                ], 200);
+                if ($save) {
+                    return response()->json([
+                        'message'   => 'Dokumen <strong>' . $name . '</strong> berhasil diunggah',
+                        'data'      => $file,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message'   => 'Dokumen <strong>' . $name . '</strong> gagal diunggah',
+                        'data'      => $file,
+                    ], 200);
+                }
                 break;
 
             case 'delete':
@@ -775,66 +782,6 @@ class ProcessController extends Controller
                 break;
 
             case 'renewal':
-                $transaksi = Transaksi::find($request->transid);
-                switch ($role) {
-                    case 'maker':
-                        $status = 0;
-                        if ($transaksi->id_status == 4) {
-                            $update = [
-                                'id_okupasi'    => NULL,
-                                'location'      => NULL,
-                                'object'        => NULL,
-                                'id_kodepos'    => NULL,
-                            ];
-                        }
-                        break;
-                    case 'checker':
-                        $status = 0;
-                        if ($transaksi->id_status == 4) {
-                            $update = [
-                                'id_okupasi'    => NULL,
-                                'location'      => NULL,
-                                'object'        => NULL,
-                                'id_kodepos'    => NULL,
-                            ];
-                        }
-                        break;
-                    case 'approver':
-                        $status = 0;
-                        break;
-                    case 'broker':
-                        if ($transaksi->id_status == "2") {
-                            $status = 1;
-                        } else if ($transaksi->id_status == "7") {
-                            $status = 6;
-                        }
-                        break;
-                    case 'insurance':
-                        $status = 2;
-                        break;
-
-                    default:
-                        return redirect()->route('logout');
-                        break;
-                }
-
-                $catatan = "Dikembalikan.";
-                if (!empty($request->catatan)) {
-                    $catatan .= " Catatan: " . $request->catatan;
-                }
-                $update['id_status']    = $status;
-                $update['catatan']      = $catatan;
-                $data = Transaksi::where('transid', $request->transid)->update($update);
-
-                $this->aktifitas($request->transid, $status, $catatan);
-                $notif = new NotificationController;
-                $notif->sendPushNotif($request->transid, $transaksi->created_by, "rollback", "ID Transaksi: " . $request->transid . " dikembalikan dengan catatan: " . $catatan);
-
-                return response()->json([
-                    'message'   => 'Debitur ' . $request->nama_insured . " berhasil dikembalikan ",
-                    'data'      => $data,
-                    'method'    => "rollback",
-                ], 200);
 
                 break;
 

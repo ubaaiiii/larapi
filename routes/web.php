@@ -85,9 +85,14 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('pembayaran/{any}', [PageController::class, 'pembayaran'])->name('pembayaran');
 
   // pengajuan
-  Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:maker|checker|adm');
+  Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:maker|adm');
   Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
   Route::post('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+
+  // perpanjangan
+  Route::get('perpanjangan', [PageController::class, 'perpanjangan'])->name('perpanjangan')->middleware('role:maker|adm');
+  Route::get('perpanjangan/{any}', [PageController::class, 'perpanjangan'])->name('perpanjangan');
+  Route::post('perpanjangan/{any}', [PageController::class, 'perpanjangan'])->name('perpanjangan');
 
   // master
   Route::get('user', [PageController::class, 'user'])->name('user')->middleware('role:adm|broker');

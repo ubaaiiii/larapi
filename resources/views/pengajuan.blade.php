@@ -1,11 +1,17 @@
 @extends('layouts.master')
-@section('title', 'Pengajuan')
-@section('breadcrumb', 'Pengajuan')
-@section('menu', 'Pengajuan')
+@if (!empty($method) && $method == "renewal")
+    @section('title', 'Perpanjangan')
+    @section('breadcrumb', 'Perpanjangan')
+    @section('menu', 'Pengajuan')
+@else
+    @section('title', 'Pengajuan')
+    @section('breadcrumb', 'Pengajuan')
+    @section('menu', 'Pengajuan')
+@endif
 @section('content')
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
-            Formulir Pengajuan @if (!empty($data->tertanggung)){!! 'a/n <b>' . $data->tertanggung . '</b><br>' !!}@endif
+            Formulir @yield('title') @if (!empty($data->tertanggung)){!! 'a/n <b>' . $data->tertanggung . '</b><br>' !!}@endif
             @if (empty($method) && empty($data))
                 <button class="btn btn-sm btn-primary" id="btn-add">Simpan</button>
             @endif
@@ -75,6 +81,7 @@
                     <a class="btn btn-success mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i> Placing</a>
                     @endrole
                 </div>
+                <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div>
                 <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
@@ -461,6 +468,9 @@
                                             formData.append(v.name, v.value);
                                         });
                                         formData.append("method", "store");
+                                        for (var pair of formData.entries()) {
+                                            console.log(pair[0]+ ', ' + pair[1]); 
+                                        }
                                     }),
                                     this.on("success", function(file, xhr) {
                                         $('#tb-dokumen').DataTable().ajax.reload();
@@ -475,7 +485,11 @@
                                         }
                                     });
                                 },
+                                success: function(file, response) {
+                                    console.log('respones',response);
+                                },
                                 error: function(file, response) {
+                                    console.log('response',response);
                                     $(file.previewElement).addClass("dz-error").find('.dz-error-message').text(response.errors.file);
                                 }
                             });
@@ -1170,6 +1184,13 @@
                         $('[d-input="LAIN"]').prop('readonly', false);
                         $('#frm-document :input').prop('disabled',false);
                         $('.dz-hidden-input').prop('disabled',false);
+                        @break
+
+                    @case("10")
+                        $(":input").prop('readonly', false);
+                        $("select").prop('disabled', false);
+                        $(".range-periode").prop('disabled', false);
+                        $('#multiple-file-upload').show();
                         @break
                 
                     @default

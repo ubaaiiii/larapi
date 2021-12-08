@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Notification;
 
 class DataController extends Controller
 {
+
     function index(Request $request)
     {
         return response()->json([
@@ -308,7 +309,8 @@ class DataController extends Controller
             'sts.msdesc as statusnya',
             'cabang.nama_cabang as cabang',
             'cabang.alamat_cabang',
-            'docs.lokasi_file'
+            'cn.lokasi_file as lokasi_file_cn',
+            'polis.lokasi_file as lokasi_file_polis',
         ];
 
         $table = DB::table("transaksi")->whereNull('transaksi.deleted_at');
@@ -511,7 +513,8 @@ class DataController extends Controller
             ['asuransi', 'id_asuransi = asuransi.id'],
             ['masters as sts', ['transaksi.id_status = sts.msid', "sts.mstype = status"]],
             ['cabang', 'id_cabang = cabang.id'],
-            ['documents as docs', ['transid = docs.id_transaksi', 'docs.jenis_file = COVERNOTE']],
+            ['documents as cn', ['transid = cn.id_transaksi', 'cn.jenis_file = COVERNOTE']],
+            ['documents as polis', ['transid = polis.id_transaksi', 'polis.jenis_file = POLIS']],
             ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
@@ -526,8 +529,8 @@ class DataController extends Controller
             $nestedData[] = $row->instype_name;
             $nestedData[] = $row->cabang;
             $nestedData[] = $row->tertanggung;
-            $nestedData[] = $row->policy_no;
-            $nestedData[] = "<a href='$row->lokasi_file' target='covernote'>$row->cover_note</a>";
+            $nestedData[] = "<a href='$row->lokasi_file_polis' target='polis'>$row->policy_no</a>";
+            $nestedData[] = "<a href='$row->lokasi_file_cn' target='covernote'>$row->cover_note</a>";
             $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
             $nestedData[] = $row->tgl_dibuat;
             $nestedData[] = number_format($row->tsi, 2);
@@ -826,12 +829,13 @@ class DataController extends Controller
             'documents.*',
             'username',
         ];
-
         $role = Auth::user()->getRoleNames()[0];
-
         $table = DB::table("documents");
         $table->where('id_transaksi', $request->transid);
-        $table->where('visible_by','like', '%'. $role .'%');
+        $table->where(function($q) {
+            $q->whereNull('visible_by')
+              ->orWhere('visible_by', 'like', '%' . Auth::user()->getRoleNames()[0] . '%');
+        });
         $table->whereNull('documents.deleted_at');
 
         $joins = [

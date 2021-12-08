@@ -94,7 +94,7 @@
                                                 <div class="ml-2 overflow-hidden">
                                                     <div class="flex items-center">
                                                         <a href="javascript:;" class="font-medium truncate mr-5">`+name+`</a>
-                                                        <div class="text-xs text-gray-500 ml-auto whitespace-nowrap">`+prettyDate(d[i].created_at)+`</div>
+                                                        <div class="text-xs text-gray-500 ml-auto whitespace-nowrap">`+ prettyDate(d[i].created_at) +`</div>
                                                     </div>
                                                     <div class="w-full truncate text-gray-600 mt-0.5 tooltip" data-theme="light" title="`+ data.text +`">`+ text +`</div>
                                                 </div>

@@ -45,11 +45,11 @@
     <script src="{{ url('public/dist/js/app.js') }}"></script>
 
     {{-- script vendor --}}
-    <script src="{{ url('public/vendor/select2/select2.min.js') }}"></script>
-    <script src="{{ url('public/vendor/select2/id.js') }}"></script>
-    <script src="{{ url('public/vendor/quill/quill.js') }}"></script>
-    <script src="{{ url('public/vendor/sweetalert2/sweetalert2.js') }}"></script>
-    <script src="{{ url('public/js/jquery.inputmask.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url('public/vendor/select2/select2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url('public/vendor/select2/id.js') }}"></script>
+    <script type="text/javascript" src="{{ url('public/vendor/quill/quill.js') }}"></script>
+    <script type="text/javascript" src="{{ url('public/vendor/sweetalert2/sweetalert2.js') }}"></script>
+    <script type="text/javascript" src="{{ url('public/js/jquery.inputmask.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/daterangepicker.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/datatables/datatables.min.js') }}"></script>
