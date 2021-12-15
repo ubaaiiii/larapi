@@ -73,6 +73,7 @@ class ProcessController extends Controller
                 break;
 
             case 'update':
+                // return $request->all();
                 $user = User::find($request->id);
 
                 $request->validate([
@@ -150,11 +151,11 @@ class ProcessController extends Controller
                     return response()->json(['errors' => $errors], 422);
                 }
                 
-                $user = $user->update($dataUpdate);
-                
                 if (!empty($request->level)) {
                     $user->syncRoles($request->level);
                 }
+                $user = $user->update($dataUpdate);
+                
                 
                 return response()->json([
                     'message'   => 'User ' . $request->name . ' Berhasil Diubah',
