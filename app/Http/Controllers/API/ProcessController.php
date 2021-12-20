@@ -450,7 +450,7 @@ class ProcessController extends Controller
                     $transid    = $sequential->seqlead . date($sequential->seqformat) . str_pad($nourut, $sequential->seqlen, '0', STR_PAD_LEFT);
                     $request->merge(['transid' => $transid]);
 
-                    if (Transaksi::find($transid) !== null) {
+                    if (Transaksi::withTrashed()->where('transid', '=', $transid)->get() !== null) {
                         $nourut++;
                         $transid = $sequential->seqlead . date($sequential->seqformat) . str_pad($nourut, $sequential->seqlen, '0', STR_PAD_LEFT);
                         $request->merge(['transid' => $transid]);
