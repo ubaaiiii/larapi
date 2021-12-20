@@ -322,11 +322,15 @@ class DataController extends Controller
                 break;
 
             case 'checker':
-                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                }
                 break;
 
             case 'approver':
-                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                }
                 break;
                 
             case 'broker':
