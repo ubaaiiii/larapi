@@ -79,7 +79,7 @@
                                             <div class="mt-3">
                                                 <label for="cabang" class="form-label">Cabang</label>
                                                 <select id="cabang" data-search="true" class="tom-select w-full" name="cabang"
-                                                    required @unlessrole('adm|broker') readonly @endunlessrole>
+                                                    required>
                                                     @foreach ($cabang as $cab)
                                                         <option value="{{ $cab->id }}" @if ($cab->id === Auth::user()->cabang) selected="true" @endif>
                                                             {{ $cab->nama_cabang }}</option>
@@ -89,17 +89,22 @@
                                             <div class="mt-3">
                                                 <label for="level" class="form-label">Level</label>
                                                 <select id="level" data-search="true" class="tom-select w-full" name="level"
-                                                    required @unlessrole('adm|broker') readonly @endunlessrole>
+                                                    required>
                                                     @foreach ($level as $lvl)
                                                         <option value="{{ $lvl->msid }}" @if ($lvl->msid === Auth::user()->level) selected="true" @endif>
                                                             {{ $lvl->msdesc }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
+                                            <script>
+                                                $(document).ready(function(){
+
+                                                });
+                                            </script>
                                             <div class="mt-3">
                                                 <label for="parent" class="form-label">Parent</label>
                                                 <select id="parent" data-search="true" class="tom-select w-full" name="parent"
-                                                    required @unlessrole('adm|broker') readonly @endunlessrole>
+                                                    required>
                                                     @foreach ($parent as $prt)
                                                         <option value="{{ $prt->id }}" @if ($prt->id === Auth::user()->parent_id) selected="true" @endif>
                                                             {{ $prt->name }}</option>
