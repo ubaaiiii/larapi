@@ -40,15 +40,15 @@ class PageController extends Controller
     function pengajuan($transid = null, Request $request)
     {
         $data = [
-            'cabang'    => Cabang::orderBy('nama_cabang','asc')->get(),
+            'cabang'    => Cabang::withoutTrashed()->orderBy('nama_cabang','asc')->get(),
             'asuransi'  => Asuransi::all(),
             'okupasi'   => Okupasi::all(),
             'instype'   => Instype::all(),
-            'jaminan'   => Master::where('mstype', 'jaminan')->get(),
+            'jaminan'   => Master::withoutTrashed()->where('mstype', 'jaminan')->get(),
             'act'       => 'add',
-            'price'     => KodeTrans::where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
-            'formula'   => KodeTrans::whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
-            'value'     => KodeTrans::whereNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'price'     => KodeTrans::withoutTrashed()->where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'formula'   => KodeTrans::withoutTrashed()->whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'value'     => KodeTrans::withoutTrashed()->whereNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
             'hitung'    => KodeTrans::where('hitung', true)->orderBy('kodetrans_index', 'ASC')->get(),
             'transid'   => Sequential::where('seqdesc', 'transid')->first(),
             'method'    => $request->method,

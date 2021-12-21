@@ -251,7 +251,7 @@ class CetakController extends Controller
                     'tipe_file'     => "pdf",
                     'visible_by'    => 'broker,insurance,adm',
                     'ukuran_file'   => File::size(public_path($path . $filename)) / 1024000,
-                    'lokasi_file'   => $path . $filename,
+                    'lokasi_file'   => "public/".$path . $filename,
                     'jenis_file'    => "PLACING",
                     'created_by'    => 1,
                 ];
@@ -360,7 +360,6 @@ class CetakController extends Controller
             'id'    => $encrypted['id'],
         ];
 
-        
         $transaksi = Transaksi::where('transid','=',$encrypted['id'])
         ->join('insured', 'insured.id', '=', 'transaksi.id_insured')
         ->join('cabang', 'cabang.id', '=', 'transaksi.id_cabang')

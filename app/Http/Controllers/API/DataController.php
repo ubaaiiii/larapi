@@ -212,21 +212,27 @@ class DataController extends Controller
                 $statApproval   = "4";
                 $statDibayar    = "7,8";
                 $statPolis      = "10";
-                $customWhere    .= " AND created_by = ". Auth::user()->id;
+                if (Auth::user()->id_cabang !== 1) {
+                    $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                }
                 break;
             case 'checker':
                 $statPengajuan  = "0";
                 $statApproval   = "4";
                 $statDibayar    = "7,8";
                 $statPolis      = "10";
-                $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                if (Auth::user()->id_cabang !== 1) {
+                    $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                }
                 break;
             case 'approver':
                 $statPengajuan  = "1";
                 $statApproval   = "4";
                 $statDibayar    = "7,8";
                 $statPolis      = "10";
-                $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                if (Auth::user()->id_cabang !== 1) {
+                    $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                }
                 break;
             case 'broker':
                 $statPengajuan  = "2";
@@ -427,19 +433,19 @@ class DataController extends Controller
                 case 'dibayar':
                     switch ($user) {
                         case 'maker':
-                            $table->where('id_status', "7");
+                            $table->whereIN('id_status', [7, 8]);
                             break;
 
                         case 'checker':
-                            $table->where('id_status', "7");
+                            $table->whereIN('id_status', [7, 8]);
                             break;
 
                         case 'approver':
-                            $table->where('id_status', "7");
+                            $table->whereIN('id_status', [7, 8]);
                             break;
 
                         case 'broker':
-                            $table->where('id_status', "8");
+                            $table->whereIN('id_status', [6, 7, 8]);
                             break;
 
                         case 'insurance':

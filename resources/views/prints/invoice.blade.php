@@ -19,7 +19,7 @@
 <body>
   <table style="font-size:6" width="100%">
     <tr>
-      <td><img src="{{ url('public/dist/images/Logo BDS insurance SIUP.png') }}" width="35%"></td>
+      <td><img src="{{ public_path('dist/images/Logo BDS insurance SIUP.png') }}" width="35%"></td>
       <td style="text-align: right">
         <b>Ruko Sentradana Kalimalang</b><br>
         Jl. Seulawah Raya No.B<br>

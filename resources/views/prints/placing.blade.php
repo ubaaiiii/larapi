@@ -52,8 +52,8 @@
 </head>
 
 <body>
-  <header><img src="{{ url('public/dist/images/Header') }}/Header-{{ $data['asuransi']->akronim }}.jpg" height="87 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></header>
-  <footer><img src="{{ url('public/dist/images/Footer') }}/Footer-{{ $data['asuransi']->akronim }}.jpg" height="87 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></footer>
+  <header><img src="{{ public_path('dist/images/Header') }}/Header-{{ $data['asuransi']->akronim }}.jpg" height="87 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></header>
+  <footer><img src="{{ public_path('dist/images/Footer') }}/Footer-{{ $data['asuransi']->akronim }}.jpg" height="87 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></footer>
   <main>
     <table>
       <tr>
@@ -162,7 +162,7 @@
           <table CELLSPACING=0>
             <tr valign="top">
               <td>-</td>
-              <td>Fire, Lightning, Explosion, Aircraft Impact & Smoke ; NIL any one accident.</td>
+              <td>Fire, Lightning, Explosion, Aircraft Impact & Smoke ; {{ $data['okupasi']->deductible }}.</td>
             </tr>
             @if($data['instype']->id == "PAR")
             <tr valign="top">
@@ -183,7 +183,7 @@
     <tr>
       <td><strong>Total Nilai Pertanggungan</strong></td>
       <td>:</td>
-      <td><strong>*Maksimal IDR {{ number_format($data['instype']->max_tsi,2) }}</strong></td>
+      <td></td>
     </tr>
   </table>
   <table style="font-size:10pt">

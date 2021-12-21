@@ -10,8 +10,8 @@
   </style>
 </head>
 <body>
-  <header><img src="{{ url('public/dist/images/Header') }}/Header-KB.jpg"></header>
-  <footer>Footer Asuransi</footer>
+  <header><img src="{{ public_path('dist/images/Header') }}/Header-{{ $data['asuransi']->akronim }}.jpg" height="87 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></header>
+  <footer><img src="{{ public_path('dist/images/Footer') }}/Footer-{{ $data['asuransi']->akronim }}.jpg" height="87 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></footer>
   <main>
     <table>
       <tr>

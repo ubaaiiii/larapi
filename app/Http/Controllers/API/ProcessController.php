@@ -299,6 +299,8 @@ class ProcessController extends Controller
                 $insert = [
                     'id_transaksi'  => $request->transid,
                     'paid_amount'   => $request->paid,
+                    'paid_type'     => "PD01",
+                    'dc'            => "C",
                     'paid_at'       => $request->tgl_bayar,
                     'created_by'    => Auth::user()->id,
                 ];
@@ -444,17 +446,20 @@ class ProcessController extends Controller
                 // return $request->all();
 
                 if (empty($request->transid) || !isset($request->transid)) {
-                    $nourut     = DB::table('transaksi')->whereYear('created_at', '=', date('Y'))->whereMonth('created_at', '=', date('m'))->count();
-                    if ($nourut == 0) $nourut++;
+                    $totalBulanIni  = DB::table('transaksi')->whereYear('created_at', '=', date('Y'))->whereMonth('created_at', '=', date('m'))->count();
                     $sequential = Sequential::where('seqdesc', 'transid')->first();
-                    $transid    = $sequential->seqlead . date($sequential->seqformat) . str_pad($nourut, $sequential->seqlen, '0', STR_PAD_LEFT);
-                    $request->merge(['transid' => $transid]);
-
-                    if (Transaksi::withTrashed()->where('transid', '=', $transid)->get() !== null) {
-                        $nourut++;
-                        $transid = $sequential->seqlead . date($sequential->seqformat) . str_pad($nourut, $sequential->seqlen, '0', STR_PAD_LEFT);
-                        $request->merge(['transid' => $transid]);
+                    if ($totalBulanIni == 0) {
+                        $sequential = tap(Sequential::where('seqdesc', 'transid'))->update(['seqno' => 0])->first();
                     }
+                    $sequential = tap(Sequential::where('seqdesc', 'transid'))->update(['seqno' => $sequential->seqno + 1])->first();
+                    $transid    = $sequential->seqlead . date($sequential->seqformat) . str_pad($sequential->seqno, $sequential->seqlen, '0', STR_PAD_LEFT);
+
+                    if (Transaksi::withTrashed()->where('transid', '=', $transid)->count() !== 0) {
+                        $sequential = tap(Sequential::where('seqdesc', 'transid'))->update(['seqno' => $sequential->seqno + 1])->first();
+                        $transid    = $sequential->seqlead . date($sequential->seqformat) . str_pad($sequential->seqno, $sequential->seqlen, '0', STR_PAD_LEFT);
+                    }
+
+                    $request->merge(['transid' => $transid]);
                 }
 
                 $insured    = $this->tertanggung($request);

@@ -81,7 +81,7 @@
                     <a class="btn btn-success mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i> Placing</a>
                     @endrole
                 </div>
-                <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div>
+                {{-- <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div> --}}
                 <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
@@ -283,26 +283,26 @@
                                     <label class="form-label sm:w-20"></label>
                                     <label>Sudah Termasuk: RSMDCC, TSFWD, Others</label>
                                 </div>
-                                <div class="form-inline mt-5">
-                                    <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
-                                    <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
-                                </div>
-                                <div class="form-inline mt-5">
-                                    <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
-                                    <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->object)){{ $data->object }}@endif</textarea>
-                                </div>
-                                <div class="form-inline mt-5">
-                                    <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
-                                    <select id="kodepos" style="width:100%" name="kodepos" required>
-                                    </select>
-                                </div>
-                                @if (!empty($data->id_kodepos))
-                                    <script>
-                                        var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
-                                        {{ $data->id_kodepos }}, false, false);
-                                        $('#kodepos').append(newOption).trigger('change');
-                                    </script>
-                                @endif
+                            @endif
+                            <div class="form-inline mt-5">
+                                <label for="lokasi_okupasi" class="form-label sm:w-20">Lokasi Okupasi</label>
+                                <textarea id="lokasi_okupasi" name="lokasi_okupasi" class="form-control" required>@if (!empty($data->location)){{ $data->location }}@endif</textarea>
+                            </div>
+                            <div class="form-inline mt-5">
+                                <label for="objek_okupasi" class="form-label sm:w-20">Objek Pertanggungan</label>
+                                <textarea id="objek_okupasi" name="objek_okupasi" class="form-control" required>@if (!empty($data->object)){{ $data->object }}@endif</textarea>
+                            </div>
+                            <div class="form-inline mt-5">
+                                <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
+                                <select id="kodepos" style="width:100%" name="kodepos" required>
+                                </select>
+                            </div>
+                            @if (!empty($data->id_kodepos))
+                                <script>
+                                    var newOption = new Option("{{ $data->kecamatan . ' / ' . $data->kelurahan . ' / ' . $data->kodepos }}",
+                                    {{ $data->id_kodepos }}, false, false);
+                                    $('#kodepos').append(newOption).trigger('change');
+                                </script>
                             @endif
                             @if (!empty($data->transid))
                                 <input type="hidden" class="form-control" required name="transid" value="{{ $data->transid }}" readonly>

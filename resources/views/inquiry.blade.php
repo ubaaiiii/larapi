@@ -38,12 +38,12 @@
                                 Lihat
                             </a>
                             @role('maker|checker|adm')
-                                <a id="ps-ubah"
+                                {{-- <a id="ps-ubah"
                                     class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                     style="cursor:pointer">
                                     <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ubah
-                                </a>
+                                </a> --}}
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                     style="cursor:pointer">
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
@@ -469,14 +469,14 @@
                 $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
             });
 
-            $('#ps-ubah').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[0];
-                $('#frm-method').val('update');
-                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
-            });
+            // $('#ps-ubah').click(function(e) {
+            //     e.preventDefault();
+            //     var transid = tablenya.row({
+            //         selected: true
+            //     }).data()[0];
+            //     $('#frm-method').val('update');
+            //     $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
+            // });
 
             $('.ps-bayar').click(function(e) {
                 e.preventDefault();
