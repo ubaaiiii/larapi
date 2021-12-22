@@ -239,7 +239,7 @@ class DataController extends Controller
                 $statApproval   = "5";
                 $statDibayar    = "6,7,8";
                 $statPolis      = "10";
-                $customWhere    = "";
+                $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '".Auth::user()->id."' ";
                 break;
             case 'insurance':
                 $statPengajuan  = "3";
@@ -340,7 +340,10 @@ class DataController extends Controller
                 break;
                 
             case 'broker':
-                // wherenya broker
+                $table->join('cabang as cbg_broker', function ($q) {
+                    $q->on('cbg_broker.id', '=', 'transaksi.id_cabang')
+                    ->where('cbg_broker.id_broker', '=', Auth::user()->id);
+                });
                 break;
 
             case 'insurance':
