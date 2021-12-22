@@ -9,58 +9,63 @@
     @section('menu', 'Pengajuan')
 @endif
 @section('content')
+<style>
+    .swal2-container {
+        z-index: 100000;
+    }
+</style>
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
             Formulir @yield('title') @if (!empty($data->tertanggung)){!! 'a/n <b>' . $data->tertanggung . '</b><br>' !!}@endif
             @if (empty($method) && empty($data))
-                <button class="btn btn-sm btn-primary" id="btn-add">Simpan</button>
+                <button class="btn btn-sm btn-primary" id="btn-add"><i class="fa fa-save mr-2"></i>Simpan</button>
             @endif
             @if ($method == 'update' && !empty($data))
-                <button class="btn btn-sm btn-primary" id="btn-update">Simpan</button>
+                <button class="btn btn-sm btn-primary" id="btn-update"><i class="fa fa-save mr-2"></i>Simpan</button>
             @endif
             @if ($method == 'perpanjang' && !empty($data))
-                <button class="btn btn-sm btn-primary" id="btn-perpanjang">Perpanjang</button>
+                <button class="btn btn-sm btn-primary" id="btn-perpanjang"><i class="fa fa-sync-alt mr-2"></i>Perpanjang</button>
             @endif
             @if ($method == 'approve' && !empty($data))
                 @role('checker|maker')
                     @if($data->id_status == 0)
-                        <button class="btn btn-sm btn-success btn-approve">Ajukan</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Ajukan</button>
                     @endif
                     @if($data->id_status == 4)
-                        <button class="btn btn-sm btn-success btn-approve">Setujui</button>
-                        <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Setujui</button>
+                        <button class="btn btn-sm btn-warning btn-rollback"><i class="fa fa-redo-alt mr-2"></i>Kembalikan</button>
                         <?php 
                             $status_rollback = "TERTUNDA";
                         ?>
                     @endif
                 @endrole
                 @role('approver')
-                    <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                    <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Setujui</button>
                     <?php 
                         $status_rollback = "TERTUNDA";
                     ?>
                 @endrole
                 @role('broker')
                     @if ($data->id_status == 2)
-                        <button class="btn btn-sm btn-success btn-approve">Verifikasi</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Verifikasi</button>
                         <?php 
                             $status_rollback = "DISETUJUI";
                         ?>
                     @elseif ($data->id_status == 8)
-                        <button class="btn btn-sm btn-success btn-approve">Polis Sesuai</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Polis Sesuai</button>
                         <?php 
                             $status_rollback = "MENUNGGU POLIS";
                         ?>
                     @endif
                 @endrole
                 @role('insurance')
-                    <button class="btn btn-sm btn-success btn-approve">Setujui</button>
+                    <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Setujui</button>
                     <?php 
                         $status_rollback = "DIVERIFIKASI";
                     ?>
                 @endrole
                 @role('approver|broker|insurance|adm')
-                    <button class="btn btn-sm btn-warning btn-rollback">Kembalikan</button>
+                    <button class="btn btn-sm btn-warning btn-rollback"><i class="fa fa-redo-alt mr-2"></i>Kembalikan</button>
                 @endrole
             @endif
         </h2>
@@ -78,7 +83,7 @@
                     </h2>
                     @role('broker|insurance|adm')
                     <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2"><i class="fa fa-file-alt mr-2"></i>Klausula</a>
-                    <a class="btn btn-success mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i> Placing</a>
+                    <a class="btn btn-primary mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i>Placing</a>
                     @endrole
                 </div>
                 {{-- <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div> --}}
@@ -92,6 +97,14 @@
                                 <div class="p-5" id="editor">
                                     <p>@if(!empty($data->klausula)){!! $data->klausula !!}@endif</p>
                                 </div>
+                            </div>
+                            <div class="modal-footer text-right">
+                                <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
+                                    Cancel
+                                </button>
+                                <button type="button" id="btn-klausula" class="btn btn-primary w-20">
+                                    Save
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1313,6 +1326,50 @@
                             $('#'+i).closest('div').addClass('has-error');
                             $('#'+i).prev().append('<div class="sm:ml-auto mt-1 sm:mt-0 text-xs pristine-error text-primary-3 mt-2">* harus diisi</div>');
                         });
+                    }
+                });
+                $(this)
+                    .attr('disabled',false)
+                    .html(btnHtml);
+            });
+
+            $('#btn-klausula').click(function(){
+                var klausulaValue = $('.ql-editor').html(),
+                    btnHtml = $(this).html(),
+                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...";
+
+                $(this)
+                    .attr('disabled',true)
+                    .html(loading);
+
+                $.ajax({
+                    url: "{{ url('api/pengajuan') }}",
+                    method: "POST",
+                    data: {
+                        "klausula":klausulaValue,
+                        "method":"klausula",
+                        "transid":"{{ $data->transid }}",
+                        "_token":"{{ csrf_token() }}"},
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    success: function(d) {
+                        console.log(d);
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        );
+                    },
+                    error: function(d) {
+                        console.log(d);
+                        var message = d.responseJSON.message;
+                        console.log('message:',message);
+                        Swal.fire(
+                            'Gagal!',
+                            message,
+                            'error'
+                        );
                     }
                 });
                 $(this)

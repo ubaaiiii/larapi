@@ -65,42 +65,40 @@
           <td width="25%">TIPE ASURANSI</td>
           <td width="44%">{{ $data['instype']->instype_name }}</td>
           <td width="13%">Premium</td>
-          <td width="17%" class="tright">{{ number_format($data['pricing'][1]->value,2) }}</td>
+          <td width="17%" class="tright">{{ number_format($data['pricing'][2]->value,2) }}</td>
         </tr>
         <tr>
           <td>ASURANSI</td>
           <td>{{ $data['asuransi']->nama_asuransi }}</td>
           <td>By. Polis</td>
-          <td class="tright">{{ number_format($data['pricing'][9]->value,2) }}</td>
+          <td class="tright">{{ number_format($data['pricing'][10]->value,2) }}</td>
         </tr>
         <tr>
           <td>NO. POLIS</td>
           <td>{{ $data['transaksi']->policy_no }}</td>
           <td>By. Materai</td>
-          <td class="tright">{{ number_format($data['pricing'][10]->value,2) }}</td>
+          <td class="tright">{{ number_format($data['pricing'][11]->value,2) }}</td>
         </tr>
         <tr>
           <td>PERIODE POLIS</td>
           <td>{{ FunctionsHelp::tgl_indo($data['transaksi']->polis_start) ." - ". FunctionsHelp::tgl_indo($data['transaksi']->polis_end) }}</td>
           {{-- <td>{{ date_format(date_create($data['transaksi']->polis_start),"d F Y") }} - {{ date_format(date_create($data['transaksi']->polis_end),"d F Y") }}</td> --}}
-          <td>By. Admin</td>
-          <td class="tright">{{ number_format($data['pricing'][11]->value,2) }}</td>
-        </tr>
-        <tr>
-          <td>TERTANGGUNG</td>
-          <td>QQ {{ $data['insured']->nama_insured }}</td>
           <td>By. Lain</td>
           <td class="tright gbawah">{{ number_format($data['pricing'][16]->value,2) }}</td>
         </tr>
         <tr>
-          <td>OBJEK PERTANGGUNGAN</td>
-          <td>{{ $data['transaksi']->object }}</td>
+          <td>TERTANGGUNG</td>
+          <td>QQ {{ $data['insured']->nama_insured }}</td>
           <td>Total Tagihan</td>
           <td class="tright">{{ number_format($data['pricing'][18]->value,2) }}</td>
         </tr>
         <tr>
+          <td>OBJEK PERTANGGUNGAN</td>
+          <td colspan="3">{{ $data['transaksi']->object }}</td>
+        </tr>
+        <tr>
           <td>TOTAL PERTANGGUNGAN</td>
-          <td colspan="3">{{ number_format($data['pricing'][0]->value,2) }}</td>
+          <td colspan="3">{{ number_format($data['pricing'][1]->value,2) }}</td>
         </tr>
         <tr>
           <td>LOKASI PERTANGGUNGAN</td>

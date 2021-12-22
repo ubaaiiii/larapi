@@ -515,7 +515,7 @@ class ProcessController extends Controller
                     if (!empty($request->catatan)) {
                         $text .= "<br>Catatan: " . $request->catatan;
                     }
-                    $this->aktifitas($request->transid, '7', $text);
+                    $this->aktifitas($request->transid, '0', $text);
                 } else if ($save->wasRecentlyCreated) {
                     $method = "create";
                     $this->aktifitas($request->transid, '0', $request->catatan);
@@ -673,6 +673,7 @@ class ProcessController extends Controller
                                 'kodepos'           => 'required|numeric',
                                 'lokasi_okupasi'    => 'required|string',
                                 'objek_okupasi'     => 'required|string',
+                                'klausula'          => 'required',
                             ]);
 
                             $update = [
@@ -681,8 +682,8 @@ class ProcessController extends Controller
                                 'id_kodepos'    => $request->kodepos,
                                 'location'      => $request->lokasi_okupasi,
                                 'object'        => $request->objek_okupasi,
+                                'klausula'      => $request->klausula,
                             ];
-                        } else if ($transaksi->id_status == 5) {
                         } else if ($transaksi->id_status == 8) {
                             $status = 10;
                             $string = "cek kebenaran polisnya";
@@ -691,6 +692,13 @@ class ProcessController extends Controller
                         break;
 
                     case 'insurance':
+                        $request->validate([
+                            'klausula'  => 'required',
+                        ]);
+
+                        $update = [
+                            'klausula'  => $request->klausula,
+                        ];
                         if ($transaksi->id_status == 3) {
                             $status = 4;
                             $string = "setujui";
@@ -727,38 +735,49 @@ class ProcessController extends Controller
                 $transaksi = Transaksi::find($request->transid);
                 switch ($role) {
                     case 'maker':
+                        // PENDING
                         $status = 0;
+
+                        // DISETUJUI ASURANSI
                         if ($transaksi->id_status == 4) {
                             $update = [
                                 'id_okupasi'    => NULL,
-                                'location'      => NULL,
-                                'object'        => NULL,
-                                'id_kodepos'    => NULL,
                             ];
+                            Pricing::where('id_transaksi', $request->transid)->where()->delete();
                         }
                         break;
+
                     case 'checker':
+                        // PENDING
                         $status = 0;
+                        
+                        // DISETUJUI ASURANSI
                         if ($transaksi->id_status == 4) {
                             $update = [
                                 'id_okupasi'    => NULL,
-                                'location'      => NULL,
-                                'object'        => NULL,
-                                'id_kodepos'    => NULL,
                             ];
+                            Pricing::where('id_transaksi', $request->transid)->delete();
                         }
                         break;
+
                     case 'approver':
+                        // PENDING
                         $status = 0;
                         break;
+
                     case 'broker':
+                        // DISETUJUI -> TERTUNDA
                         if ($transaksi->id_status == "2") {
                             $status = 1;
-                        } else if ($transaksi->id_status == "7") {
-                            $status = 6;
+                        
+                        // PENGECEKAN POLIS -> MENUNGGU E-POLIS
+                        } else if ($transaksi->id_status == "8") {
+                            $status = 7;
                         }
                         break;
+
                     case 'insurance':
+                        // DISETUJUI
                         $status = 2;
                         break;
 
@@ -775,7 +794,8 @@ class ProcessController extends Controller
                 $update['catatan']      = $catatan;
                 $data = Transaksi::where('transid', $request->transid)->update($update);
 
-                $this->aktifitas($request->transid, $status, $catatan);
+                // Status 11 = DIKEMBALIKAN
+                $this->aktifitas($request->transid, 11, $catatan);
                 $notif = new NotificationController;
                 $notif->sendPushNotif($request->transid, $transaksi->created_by, "rollback", "ID Transaksi: " . $request->transid . " dikembalikan dengan catatan: " . $catatan);
 
@@ -789,6 +809,27 @@ class ProcessController extends Controller
 
             case 'renewal':
 
+                break;
+
+            case 'klausula':
+                if (in_array($role, ['admin', 'broker', 'insurance'])) {
+                    $request->validate([
+                        'transid'   => 'required',
+                        'klausula'  => 'required',
+                    ]);
+
+                    $transaksi = tap(Transaksi::where('transid', $request->transid))->update(['klausula'  => $request->klausula])->first();
+                    $insured = Insured::find($transaksi->id_insured);
+
+                    return response()->json([
+                        'message'   => 'Klausula debitur ' . $insured->nama_insured . " berhasil diubah",
+                        'data'      => $transaksi,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message'   => 'Unauthorized',
+                    ], 401);
+                }
                 break;
 
             default:

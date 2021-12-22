@@ -58,12 +58,18 @@ class CetakController extends Controller
                     Transaksi::where('transid',$transaksi->transid)->update(['billing_at' => date('Y-m-d')]);
                     $transaksi = Transaksi::find($transid);
                 }
+                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)->orderBy('id_kodetrans')->get();
+                foreach ($dataPricing as $row) {
+                    // echo $row->id_kodetrans;
+                    $pricing[$row->id_kodetrans] = $row;
+                }
+
                 $data = [
                     'instype'     => Instype::find($transaksi->id_instype),
                     'asuransi'    => Asuransi::find($transaksi->id_asuransi),
                     'transaksi'   => $transaksi,
                     'insured'     => Insured::find($transaksi->id_insured),
-                    'pricing'     => Pricing::where('id_transaksi',$transaksi->transid)->orderBy('id_kodetrans')->get(),
+                    'pricing'     => $pricing,
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'due_date'    => Activity::where([
                         ['id_transaksi',$transaksi->transid],
@@ -86,12 +92,12 @@ class CetakController extends Controller
         
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
-                $path   = "public/files/$transid/";
-                if (!is_dir($path)) {
-                    mkdir($path, 0777, TRUE);
+                $path   = "files/$transid/";
+                if (!is_dir(public_path($path))) {
+                    mkdir(public_path($path), 0777, TRUE);
                 }
-                file_put_contents($path . "Invoice_BDS-$transid.pdf", $output);
-                return redirect($path . "Invoice_BDS-$transid.pdf");
+                file_put_contents(public_path($path) . "Invoice_BDS-$transid.pdf", $output);
+                return redirect(url("public/".$path) . "/Invoice_BDS-$transid.pdf");
             } elseif ($transaksi->id_status < 5) {
                 abort(403, "Belum disetujui oleh asuransi");
             } else {
@@ -108,7 +114,15 @@ class CetakController extends Controller
         $transaksi = Transaksi::find($transid);
         if (!empty($transaksi)) {
             if ($transaksi->id_status >= 4) {
-                // return $transaksi->billing_at;
+                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)
+                    ->join('transaksi_kode as tk','transaksi_pricing.id_kodetrans','=','tk.kodetrans_id')
+                    ->orderBy('id_kodetrans','ASC')
+                    ->get();
+                foreach ($dataPricing as $row) {
+                    // echo $row->id_kodetrans;
+                    $pricing[$row->id_kodetrans] = $row;
+                }
+
                 $data = [
                     'transaksi'   => $transaksi,
                     'asuransi'    => Asuransi::find($transaksi->id_asuransi),
@@ -119,10 +133,7 @@ class CetakController extends Controller
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
                     'kodepos'     => KodePos::find($transaksi->id_kodepos),
-                    'pricing'     => Pricing::where('id_transaksi',$transaksi->transid)
-                        ->join('transaksi_kode as tk','transaksi_pricing.id_kodetrans','=','tk.kodetrans_id')
-                        ->orderBy('id_kodetrans','ASC')
-                        ->get(),
+                    'pricing'     => $pricing,
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi',1)
                         ->where('transaksi_pricing.value','<>',0)
@@ -154,7 +165,7 @@ class CetakController extends Controller
 
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
-                $path   = "public/files/$transid/";
+                $path   = "files/$transid/";
                 $filename = "Cover_Note-$transid.pdf";
                 if (!is_dir(public_path($path))) {
                     mkdir(public_path($path), 0777, TRUE);
@@ -165,14 +176,14 @@ class CetakController extends Controller
                     $eksis = true;
                 }
 
-                file_put_contents($path . $filename, $output);
+                file_put_contents(public_path($path) . $filename, $output);
                 // return redirect($path . $filename);
                 $insert = [
                     'id_transaksi'  => $transaksi->transid,
                     'nama_file'     => $filename,
                     'tipe_file'     => "pdf",
                     'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
-                    'lokasi_file'   => $path . $filename,
+                    'lokasi_file'   => "public/".$path . $filename,
                     'jenis_file'    => "COVERNOTE",
                     'created_by'    => 1,
                 ];
@@ -198,7 +209,15 @@ class CetakController extends Controller
         $transaksi = Transaksi::find($transid);
         if (!empty($transaksi)) {
             if ($transaksi->id_status >= 3) {
-                // return $transaksi->billing_at;
+                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)
+                    ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')
+                    ->orderBy('id_kodetrans', 'ASC')
+                    ->get();
+                foreach ($dataPricing as $row) {
+                    // echo $row->id_kodetrans;
+                    $pricing[$row->id_kodetrans] = $row;
+                }
+
                 $data = [
                     'transaksi'   => $transaksi,
                     'asuransi'    => Asuransi::find($transaksi->id_asuransi),
@@ -209,10 +228,7 @@ class CetakController extends Controller
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
                     'kodepos'     => KodePos::find($transaksi->id_kodepos),
-                    'pricing'     => Pricing::where('id_transaksi', $transaksi->transid)
-                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')
-                        ->orderBy('id_kodetrans', 'ASC')
-                        ->get(),
+                    'pricing'     => $pricing,
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi', 1)
                         ->where('transaksi_pricing.value', '<>', 0)
@@ -280,7 +296,15 @@ class CetakController extends Controller
         if (!empty($transaksi)) {
             $asuransi   = Asuransi::find($transaksi->id_asuransi);
             if ($transaksi->id_status >= 3) {
-                // return $transaksi->billing_at;
+                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)
+                    ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')
+                    ->orderBy('id_kodetrans', 'ASC')
+                    ->get();
+                foreach ($dataPricing as $row) {
+                    // echo $row->id_kodetrans;
+                    $pricing[$row->id_kodetrans] = $row;
+                }
+
                 $data = [
                     'transaksi'   => $transaksi,
                     'asuransi'    => Asuransi::find($transaksi->id_asuransi),
@@ -290,10 +314,7 @@ class CetakController extends Controller
                     'tertanggung' => Insured::find($transaksi->id_insured),
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
-                    'pricing'     => Pricing::where('id_transaksi', $transaksi->transid)
-                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')
-                        ->orderBy('id_kodetrans', 'ASC')
-                        ->get(),
+                    'pricing'     => $pricing,
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi', 1)
                         ->where('transaksi_pricing.value', '<>', 0)
@@ -313,7 +334,7 @@ class CetakController extends Controller
 
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
-                $path   = "public/files/$transid/";
+                $path   = "files/$transid/";
                 $filename = "Akseptasi_".$asuransi->akronim."-$transid.pdf";
                 if (!is_dir(public_path($path))) {
                     mkdir(public_path($path), 0777, TRUE);
@@ -324,14 +345,14 @@ class CetakController extends Controller
                     $eksis = true;
                 }
 
-                file_put_contents($path . $filename, $output);
+                file_put_contents(public_path($path) . $filename, $output);
                 // return redirect($path . $filename);
                 $insert = [
                     'id_transaksi'  => $transaksi->transid,
                     'nama_file'     => $filename,
                     'tipe_file'     => "pdf",
                     'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
-                    'lokasi_file'   => $path . $filename,
+                    'lokasi_file'   => "public/" . $path . $filename,
                     'jenis_file'    => "AKSEPTASI",
                     'created_by'    => 1,
                 ];
@@ -389,9 +410,15 @@ class CetakController extends Controller
         ->first();
         if (!empty($transaksi)){
             if ($transaksi->id_status >= 4) {
+                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)->orderBy('id_kodetrans', 'ASC')->get();
+                foreach ($dataPricing as $row) {
+                    // echo $row->id_kodetrans;
+                    $pricing[$row->id_kodetrans] = $row;
+                }
+
                 $data['data']       = $transaksi;
                 $data['tgl_aktif']  = Activity::where('id_transaksi',$transaksi->transid)->where('id_status','4')->orderBy('created_at','DESC')->first();
-                $data['pricing']    = Pricing::where('id_transaksi', $transaksi->transid)->orderBy('id_kodetrans','ASC')->get();
+                $data['pricing']    = $pricing;
                 $data['asuransi']   = Asuransi::find($transaksi->id_asuransi);
             } else {
                 return abort(403, "Belum disetujui oleh asuransi");
@@ -399,10 +426,6 @@ class CetakController extends Controller
         } else {
             $data['data'] = null;
         }
-
-        // return "$data";
-
-        // dd($data['pricing']);
 
         return view('cek/cover_note', $data);
     }

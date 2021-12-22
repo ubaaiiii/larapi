@@ -209,7 +209,7 @@
         <table cellspacing=0 style="width: 40% !important">
           <tr>
             <td><strong>IDR</strong></td>
-            <td align="right" style="border-top: 1px solid black;"><strong>{{ number_format($data['pricing'][0]->value,2) }}</strong></td>
+            <td align="right" style="border-top: 1px solid black;"><strong>{{ number_format($data['pricing'][1]->value,2) }}</strong></td>
           </tr>
         </table>
       </td>
@@ -278,9 +278,9 @@
       <tr>
         <td width="10%">&nbsp;&nbsp;Premi</td>
         <td width="5%">:</td>
-        <td width="55%">IDR {{ number_format($data['pricing'][0]->value,2) }} &nbsp;&nbsp;&nbsp;x {{ $total_rate }} ‰</td>
+        <td width="55%">IDR {{ number_format($data['pricing'][1]->value,2) }} &nbsp;&nbsp;&nbsp;x {{ $total_rate }} ‰</td>
         <td width="6%" align="right">= IDR</td>
-        <td width="" align="right">{{ number_format($data['pricing'][1]->value,2) }}</td>
+        <td width="" align="right">{{ number_format($data['pricing'][2]->value,2) }}</td>
         <td width="1%"></td>
       </tr>
       <tr>
@@ -288,7 +288,7 @@
         <td></td>
         <td>Biaya Materai + Polis</td>
         <td align="right">= IDR</td>
-        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][9]->value+$data['pricing'][10]->value,2) }}</td>
+        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][10]->value+$data['pricing'][11]->value,2) }}</td>
         <td>+</td>
       </tr>
       <tr>
