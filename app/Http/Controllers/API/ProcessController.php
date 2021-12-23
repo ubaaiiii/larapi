@@ -588,8 +588,7 @@ class ProcessController extends Controller
                         } else if ($transaksi->id_status == 4) {
                             $status     = 5;
                             $string     = "setujui";
-                            $cetak      = new CetakController;
-                            $cetak->cetakCoverNote($request->transid);
+                            $cetakCoverNote = true;
                         }
                         break;
 
@@ -652,8 +651,7 @@ class ProcessController extends Controller
                         } else if ($transaksi->id_status == 4) {
                             $status     = 5;
                             $string     = "setujui";
-                            $cetak      = new CetakController;
-                            $cetak->cetakCoverNote($request->transid);
+                            $cetakCoverNote = true;
                         }
                         break;
 
@@ -702,8 +700,7 @@ class ProcessController extends Controller
                         if ($transaksi->id_status == 3) {
                             $status = 4;
                             $string = "setujui";
-                            $cetak = new CetakController;
-                            $cetak->cetakAkseptasi($request->transid);
+                            $cetakAkseptasi = true;
                         } else if ($transaksi->id_status == 6) {
                             $status = 7;
                             $string = "aktifkan polisnya";
@@ -722,6 +719,14 @@ class ProcessController extends Controller
 
                 $this->pricing($request);
                 $this->aktifitas($request->transid, $status, $request->catatan);
+
+                $cetak = new CetakController;
+                if (!empty($cetakAkseptasi)) {
+                    $cetak->cetakAkseptasi($request->transid);
+                }
+                if (!empty($cetakCoverNote)) {
+                    $cetak->cetakCoverNote($request->transid);
+                }
 
                 return response()->json([
                     'message'   => 'Debitur ' . $request->nama_insured . " berhasil di" . $string,

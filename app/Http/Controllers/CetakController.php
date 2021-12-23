@@ -314,6 +314,7 @@ class CetakController extends Controller
                     'tertanggung' => Insured::find($transaksi->id_insured),
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
+                    'kodepos'     => KodePos::find($transaksi->id_kodepos),
                     'pricing'     => $pricing,
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi', 1)
