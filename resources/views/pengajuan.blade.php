@@ -1341,7 +1341,7 @@
                     .html(btnHtml);
             });
 
-            @if (!empty($data)
+            @if (!empty($data))
                 $('#btn-klausula').click(function(){
                     var klausulaValue = $('.ql-editor').html(),
                         btnHtml = $(this).html(),
