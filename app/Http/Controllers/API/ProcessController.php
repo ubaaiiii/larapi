@@ -808,7 +808,125 @@ class ProcessController extends Controller
                 break;
 
             case 'renewal':
+                $request->validate([
+                    'transid_parent'    => 'string|max:12',
+                    'type_insurance'    => 'required|string',
+                    'asuransi'          => 'string',
+                    'cabang'            => 'required',
+                    'alamat_cabang'     => 'required|string',
+                    'nama_cabang'       => 'required|string',
+                    'nopinjaman'        => 'numeric',
+                    'cif'               => 'string',
+                    'insured'           => 'required',
+                    'nik_insured'       => 'numeric|nullable',
+                    'npwp_insured'      => 'numeric|nullable',
+                    'nama_insured'      => 'required|string',
+                    'nohp_insured'      => 'required|string',
+                    'alamat_insured'    => 'required|string',
+                    'plafond_kredit'    => 'required',
+                    'outstanding_kredit' => 'required',
+                    'policy_no'         => 'alpha_dash|nullable',
+                    'nopolis_lama'      => 'alpha_dash|nullable',
+                    'polis_start'       => 'required|string',
+                    'polis_end'         => 'required|string',
+                    'masa'              => 'required|numeric',
+                    'kjpp_start'        => 'required|string',
+                    'kjpp_end'          => 'required|string',
+                    'agunan_kjpp'       => 'required',
+                    'jaminan'           => 'required|string',
+                    'no_jaminan'        => 'required',
+                    'okupasi'           => 'numeric',
+                    'lokasi_okupasi'    => 'string',
+                    'objek_okupasi'     => 'string',
+                    'kodepos'           => 'numeric',
+                    'catatan'           => 'string|nullable',
+                    'kodetrans_value'   => 'required|array|min:1|nullable',
+                    'kodetrans_remarks' => 'array|nullable',
+                    'klausula'          => 'required',
+                ]);
+                // return $request->all();
 
+                if (empty($request->transid) || !isset($request->transid)) {
+                    $totalBulanIni  = DB::table('transaksi')->whereYear('created_at', '=', date('Y'))->whereMonth('created_at', '=', date('m'))->count();
+                    $sequential = Sequential::where('seqdesc', 'transid')->first();
+                    if ($totalBulanIni == 0) {
+                        $sequential = tap(Sequential::where('seqdesc', 'transid'))->update(['seqno' => 0])->first();
+                    }
+                    $sequential = tap(Sequential::where('seqdesc', 'transid'))->update(['seqno' => $sequential->seqno + 1])->first();
+                    $transid    = $sequential->seqlead . date($sequential->seqformat) . str_pad($sequential->seqno, $sequential->seqlen, '0', STR_PAD_LEFT);
+
+                    if (Transaksi::withTrashed()->where('transid', '=', $transid)->count() !== 0) {
+                        $sequential = tap(Sequential::where('seqdesc', 'transid'))->update(['seqno' => $sequential->seqno + 1])->first();
+                        $transid    = $sequential->seqlead . date($sequential->seqformat) . str_pad($sequential->seqno, $sequential->seqlen, '0', STR_PAD_LEFT);
+                    }
+
+                    $request->merge(['transid' => $transid]);
+                }
+
+                $insured    = $this->tertanggung($request);
+                $cabang     = $this->cabang($request);
+                $pricing    = $this->pricing($request);
+                // return $pricing;
+
+                $data       = Transaksi::find($request->transid);
+
+                $save = Transaksi::updateOrCreate(
+                    [
+                        'transid'           => $request->transid,
+                    ],
+                    [
+                        'id_instype'        => $request->type_insurance,
+                        'id_cabang'         => $cabang->id,
+                        'nopinjaman'        => $request->nopinjaman,
+                        'cif'               => $request->cif,
+                        'id_insured'        => $insured->id,
+                        'plafond_kredit'    => round($request->plafond_kredit, 2),
+                        'outstanding_kredit' => round($request->outstanding_kredit, 2),
+                        'policy_no'         => $request->policy_no,
+                        'policy_parent'     => $request->nopolis_lama,
+                        'polis_start'       => $request->polis_start,
+                        'polis_end'         => $request->polis_end,
+                        'masa'              => $request->masa,
+                        'kjpp_start'        => $request->kjpp_start,
+                        'kjpp_end'          => $request->kjpp_end,
+                        'agunan_kjpp'       => round($request->agunan_kjpp, 2),
+                        'id_jaminan'        => $request->jaminan,
+                        'no_jaminan'        => $request->no_jaminan,
+                        'id_okupasi'        => $request->okupasi,
+                        'location'          => $request->lokasi_okupasi,
+                        'object'            => $request->objek_okupasi,
+                        'id_kodepos'        => $request->kodepos,
+                        'catatan'           => $request->catatan,
+                        'klausula'          => $request->klausula,
+                        'created_by'        => Auth::user()->id,
+                        'id_status'         => '0',
+                    ]
+                );
+
+                if (!$save->wasRecentlyCreated && $save->wasChanged()) {
+                    $method = "update";
+                    $changes = $save->getChanges();
+                    // $original = $save->getRawOriginal();
+                    $text = 'Perubahan data pengajuan, sebelumnya:';
+                    foreach ($changes as $key => $value) {
+                        if ($key !== "updated_at" && $key !== "catatan" && $key !== "created_by") {
+                            $text .= "<br>- " . $key . " : " . $data->$key;
+                        }
+                    }
+                    if (!empty($request->catatan)) {
+                        $text .= "<br>Catatan: " . $request->catatan;
+                    }
+                    $this->aktifitas($request->transid, '0', $text);
+                } else if ($save->wasRecentlyCreated) {
+                    $method = "create";
+                    $this->aktifitas($request->transid, '0', $request->catatan);
+                }
+
+                return response()->json([
+                    'message'   => 'Pengajuan ' . $request->name . ' Berhasil Disimpan',
+                    'method'    => $method,
+                    'data'      => $save
+                ], 200);
                 break;
 
             case 'klausula':
@@ -922,10 +1040,5 @@ class ProcessController extends Controller
         }
 
         return $cabang;
-    }
-
-    public function profil(Request $request)
-    {
-        return $request->all();
     }
 }

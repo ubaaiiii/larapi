@@ -23,7 +23,7 @@
             @if ($method == 'update' && !empty($data))
                 <button class="btn btn-sm btn-primary" id="btn-update"><i class="fa fa-save mr-2"></i>Simpan</button>
             @endif
-            @if ($method == 'perpanjang' && !empty($data))
+            @if ($method == 'renewal' && !empty($data))
                 <button class="btn btn-sm btn-primary" id="btn-perpanjang"><i class="fa fa-sync-alt mr-2"></i>Perpanjang</button>
             @endif
             @if ($method == 'approve' && !empty($data))
@@ -45,7 +45,7 @@
                         $status_rollback = "TERTUNDA";
                     ?>
                 @endrole
-                @role('broker')
+                @role('broker|adm')
                     @if ($data->id_status == 2)
                         <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Verifikasi</button>
                         <?php 
@@ -112,10 +112,18 @@
                 <div id="horizontal-form" class="p-5">
                     <form class="formnya">
                         <div class="preview">
-                            @if (($act == 'view' || $act == 'edit') && !empty($data->transid))
+                            @if ($method !== 'renewal')
+                                @if (($act == 'view' || $act == 'edit') && !empty($data->transid))
+                                    <div class="form-inline mt-5">
+                                        <label for="transid" class="form-label sm:w-20">Nomor Transaksi</label>
+                                        <input type="text" id="transid" class="form-control" required
+                                            value="{{ $data->transid }}" disabled>
+                                    </div>
+                                @endif
+                            @else
                                 <div class="form-inline mt-5">
-                                    <label for="transid" class="form-label sm:w-20">Nomor Transaksi</label>
-                                    <input type="text" id="transid" class="form-control" required
+                                    <label for="transid_parent" class="form-label sm:w-20">Nomor Transaksi Renewal</label>
+                                    <input type="text" id="transid_parent" class="form-control" required
                                         value="{{ $data->transid }}" disabled>
                                 </div>
                             @endif
@@ -1333,121 +1341,123 @@
                     .html(btnHtml);
             });
 
-            $('#btn-klausula').click(function(){
-                var klausulaValue = $('.ql-editor').html(),
-                    btnHtml = $(this).html(),
-                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...";
+            @if (!empty($data)
+                $('#btn-klausula').click(function(){
+                    var klausulaValue = $('.ql-editor').html(),
+                        btnHtml = $(this).html(),
+                        loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...";
 
-                $(this)
-                    .attr('disabled',true)
-                    .html(loading);
+                    $(this)
+                        .attr('disabled',true)
+                        .html(loading);
 
-                $.ajax({
-                    url: "{{ url('api/pengajuan') }}",
-                    method: "POST",
-                    data: {
-                        "klausula":klausulaValue,
-                        "method":"klausula",
-                        "transid":"{{ $data->transid }}",
-                        "_token":"{{ csrf_token() }}"},
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                    },
-                    success: function(d) {
-                        console.log(d);
-                        Swal.fire(
-                            'Berhasil!',
-                            d.message,
-                            'success'
-                        );
-                    },
-                    error: function(d) {
-                        console.log(d);
-                        var message = d.responseJSON.message;
-                        console.log('message:',message);
-                        Swal.fire(
-                            'Gagal!',
-                            message,
-                            'error'
-                        );
-                    }
+                    $.ajax({
+                        url: "{{ url('api/pengajuan') }}",
+                        method: "POST",
+                        data: {
+                            "klausula":klausulaValue,
+                            "method":"klausula",
+                            "transid":"{{ $data->transid }}",
+                            "_token":"{{ csrf_token() }}"},
+                        headers: {
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        },
+                        success: function(d) {
+                            console.log(d);
+                            Swal.fire(
+                                'Berhasil!',
+                                d.message,
+                                'success'
+                            );
+                        },
+                        error: function(d) {
+                            console.log(d);
+                            var message = d.responseJSON.message;
+                            console.log('message:',message);
+                            Swal.fire(
+                                'Gagal!',
+                                message,
+                                'error'
+                            );
+                        }
+                    });
+                    $(this)
+                        .attr('disabled',false)
+                        .html(btnHtml);
                 });
-                $(this)
-                    .attr('disabled',false)
-                    .html(btnHtml);
-            });
+            @endif
 
             @if (!empty($data) && $data->id_status !== 0 && $method == 'approve')
-            $('.btn-rollback').click(function(){
-                var btnHtml = $(this).html(),
-                    loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
-                    nama_insured = $('#insured option:selected').text(),
-                    method  = "rollback",
-                    _token  = "{{ csrf_token() }}",
-                    catatan = $('#catatan').val(),
-                    transid = "{{ $data->transid }}";
+                $('.btn-rollback').click(function() {
+                    var btnHtml = $(this).html(),
+                        loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
+                        nama_insured = $('#insured option:selected').text(),
+                        method  = "rollback",
+                        _token  = "{{ csrf_token() }}",
+                        catatan = $('#catatan').val(),
+                        transid = "{{ $data->transid }}";
 
-                $(this)
-                    .attr('disabled',true)
-                    .html(loading);
+                    $(this)
+                        .attr('disabled',true)
+                        .html(loading);
 
-                Swal.fire({
-                    title: 'Apakah Anda Yakin?',
-                    text: "Data akan dikembalikan ke status {{ $status_rollback }}",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Kembalikan!',
-                    cancelButtonText: 'Tidak Jadi'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Catatan Pengembalian',
-                            input: 'textarea',
-                            inputValue: catatan,
-                            showCancelButton: true,
-                            confirmButtonText: 'Konfirmasi',
-                            cancelButtonText: 'Batal'
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                $.ajax({
-                                    url: "{{ url('api/pengajuan') }}",
-                                    method: "POST",
-                                    data: {catatan,transid,nama_insured,method,_token},
-                                    headers: {
-                                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                                    },
-                                    success: function(d) {
-                                        console.log(d);
-                                        Swal.fire(
-                                            'Berhasil!',
-                                            d.message,
-                                            'success'
-                                        ).then(function() {
-                                            if (d.method == 'create') {
-                                                window.location = "{{ url('inquiry') }}";
-                                            } else {
-                                                window.top.close();
-                                            }
-                                        });
-                                    },
-                                    error: function(d) {
-                                        var message = d.responseJSON.message;
-                                        // console.log(d.responseJSON.errors);
-                                        Swal.fire(
-                                            'Gagal!',
-                                            message,
-                                            'error'
-                                        )
-                                    }
-                                });
-                            }
-                        });
-                    }
-                })
-                $(this)
-                    .attr('disabled',false)
-                    .html(btnHtml);
-            });
+                    Swal.fire({
+                        title: 'Apakah Anda Yakin?',
+                        text: "Data akan dikembalikan ke status {{ $status_rollback }}",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Kembalikan!',
+                        cancelButtonText: 'Tidak Jadi'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Catatan Pengembalian',
+                                input: 'textarea',
+                                inputValue: catatan,
+                                showCancelButton: true,
+                                confirmButtonText: 'Konfirmasi',
+                                cancelButtonText: 'Batal'
+                            }).then(function(result) {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        url: "{{ url('api/pengajuan') }}",
+                                        method: "POST",
+                                        data: {catatan,transid,nama_insured,method,_token},
+                                        headers: {
+                                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                                        },
+                                        success: function(d) {
+                                            console.log(d);
+                                            Swal.fire(
+                                                'Berhasil!',
+                                                d.message,
+                                                'success'
+                                            ).then(function() {
+                                                if (d.method == 'create') {
+                                                    window.location = "{{ url('inquiry') }}";
+                                                } else {
+                                                    window.top.close();
+                                                }
+                                            });
+                                        },
+                                        error: function(d) {
+                                            var message = d.responseJSON.message;
+                                            // console.log(d.responseJSON.errors);
+                                            Swal.fire(
+                                                'Gagal!',
+                                                message,
+                                                'error'
+                                            )
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    })
+                    $(this)
+                        .attr('disabled',false)
+                        .html(btnHtml);
+                });
             @endif
 
             RATE = parseFloat($("#okupasi option:selected").text().slice($("#okupasi option:selected").text().indexOf("(") + 1, $("#okupasi option:selected").text().lastIndexOf("‰")));
