@@ -91,9 +91,6 @@
                             notif += `  <div class="intro-y col-span-12 md:col-span-6 mb-2">
                                             <div class="box zoom-in" id="`+id+`">
                                                 <div class="flex flex-col lg:flex-row items-center p-5">
-                                                    <div class="w-12 h-12 image-fit lg:mr-1">
-                                                        <i data-feather="square" class="w-12 h-12"></i>
-                                                    </div>
                                                     <div class="lg:ml-2 lg:mr-auto text-center lg:text-left mt-3 lg:mt-0">
                                                         <a href="javascript:;" class="font-medium">`+name+`</a>
                                                         <div class="text-gray-600 text-xs mt-0.5">`+text+`</div>
