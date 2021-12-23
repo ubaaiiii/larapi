@@ -1303,7 +1303,7 @@
                 $.ajax({
                     url: "{{ url('api/pengajuan') }}",
                     method: "POST",
-                    data: $('.formnya').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang+"",
+                    data: $('.formnya').serialize() + "&method=approve&_token={{ csrf_token() }}&nama_insured="+nama_insured+"&nama_cabang="+nama_cabang+"&klausula="+encodeURIComponent(klausulaValue),
                     headers: {
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
