@@ -22,7 +22,7 @@
                                         <i data-feather="square" class="report-box__icon text-theme-10"></i>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengajuan"></div>
-                                    <div class="text-base text-gray-600 mt-1">Data Pengajuan</div>
+                                    <div class="text-base text-gray-600 mt-1">Pengajuan</div>
                                 </div>
                             </div>
                         </div>
@@ -33,7 +33,40 @@
                                         <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval"></div>
-                                    <div class="text-base text-gray-600 mt-1">Data Approval</div>
+                                    <div class="text-base text-gray-600 mt-1">Verifikasi</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                            <div class="report-box zoom-in">
+                                <div class="box p-5" onclick="filterInquiry('approval')">
+                                    <div class="flex">
+                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
+                                    </div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval">0</div>
+                                    <div class="text-base text-gray-600 mt-1">Persetujuan Asuransi</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                            <div class="report-box zoom-in">
+                                <div class="box p-5" onclick="filterInquiry('approval')">
+                                    <div class="flex">
+                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
+                                    </div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval">0</div>
+                                    <div class="text-base text-gray-600 mt-1">Persetujuan Bank</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                            <div class="report-box zoom-in">
+                                <div class="box p-5" onclick="filterInquiry('approval')">
+                                    <div class="flex">
+                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
+                                    </div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval">0</div>
+                                    <div class="text-base text-gray-600 mt-1">Tagihan Premi</div>
                                 </div>
                             </div>
                         </div>
@@ -44,7 +77,7 @@
                                         <i data-feather="circle" class="report-box__icon text-theme-12"></i>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar"></div>
-                                    <div class="text-base text-gray-600 mt-1">Data Dibayar</div>
+                                    <div class="text-base text-gray-600 mt-1">Premi Dibayar</div>
                                 </div>
                             </div>
                         </div>
@@ -55,7 +88,18 @@
                                         <i data-feather="check-circle" class="report-box__icon text-theme-9"></i>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-polis"></div>
-                                    <div class="text-base text-gray-600 mt-1">Data Polis SIAP</div>
+                                    <div class="text-base text-gray-600 mt-1">Polis SIAP</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                            <div class="report-box zoom-in">
+                                <div class="box p-5" onclick="filterInquiry('polis siap')">
+                                    <div class="flex">
+                                        <i data-feather="x-octagon" class="report-box__icon text-theme-6"></i>
+                                    </div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="">0</div>
+                                    <div class="text-base text-gray-600 mt-1">Cover Note Dibatalkan</div>
                                 </div>
                             </div>
                         </div>

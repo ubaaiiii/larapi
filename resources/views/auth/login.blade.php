@@ -39,7 +39,7 @@ License: You must have a valid license purchased only from themeforest(the above
                 </a>
                 <div class="my-auto">
                     <img alt="Rubick Tailwind HTML Admin Template" class="-intro-x w-1/2 -mt-16"
-                        src="{{ url('public/dist/images/illustration.svg') }}">
+                        src="{{ url('public/dist/images/illustration-3.svg') }}">
                     <div class="-intro-x text-white font-medium text-4xl leading-tight mt-10">
                         Bina Dana Sejahtera
                     </div>

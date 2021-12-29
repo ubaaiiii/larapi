@@ -13,6 +13,7 @@ use App\Models\Okupasi;
 use App\Models\Pricing;
 use App\Models\Transaksi;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -965,17 +966,6 @@ class DataController extends Controller
     }
 
     public function dataNotifikasi(Request $request) {
-        // DB::enableQueryLog();
-        // $user = User::find($request->id);
-        // $notif = $user->notifications->where('type', 'App\Notifications\PushNotification')->sortBy('created_by');
-        // if (!empty($request->search)) {
-        //     $notif->where('notifications.data','like', '%'. $request->search. '%');
-        // }
-        // if (!empty($request->limit)) {
-        //     $notif->take($request->limit);
-        // }
-        // return $request->search;
-        // return DB::getQueryLog();
         $notif = DB::table('notifications')
             ->where('notifiable_id',$request->id)
             ->where('type', 'App\Notifications\PushNotification');
@@ -988,7 +978,22 @@ class DataController extends Controller
         if (!empty($request->limit)) {
             $notif->take($request->limit);
         }
-        return $notif->get();
+        $notif = $notif->get();
+
+        foreach ($notif as $row) {
+            $data = [];
+            $data['id']                 = $row->id;
+            $data['type']               = $row->type;
+            $data['notifiable_type']    = $row->notifiable_type;
+            $data['data']               = $row->data;
+            $data['read_at']            = $row->read_at;
+            $data['created_at']         = Carbon::createFromFormat('Y-m-d H:i:s', $row->created_at)->diffForHumans();
+            $data[] = $data;
+
+            $rowdata[] = $data;
+        }
+
+        return response()->json($rowdata);
     }
 
     public function cariTransaksi(Request $request) {

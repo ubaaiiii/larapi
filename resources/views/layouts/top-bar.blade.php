@@ -56,6 +56,8 @@
                     // console.log('d',d.length);
                     var konten  = $('#notif-content'),
                         baru = false;
+                    
+                    console.log(d);
                     if (d.length > 0) {
                         var notif = "",
                             users = {!! json_encode(App\Models\User::select('id','name','username')->get()) !!},
@@ -72,12 +74,8 @@
                                 var id          = d[i].id,
                                     icon        = data.icon,
                                     newBadge    = "",
-                                    text        = data.text
-                                    name        = $.map(users, function(j) {
-                                        if (j.id == d[i].data['user']) {
-                                            return j.name;
-                                        }
-                                    });
+                                    text        = data.text,
+                                    transid     = data.transid;
 
                                 if (d[i].read_at == null) {
                                     if (baru == false) {
@@ -87,18 +85,18 @@
                                     text = `<b>`+text+`</b>`;
                                 }
 
-                                notif += `  <div class="cursor-pointer relative flex items-center mb-3 zoom-in" id="`+ id +`">
-                                                <div class="w-12 h-12 flex-none image-fit mr-1">
-                                                    <i data-feather="`+ icon +`" class="w-12 h-12"></i>`+newBadge+`
-                                                </div>
+                                notif += `  <div class="cursor-pointer relative flex items-center mb-5 zoom-in" id="`+ id +`">
                                                 <div class="ml-2 overflow-hidden">
                                                     <div class="flex items-center">
-                                                        <a href="javascript:;" class="font-medium truncate mr-5">`+name+`</a>
-                                                        <div class="text-xs text-gray-500 ml-auto whitespace-nowrap">`+ prettyDate(d[i].created_at) +`</div>
+                                                        `+ newBadge +`
+                                                        <a href="javascript:;" class="font-medium truncate mr-5">`+ transid +`</a>
+                                                        <div class="text-xs text-gray-500 ml-auto whitespace-nowrap">`+ d[i].created_at +`</div>
                                                     </div>
-                                                    <div class="w-full truncate text-gray-600 mt-0.5 tooltip" data-theme="light" title="`+ data.text +`">`+ text +`</div>
+                                                    <div class="w-full truncate text-gray-600 mt-0.5 tooltip" data-theme="light" title="`+ text +`">`+ text +`</div>
                                                 </div>
                                             </div>`;
+                            } else {
+                                break;
                             }
                         }
                         if (d.length > 5) {

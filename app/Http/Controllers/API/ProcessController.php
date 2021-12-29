@@ -802,7 +802,7 @@ class ProcessController extends Controller
                 // Status 11 = DIKEMBALIKAN
                 $this->aktifitas($request->transid, 11, $catatan);
                 $notif = new NotificationController;
-                $notif->sendPushNotif($request->transid, $transaksi->created_by, "rollback", "ID Transaksi: " . $request->transid . " dikembalikan dengan catatan: " . $catatan);
+                $notif->sendPushNotif($request->transid, $transaksi->created_by, "rollback", $catatan);
 
                 return response()->json([
                     'message'   => 'Debitur ' . $request->nama_insured . " berhasil dikembalikan ",

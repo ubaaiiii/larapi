@@ -88,15 +88,19 @@
                             } else {
                                 text = data.text;
                             }
+                            if (d[i].read_at == null) {
+                                textHtml = `<a href="javascript:;" class="font-medium"><b>`+name+`</b></a><div class="text-gray-600 text-xs mt-0.5"><b>`+text+`</b></div>`;
+                            } else {
+                                textHtml = `<a href="javascript:;" class="font-medium">`+name+`</a><div class="text-gray-600 text-xs mt-0.5">`+text+`</div>`;
+                            }
                             notif += `  <div class="intro-y col-span-12 md:col-span-6 mb-2">
                                             <div class="box zoom-in" id="`+id+`">
                                                 <div class="flex flex-col lg:flex-row items-center p-5">
                                                     <div class="lg:ml-2 lg:mr-auto text-center lg:text-left mt-3 lg:mt-0">
-                                                        <a href="javascript:;" class="font-medium">`+name+`</a>
-                                                        <div class="text-gray-600 text-xs mt-0.5">`+text+`</div>
+                                                        `+ textHtml +`
                                                     </div>
                                                     <div class="flex mt-4 lg:mt-0">
-                                                        <div class="text-xs text-gray-500 ml-auto whitespace-nowrap">`+prettyDate(d[i].created_at)+`</div>
+                                                        <div class="text-xs text-gray-500 ml-auto whitespace-nowrap">`+d[i].created_at+`</div>
                                                     </div>
                                                 </div>
                                             </div>

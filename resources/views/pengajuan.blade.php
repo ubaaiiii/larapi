@@ -402,6 +402,7 @@
                                 <input type="hidden" name="kodetrans_value[11]">
                             </div>
                         </div>
+                        <button class="btn btn-sm btn-success btn-approve mt-2"><i class="fa fa-save mr-2"></i>Simpan Biaya</button>
                     </div>
                 </form>
             </div>
