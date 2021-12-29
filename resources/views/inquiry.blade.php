@@ -91,11 +91,6 @@
                                     <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Verifikasi
                                 </a>
-                                <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
-                                    style="cursor:pointer">
-                                    <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Input Pembayaran
-                                </a>
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-8"
                                     style="cursor:pointer">
                                     <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
@@ -108,6 +103,13 @@
                                     Kembalikan
                                 </a>
                             @endrole
+                            @role('finance|adm')
+                                <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
+                                    style="cursor:pointer">
+                                    <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Input Pembayaran
+                                </a>
+                                @endrole
                             @role('insurance|adm')
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                     style="cursor:pointer">
@@ -127,8 +129,8 @@
                                 </a>
                             @endrole
                         </div>
-                        @role('checker|maker|broker|adm')
-                            <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 text-theme-9">
+                        @role('checker|maker|broker|finance|adm')
+                            <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 st-6 st-7 st-8 st-9 st-10 text-theme-9">
                                 <a id="ps-invoice"
                                     class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                     style="cursor:pointer">

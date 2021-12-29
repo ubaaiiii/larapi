@@ -10,7 +10,7 @@
                 <div class="col-span-12 mt-8">
                     <div class="intro-y flex items-center h-10">
                         <h2 class="text-lg font-medium truncate mr-5">
-                            Laporan Status<br>
+                            Statistik Data<br>
                         </h2>
                         <a id="segarkan" class="ml-auto flex items-center text-theme-1 dark:text-theme-10 cursor-pointer"> <i class="fa fa-sync-alt w-4 h-4 mr-3"></i> Segarkan Data </a>
                     </div>
@@ -19,53 +19,53 @@
                             <div class="report-box zoom-in">
                                 <div class="box p-5" onclick="filterInquiry('pengajuan')">
                                     <div class="flex">
-                                        <i data-feather="square" class="report-box__icon text-theme-10"></i>
+                                        <i class="fa fa-file-medical text-theme-10" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengajuan"></div>
-                                    <div class="text-base text-gray-600 mt-1">Pengajuan</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengajuan">0</div>
+                                    <div class="text-base text-gray-600 mt-1" id="text-pengajuan">Pengajuan Bank</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="filterInquiry('approval')">
+                                <div class="box p-5" onclick="filterInquiry('verifikasi')">
                                     <div class="flex">
-                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
+                                        <i class="fa fa-tasks text-theme-11" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval"></div>
-                                    <div class="text-base text-gray-600 mt-1">Verifikasi</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-verifikasi">0</div>
+                                    <div class="text-base text-gray-600 mt-1" id="text-approval">Verifikasi Broker</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="filterInquiry('approval')">
+                                <div class="box p-5" onclick="filterInquiry('persetujuan asuransi')">
                                     <div class="flex">
-                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
+                                        <i class="fa fa-check text-theme-11" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-asuransi">0</div>
                                     <div class="text-base text-gray-600 mt-1">Persetujuan Asuransi</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="filterInquiry('approval')">
+                                <div class="box p-5" onclick="filterInquiry('persetujuan bank')">
                                     <div class="flex">
-                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
+                                        <i class="fa fa-check-double text-theme-11" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-bank">0</div>
                                     <div class="text-base text-gray-600 mt-1">Persetujuan Bank</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="filterInquiry('approval')">
+                                <div class="box p-5" onclick="filterInquiry('tagihan')">
                                     <div class="flex">
-                                        <i data-feather="check-square" class="report-box__icon text-theme-11"></i>
+                                        <i class="fa fa-money-check-alt text-theme-12" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-approval">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-tagihan">0</div>
                                     <div class="text-base text-gray-600 mt-1">Tagihan Premi</div>
                                 </div>
                             </div>
@@ -74,10 +74,10 @@
                             <div class="report-box zoom-in">
                                 <div class="box p-5" onclick="filterInquiry('dibayar')">
                                     <div class="flex">
-                                        <i data-feather="circle" class="report-box__icon text-theme-12"></i>
+                                        <i class="fa fa-hand-holding-usd text-theme-12" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar"></div>
-                                    <div class="text-base text-gray-600 mt-1">Premi Dibayar</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar">0</div>
+                                    <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar</div>
                                 </div>
                             </div>
                         </div>
@@ -85,20 +85,20 @@
                             <div class="report-box zoom-in">
                                 <div class="box p-5" onclick="filterInquiry('polis siap')">
                                     <div class="flex">
-                                        <i data-feather="check-circle" class="report-box__icon text-theme-9"></i>
+                                        <i class="fa fa-file-invoice text-theme-9" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-polis"></div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-polis">0</div>
                                     <div class="text-base text-gray-600 mt-1">Polis SIAP</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="filterInquiry('polis siap')">
+                                <div class="box p-5" onclick="filterInquiry('covernote batal')">
                                     <div class="flex">
-                                        <i data-feather="x-octagon" class="report-box__icon text-theme-6"></i>
+                                        <i class="fa fa-exclamation-triangle text-theme-6" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-batal">0</div>
                                     <div class="text-base text-gray-600 mt-1">Cover Note Dibatalkan</div>
                                 </div>
                             </div>
@@ -585,9 +585,13 @@
                 },
                 success: function(d) {
                     $('#angka-pengajuan').text(d.Pengajuan);
-                    $('#angka-approval').text(d.Approval);
+                    $('#angka-verifikasi').text(d.Verifikasi);
+                    $('#angka-asuransi').text(d.Asuransi);
+                    $('#angka-bank').text(d.Bank);
+                    $('#angka-tagihan').text(d.Tagihan);
                     $('#angka-dibayar').text(d.Dibayar);
                     $('#angka-polis').text(d.Polis);
+                    $('#angka-batal').text(d.Batal);
                     // console.log('success: ',d);
                 },
                 error: function(d) {
@@ -602,10 +606,10 @@
                 $('#segarkan i').toggleClass('fa-spin');
                 e.preventDefault();
                 $.when( reloadDashboard() ).done(function() {
-                    console.log('segarkan');
                     $('#segarkan i').toggleClass('fa-spin');
                 });
             });
+            
             $(window).focus(function(){
                 reloadDashboard();
             });

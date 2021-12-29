@@ -18,54 +18,55 @@
         <h2 class="text-lg font-medium mr-auto">
             Formulir @yield('title') @if (!empty($data->tertanggung)){!! 'a/n <b>' . $data->tertanggung . '</b><br>' !!}@endif
             @if (empty($method) && empty($data))
-                <button class="btn btn-sm btn-primary" id="btn-add"><i class="fa fa-save mr-2"></i>Simpan</button>
+                <button class="btn btn-sm btn-primary" id="btn-add"><i class="fa fa-save mr-3"></i>Simpan</button>
             @endif
             @if ($method == 'update' && !empty($data))
-                <button class="btn btn-sm btn-primary" id="btn-update"><i class="fa fa-save mr-2"></i>Simpan</button>
+                <button class="btn btn-sm btn-primary" id="btn-update"><i class="fa fa-save mr-3"></i>Simpan</button>
             @endif
             @if ($method == 'renewal' && !empty($data))
-                <button class="btn btn-sm btn-primary" id="btn-perpanjang"><i class="fa fa-sync-alt mr-2"></i>Perpanjang</button>
+                <button class="btn btn-sm btn-primary" id="btn-perpanjang"><i class="fa fa-sync-alt mr-3"></i>Perpanjang</button>
             @endif
             @if ($method == 'approve' && !empty($data))
                 @role('checker|maker')
                     @if($data->id_status == 0)
-                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Ajukan</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-3"></i>Ajukan</button>
                     @endif
                     @if($data->id_status == 4)
-                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Setujui</button>
-                        <button class="btn btn-sm btn-warning btn-rollback"><i class="fa fa-redo-alt mr-2"></i>Kembalikan</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-3"></i>Setujui</button>
+                        <button class="btn btn-sm btn-warning btn-rollback"><i class="fa fa-redo-alt mr-3"></i>Kembalikan</button>
                         <?php 
                             $status_rollback = "TERTUNDA";
                         ?>
                     @endif
                 @endrole
                 @role('approver')
-                    <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Setujui</button>
+                    <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-3"></i>Setujui</button>
                     <?php 
                         $status_rollback = "TERTUNDA";
                     ?>
                 @endrole
                 @role('broker|adm')
                     @if ($data->id_status == 2)
-                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Verifikasi</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-3"></i>Verifikasi</button>
                         <?php 
                             $status_rollback = "DISETUJUI";
                         ?>
                     @elseif ($data->id_status == 8)
-                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Polis Sesuai</button>
+                        <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-3"></i>Polis Sesuai</button>
                         <?php 
                             $status_rollback = "MENUNGGU POLIS";
                         ?>
                     @endif
                 @endrole
                 @role('insurance')
-                    <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-2"></i>Setujui</button>
+                    <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-3"></i>Setujui</button>
+                    <button class="btn btn-sm btn-primary" id="btn-update"><i class="fa fa-save mr-3"></i>Simpan</button>
                     <?php 
                         $status_rollback = "DIVERIFIKASI";
                     ?>
                 @endrole
                 @role('approver|broker|insurance|adm')
-                    <button class="btn btn-sm btn-warning btn-rollback"><i class="fa fa-redo-alt mr-2"></i>Kembalikan</button>
+                    <button class="btn btn-sm btn-warning btn-rollback"><i class="fa fa-redo-alt mr-3"></i>Kembalikan</button>
                 @endrole
             @endif
         </h2>
@@ -83,7 +84,9 @@
                     </h2>
                     @role('broker|insurance|adm')
                     <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2"><i class="fa fa-file-alt mr-2"></i>Klausula</a>
+                    @role('insurance')
                     <a class="btn btn-primary mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i>Placing</a>
+                    @endrole
                     @endrole
                 </div>
                 {{-- <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div> --}}
@@ -402,7 +405,6 @@
                                 <input type="hidden" name="kodetrans_value[11]">
                             </div>
                         </div>
-                        <button class="btn btn-sm btn-success btn-approve mt-2"><i class="fa fa-save mr-2"></i>Simpan Biaya</button>
                     </div>
                 </form>
             </div>
@@ -1247,6 +1249,7 @@
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
                     nama_insured = $('#insured option:selected').text(),
                     nama_cabang = $('#cabang option:selected').text();
+                console.log('Masuk Sini');
                 $(this)
                     .attr('disabled',true)
                     .html(loading);
@@ -1259,7 +1262,6 @@
                         'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                     },
                     success: function(d) {
-                        console.log(d);
                         Swal.fire(
                             'Berhasil!',
                             d.message,
@@ -1267,6 +1269,8 @@
                         ).then(function() {
                             if (d.method == 'create') {
                                 window.location = "{{ url('inquiry') }}?data=pengajuan";
+                            } else if (d.method == "update") {
+                                // do nothing
                             } else {
                                 window.top.close();
                             }

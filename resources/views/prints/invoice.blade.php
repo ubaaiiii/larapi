@@ -74,8 +74,8 @@
           <td class="tright">{{ number_format($data['pricing'][10]->value,2) }}</td>
         </tr>
         <tr>
-          <td>NO. POLIS</td>
-          <td>{{ $data['transaksi']->policy_no }}</td>
+          <td>NO. COVERNOTE</td>
+          <td>{{ $data['transaksi']->cover_note }}</td>
           <td>By. Materai</td>
           <td class="tright">{{ number_format($data['pricing'][11]->value,2) }}</td>
         </tr>

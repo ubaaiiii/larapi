@@ -202,87 +202,70 @@ class DataController extends Controller
 
     public function dataDashboard(Request $request)
     {
-        $customWhere    = "WHERE 1";
+        $customWhere    = "WHERE transaksi.deleted_at IS NULL";
         $user           = Auth::user()->getRoleNames()[0];
-        $customField    = "";
         $customJoin     = "";
 
         switch ($user) {
             case 'maker':
-                $statPengajuan  = "0";
-                $statApproval   = "4";
-                $statDibayar    = "7,8";
-                $statPolis      = "10";
+                $statPengajuan  = "0,1";
+                $statDibayar    = "6";
                 if (Auth::user()->id_cabang !== 1) {
                     $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                    $customWhere    .= " AND transaksi.created_by = " . Auth::user()->id;
                 }
                 break;
             case 'checker':
-                $statPengajuan  = "0";
-                $statApproval   = "4";
-                $statDibayar    = "7,8";
-                $statPolis      = "10";
+                $statPengajuan  = "0,1";
+                $statDibayar    = "6";
                 if (Auth::user()->id_cabang !== 1) {
                     $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                    $customWhere    .= " AND created_by = " . Auth::user()->id;
                 }
                 break;
             case 'approver':
                 $statPengajuan  = "1";
-                $statApproval   = "4";
-                $statDibayar    = "7,8";
-                $statPolis      = "10";
+                $statDibayar    = "6";
                 if (Auth::user()->id_cabang !== 1) {
                     $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
                 }
                 break;
             case 'broker':
-                $statPengajuan  = "2";
-                $statApproval   = "5";
-                $statDibayar    = "6,7,8";
-                $statPolis      = "10";
+                $statPengajuan  = "1";
+                $statDibayar    = "6";
                 $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '".Auth::user()->id."' ";
                 break;
             case 'insurance':
-                $statPengajuan  = "3";
-                $statApproval   = "7";
-                $statDibayar    = "7";  // jangan dihapus, nanti jadi error
-                $statPolis      = "8,9,10";
+                $statPengajuan  = "1";
+                $statDibayar    = "9";
                 $customWhere    .= " AND id_asuransi = " . Auth::user()->id_asuransi;
-                // Overwrite field Dibayar
-                $customField    = ", IFNULL(SUM(case when activities.id_transaksi IS NOT NULL then 1 else 0 end), 0) as Dibayar";
-                $customJoin     = " LEFT JOIN activities ON id_transaksi = transid AND activities.id_status = 9 ";
                 break;
             case 'finance':
-                $statPengajuan  = "3";
-                $statApproval   = "5";
-                $statDibayar    = "8,10";
-                $statPolis      = "10";
-                $customWhere    = "";
+                $statPengajuan  = "1";
+                $statDibayar    = "6";
                 break;
             case 'adm':
-                $statPengajuan  = "1";
-                $statApproval   = "1";
-                $statDibayar    = "1";
-                $statPolis      = "10";
-                $customWhere    = "";
+                $statPengajuan  = "0,1";
+                $statDibayar    = "6";
                 break;
             
             default:
-                $statPengajuan  = "0";
-                $statApproval   = "0";
                 $statDibayar    = "0";
-                $statPolis      = "0";
                 break;
         }
         $query = "  SELECT
                         IFNULL(SUM(case when transaksi.id_status IN ($statPengajuan) then 1 else 0 end), 0) as Pengajuan,
-                        IFNULL(SUM(case when transaksi.id_status IN ($statApproval) then 1 else 0 end), 0) as Approval,
-                        IFNULL(SUM(case when transaksi.id_status IN ($statDibayar) then 1 else 0 end), 0) as Dibayar,
-                        IFNULL(SUM(case when transaksi.id_status IN ($statPolis) then 1 else 0 end), 0) as Polis
-                    $customField
+                        IFNULL(SUM(case when transaksi.id_status IN (2) then 1 else 0 end), 0) as Verifikasi,
+                        IFNULL(SUM(case when transaksi.id_status IN (3) then 1 else 0 end), 0) as Asuransi,
+                        IFNULL(SUM(case when transaksi.id_status IN (4) then 1 else 0 end), 0) as Bank,
+                        IFNULL(SUM(case when transaksi.id_status IN (5) then 1 else 0 end), 0) as Tagihan,
+                        IFNULL(SUM(case when activities.id_transaksi IS NOT NULL then 1 else 0 end), 0) as Dibayar,
+                        IFNULL(SUM(case when transaksi.id_status IN (10) then 1 else 0 end), 0) as Polis,
+                        IFNULL(SUM(case when transaksi.id_status IN (15) then 1 else 0 end), 0) as Batal
                     FROM `transaksi`
-                    $customJoin 
-                    $customWhere ";
+                    LEFT JOIN activities ON id_transaksi = transid AND activities.id_status = $statDibayar 
+                    $customJoin
+                    $customWhere";
         $result = (object) DB::select($query)[0];
         return $result;
     }
@@ -326,6 +309,7 @@ class DataController extends Controller
         switch ($user) {
             case 'maker':
                 $table->where('transaksi.created_by', Auth::user()->id);
+                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 break;
 
             case 'checker':
@@ -367,152 +351,51 @@ class DataController extends Controller
         if (!empty($request->data)) {
             switch ($request->data) {
                 case 'pengajuan':
-                    switch ($user) {
-                        case 'maker':
-                            $table->where('id_status', "0");
-                            break;
-
-                        case 'checker':
-                            $table->where('id_status', "0");
-                            break;
-
-                        case 'approver':
-                            $table->where('id_status', "1");
-                            break;
-
-                        case 'broker':
-                            $table->where('id_status', "2");
-                            break;
-
-                        case 'insurance':
-                            $table->where('id_status', "3");
-                            break;
-
-                        case 'finance':
-                            
-                            break;
-
-                        case 'adm':
-                            
-                            break;
-
-                        default:
-                            return redirect()->route('logout');
-                            break;
+                    if (in_array($user,['maker','checker','adm'])) {
+                        $table->whereIN('id_status', ["0","1"]);
+                    } else {
+                        $table->whereIN('id_status', ["1"]);
                     }
                     break;
 
-                case 'approval':
-                    switch ($user) {
-                        case 'maker':
-                            $table->where('id_status', "4");
-                            break;
+                case 'verifikasi':
+                    $table->where('id_status', "2");
+                    break;
 
-                        case 'checker':
-                            $table->where('id_status', "4");
-                            break;
+                case 'persetujuan asuransi':
+                    $table->where('id_status', "3");
+                    break;
 
-                        case 'approver':
-                            $table->where('id_status', "4");
-                            break;
+                case 'persetujuan bank':
+                    $table->where('id_status', "4");
+                    break;
 
-                        case 'broker':
-                            $table->where('id_status', "5");
-                            break;
-
-                        case 'insurance':
-                            $table->where('id_status', "7");
-                            break;
-
-                        case 'finance':
-                            $table->where('id_status', "5");
-                            break;
-
-                        case 'adm':
-                            // wherenya administrator
-                            break;
-                    }
+                case 'tagihan':
+                    $table->where('id_status', "5");
                     break;
 
                 case 'dibayar':
-                    switch ($user) {
-                        case 'maker':
-                            $table->whereIN('id_status', [7, 8]);
-                            break;
-
-                        case 'checker':
-                            $table->whereIN('id_status', [7, 8]);
-                            break;
-
-                        case 'approver':
-                            $table->whereIN('id_status', [7, 8]);
-                            break;
-
-                        case 'broker':
-                            $table->whereIN('id_status', [6, 7, 8]);
-                            break;
-
-                        case 'insurance':
-                            $table->leftJoin('activities as pmby', function ($q) use ($user) {
-                                $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                    if (in_array($user, ['insurance'])) {
+                        $table->leftJoin('activities as pmby', function ($q) use ($user) {
+                            $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
                                 ->where('pmby.id_status', '=', "9");
-                            });
-                            $table->whereNotNull('pmby.id_transaksi');
-                            break;
-
-                        case 'finance':
-                            $table->leftJoin('activities as pmby', function ($q) use ($user) {
-                                $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                                ->where('pmby.id_status', '=', "9");
-                            });
-                            $table->whereNull('pmby.id_transaksi');
-                            $table->whereIn('transaksi.id_status', ["8","10"]);
-                            break;
-
-                        case 'adm':
-                            // wherenya administrator
-                            break;
-
-                        default:
-                            return redirect()->route('logout');
-                            break;
+                        });
+                        $table->whereNotNull('pmby.id_transaksi');
+                    } else {
+                        $table->leftJoin('activities as pmby', function ($q) use ($user) {
+                            $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                                ->where('pmby.id_status', '=', "6");
+                        });
+                        $table->whereNotNull('pmby.id_transaksi');
                     }
                     break;
 
                 case 'polis siap':
-                    switch ($user) {
-                        case 'maker':
-                            $table->where('id_status', "10");
-                            break;
+                    $table->where('id_status', "10");
+                    break;
 
-                        case 'checker':
-                            $table->where('id_status', "10");
-                            break;
-
-                        case 'approver':
-                            $table->where('id_status', "10");
-                            break;
-
-                        case 'broker':
-                            $table->where('id_status', "10");
-                            break;
-
-                        case 'insurance':
-                            $table->whereIn('id_status', [8,9,10]);
-                            break;
-
-                        case 'finance':
-                            $table->where('id_status', "10");
-                            break;
-
-                        case 'adm':
-                            // wherenya administrator
-                            break;
-
-                        default:
-                            return redirect()->route('logout');
-                            break;
-                    }
+                case 'covernote batal':
+                    $table->where('id_status', "15");
                     break;
 
                 default:
@@ -980,6 +863,7 @@ class DataController extends Controller
         }
         $notif = $notif->get();
 
+        $rowdata = [];
         foreach ($notif as $row) {
             $data = [];
             $data['id']                 = $row->id;

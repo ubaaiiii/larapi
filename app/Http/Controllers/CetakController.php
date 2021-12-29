@@ -52,7 +52,7 @@ class CetakController extends Controller
         $parameter = Crypt::encrypt($parameter);
         $url = url('cek_invoice') . "/" . $parameter;
         if (!empty($transaksi)) {
-            if ($transaksi->id_status == 5) {
+            if ($transaksi->id_status >= 5 AND $transaksi->id_status <= 10) {
                 // return $transaksi->billing_at;
                 if (empty($transaksi->billing_at)) {
                     Transaksi::where('transid',$transaksi->transid)->update(['billing_at' => date('Y-m-d')]);
@@ -93,11 +93,32 @@ class CetakController extends Controller
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
                 $path   = "files/$transid/";
+                $filename = "Invoice_BDS-$transid.pdf";
                 if (!is_dir(public_path($path))) {
                     mkdir(public_path($path), 0777, TRUE);
                 }
-                file_put_contents(public_path($path) . "Invoice_BDS-$transid.pdf", $output);
-                return redirect(url("public/".$path) . "/Invoice_BDS-$transid.pdf");
+                $eksis = false;
+                if (file_exists(public_path($path . $filename))) {
+                    $eksis = true;
+                }
+
+                file_put_contents(public_path($path) . $filename, $output);
+                // return redirect($path . $filename);
+                $insert = [
+                    'id_transaksi'  => $transaksi->transid,
+                    'nama_file'     => $filename,
+                    'tipe_file'     => "pdf",
+                    'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
+                    'lokasi_file'   => "public/" . $path . $filename,
+                    'jenis_file'    => "COVERNOTE",
+                    'created_by'    => 1,
+                ];
+
+                if (!$eksis) {
+                    Document::create($insert);
+                }
+
+                return redirect(url("public/".$path) . $filename);
             } elseif ($transaksi->id_status < 5) {
                 abort(403, "Belum disetujui oleh asuransi");
             } else {
