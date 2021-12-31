@@ -790,7 +790,7 @@ class ProcessController extends Controller
                             $update = [
                                 'id_okupasi'    => NULL,
                             ];
-                            Pricing::where('id_transaksi', $request->transid)->where()->delete();
+                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans',[1,3,4,5,6,7,8,9])->update(['value'=>0]);
                         }
                         break;
 
@@ -803,7 +803,7 @@ class ProcessController extends Controller
                             $update = [
                                 'id_okupasi'    => NULL,
                             ];
-                            Pricing::where('id_transaksi', $request->transid)->delete();
+                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans',[1,3,4,5,6,7,8,9])->update(['value'=>0]);
                         }
                         break;
 
