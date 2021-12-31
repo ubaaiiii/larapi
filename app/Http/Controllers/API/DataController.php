@@ -308,12 +308,15 @@ class DataController extends Controller
         $user = Auth::user()->getRoleNames()[0];
         switch ($user) {
             case 'maker':
-                $table->where('transaksi.created_by', Auth::user()->id);
-                $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $table->where('transaksi.created_by', Auth::user()->id);
+                    $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
+                }
                 break;
 
             case 'checker':
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $table->where('transaksi.created_by', Auth::user()->id);
                     $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 }
                 break;
