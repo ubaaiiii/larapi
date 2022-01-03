@@ -166,8 +166,8 @@
                         <th class="whitespace-nowrap">No. Pinjaman</th>
                         <th class="whitespace-nowrap">Periode Polis</th>
                         <th class="whitespace-nowrap">Nilai Pertanggungan</th>
-                        <th class="whitespace-nowrap">Tanggal Dibuat</th>
                         <th class="whitespace-nowrap">Premium</th>
+                        <th class="whitespace-nowrap">Tanggal Dibuat</th>
                         <th class="whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
