@@ -283,10 +283,11 @@ class DataController extends Controller
             'insured.nama_insured',
             'policy_no',
             'cover_note',
+            'nopinjaman',
             'polis_start',
-            'transaksi.created_at',
             'tsi.value',
             'premi.value',
+            'transaksi.created_at',
             'sts.msdesc',
         ];
 
@@ -435,10 +436,11 @@ class DataController extends Controller
             $nestedData[] = $row->tertanggung;
             $nestedData[] = "<a href='$row->lokasi_file_polis' target='polis'>$row->policy_no</a>";
             $nestedData[] = "<a href='$row->lokasi_file_cn' target='covernote'>$row->cover_note</a>";
+            $nestedData[] = $row->nopinjaman;
             $nestedData[] = date_format(date_create($row->polis_start), "d-M-Y") . " s/d " . date_format(date_create($row->polis_end), "d-M-Y");
-            $nestedData[] = $row->tgl_dibuat;
             $nestedData[] = number_format($row->tsi, 2);
             $nestedData[] = number_format($row->premi, 2);
+            $nestedData[] = date_format(date_create($row->tgl_dibuat), "d-M-Y");
             $nestedData[] = $row->statusnya;
 
             // hidden

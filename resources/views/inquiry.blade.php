@@ -163,10 +163,11 @@
                         <th class="whitespace-nowrap">Tertanggung</th>
                         <th class="whitespace-nowrap">No. Polis</th>
                         <th class="whitespace-nowrap">Cover Note</th>
+                        <th class="whitespace-nowrap">No. Pinjaman</th>
                         <th class="whitespace-nowrap">Periode Polis</th>
-                        <th class="whitespace-nowrap">Tanggal Dibuat</th>
                         <th class="whitespace-nowrap">Nilai Pertanggungan</th>
                         <th class="whitespace-nowrap">Premium</th>
+                        <th class="whitespace-nowrap">Tanggal Dibuat</th>
                         <th class="whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
@@ -311,6 +312,10 @@
                 "serverSide": true,
                 "bLengthChange": true,
                 "aoColumns": [{
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
                         "bSortable": true,
                         "className": "border-b",
                     },
