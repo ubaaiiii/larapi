@@ -560,7 +560,7 @@
                     tagihan = data[5].value;
                 data.push({
                     name: "method",
-                    value: "store"
+                    value: "bank"
                 });
                 console.log(data);
                 if (paid == tagihan) {
@@ -568,6 +568,7 @@
                         url: "{{ url('api/pembayaran') }}",
                         data: data,
                         type: "POST",
+                        dataType: "JSON",
                         success: function(d) {
                             console.log(d);
                             Swal.fire(
@@ -583,10 +584,10 @@
                             reloadTable();
                         },
                         error: function(d) {
-                            console.log(d);
+                            console.log(d.responseJSON);
                             Swal.fire(
                                 'Gagal!',
-                                d.message,
+                                d.responseJSON.message,
                                 'error'
                             );
                         },
