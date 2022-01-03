@@ -210,30 +210,32 @@ class DataController extends Controller
             case 'maker':
                 $statPengajuan  = "0,1";
                 $statDibayar    = "6";
-                if (Auth::user()->id_cabang !== 1) {
-                    $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $customWhere    .= " AND transaksi.id_cabang = " . Auth::user()->id_cabang;
                     $customWhere    .= " AND transaksi.created_by = " . Auth::user()->id;
                 }
                 break;
             case 'checker':
                 $statPengajuan  = "0,1";
                 $statDibayar    = "6";
-                if (Auth::user()->id_cabang !== 1) {
-                    $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
-                    $customWhere    .= " AND created_by = " . Auth::user()->id;
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $customWhere    .= " AND transaksi.id_cabang = " . Auth::user()->id_cabang;
+                    $customWhere    .= " AND transaksi.created_by = " . Auth::user()->id;
                 }
                 break;
             case 'approver':
                 $statPengajuan  = "1";
                 $statDibayar    = "6";
-                if (Auth::user()->id_cabang !== 1) {
-                    $customWhere    .= " AND id_cabang = " . Auth::user()->id_cabang;
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $customWhere    .= " AND transaksi.id_cabang = " . Auth::user()->id_cabang;
                 }
                 break;
             case 'broker':
                 $statPengajuan  = "1";
                 $statDibayar    = "6";
-                $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '".Auth::user()->id."' ";
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '".Auth::user()->id."' ";
+                }
                 break;
             case 'insurance':
                 $statPengajuan  = "1";
@@ -328,10 +330,12 @@ class DataController extends Controller
                 break;
                 
             case 'broker':
-                $table->join('cabang as cbg_broker', function ($q) {
-                    $q->on('cbg_broker.id', '=', 'transaksi.id_cabang')
-                    ->where('cbg_broker.id_broker', '=', Auth::user()->id);
-                });
+                if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                    $table->join('cabang as cbg_broker', function ($q) {
+                        $q->on('cbg_broker.id', '=', 'transaksi.id_cabang')
+                        ->where('cbg_broker.id_broker', '=', Auth::user()->id);
+                    });
+                }
                 break;
 
             case 'insurance':
@@ -732,9 +736,9 @@ class DataController extends Controller
         $role = Auth::user()->getRoleNames()[0];
         $table = DB::table("documents");
         $table->where('id_transaksi', $request->transid);
-        $table->where(function($q) {
+        $table->where(function($q) use ($role) {
             $q->whereNull('visible_by')
-              ->orWhere('visible_by', 'like', '%' . Auth::user()->getRoleNames()[0] . '%');
+              ->orWhere('visible_by', 'like', '%' . $role . '%');
         });
         $table->whereNull('documents.deleted_at');
 
@@ -884,9 +888,14 @@ class DataController extends Controller
     }
 
     public function cariTransaksi(Request $request) {
+        $dataPricing = Pricing::where('id_transaksi', $request->transid)->orderBy('id_kodetrans')->get();
+        foreach ($dataPricing as $row) {
+            // echo $row->id_kodetrans;
+            $pricing[$row->id_kodetrans] = $row;
+        }
         $data = [
             'transaksi' => Transaksi::find($request->transid),
-            'pricing'   => Pricing::where('id_transaksi',$request->transid)->orderBy('id_kodetrans','ASC')->get(),
+            'pricing'   => $pricing,
         ];
         $data['insured'] = Insured::find($data['transaksi']->id_insured);
         return $data;
