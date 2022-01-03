@@ -35,7 +35,7 @@
                                 class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                 style="cursor:pointer">
                                 <i data-feather="search" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                Lihat
+                                Lihat 
                             </a>
                             @role('maker|checker|adm')
                                 {{-- <a id="ps-ubah"
@@ -166,8 +166,8 @@
                         <th class="whitespace-nowrap">No. Pinjaman</th>
                         <th class="whitespace-nowrap">Periode Polis</th>
                         <th class="whitespace-nowrap">Nilai Pertanggungan</th>
-                        <th class="whitespace-nowrap">Premium</th>
                         <th class="whitespace-nowrap">Tanggal Dibuat</th>
+                        <th class="whitespace-nowrap">Premium</th>
                         <th class="whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
@@ -441,7 +441,7 @@
                         $('.ps-st').css('display', 'none');
                     }
                 }, 64);
-                var statusnya = tablenya.row(this).data()[12];
+                var statusnya = tablenya.row(this).data()[13];
                 $('.ps-st').css('display', 'none');
                 $('.st-' + statusnya).css('display', 'block');
             });
