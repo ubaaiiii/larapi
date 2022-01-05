@@ -8,6 +8,7 @@
   <title>Cek Cover Note | BDS General</title>
   <!-- BEGIN: CSS Assets-->
   <link rel="stylesheet" href="{{ url('public/dist/css/app.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/fontawesome/all.css') }}" />
   <!-- END: CSS Assets-->
 </head>
 <!-- END: Head -->
@@ -65,6 +66,7 @@
           <div class="mt-2">Cover Note: <span class="font-medium">#<a href="{{ url('inquiry') }}?q={{ $id }}">{{ $id }}
                 <i data-feather="external-link" class="w-4 h-4 mr-2"></i></a></span> </div>
           <br>
+          <a href="{{ url($dokumen->lokasi_file) }}" target="dokumen_covernote" class="btn btn-sm btn-elevated-rounded-primary w-24 mr-1 mb-2"><i class="fa fa-file-download mr-2"></i>Download</a><br>
           @php
           $date = date_create($tgl_aktif->created_at);
           date_add($date,date_interval_create_from_date_string("30 days"));

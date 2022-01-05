@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <link href="{{ url('public/dist/images/logo.svg') }}" rel="shortcut icon">
-  <title>Cek Invoice | BDS General</title>
+  <title>Cek Nota Pembayaran | BDS General</title>
   <!-- BEGIN: CSS Assets-->
   <link rel="stylesheet" href="{{ url('public/dist/css/app.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/fontawesome/all.css') }}" />
@@ -30,7 +30,7 @@
       color: #1CAC4D;
       border: 1rem double #1CAC4D;
       transform: rotate(-5deg);
-      font-size: 4rem;
+      font-size: 1.5rem;
       font-family: "Open sans", Helvetica, Arial, sans-serif;
       border-radius: 0;
       padding: 1rem;
@@ -68,7 +68,7 @@
   <div class="content">
     <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
       <h2 class="text-lg font-medium mr-auto">
-        Cek Invoice
+        Cek Nota Pembayaran
       </h2>
     </div>
     <!-- BEGIN: Invoice -->
@@ -76,7 +76,7 @@
       @if(empty($data))
         <div class="border-b border-gray-200 dark:border-dark-5 text-center sm:text-left">
           <div class="px-5 py-10 sm:px-20 sm:py-20">
-            <div class="text-theme-1 dark:text-theme-10 font-semibold text-3xl">INVOICE TIDAK DITEMUKAN</div>
+            <div class="text-theme-1 dark:text-theme-10 font-semibold text-3xl">NOTA PEMBAYARAN TIDAK DITEMUKAN</div>
             <div class="mt-2">Transaksi ID <span class="font-medium">#<a href="{{ url('pengajuan',$id) }}">{{ $id }} <i data-feather="external-link" class="w-6 h-6 mr-2"></i></a></span> </div>
             <div class="alert alert-danger-soft show flex items-center mt-3" role="alert"> <i data-feather="alert-octagon" class="w-6 h-6 mr-2"></i> Harap cek kembali QRCode yang dipindai. </div>
           </div>
@@ -84,39 +84,27 @@
       @else
         <div class="border-b border-gray-200 dark:border-dark-5 text-center sm:text-left">
           <div class="px-5 py-10 sm:px-20 sm:py-20">
-            <div class="text-theme-1 dark:text-theme-10 font-semibold text-3xl">INVOICE</div>
-            @if (!empty($pembayaran))
-              @php
-                $date = date_create($pembayaran->paid_at);
-              @endphp
-              <div class="alert alert-success-soft show flex items-center mb-2" role="alert"> <i data-feather="check-circle" class="w-6 h-6 mr-2"></i> Pembayaran telah diterima pada tanggal : {{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }} </div>
-            @else
-              <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap menyertakan catatan pembayaran seperti berikut saat akan transfer :<br>PEMB_PREMI {{ $id." A/N ".$data->nama_insured." NO. COVER NOTE: ".$data->cover_note }} </div>
-              @php
-                $date = date_create($data->billing_at);
-                date_add($date,date_interval_create_from_date_string("14 days"));
-              @endphp
-              <div class="alert alert-warning-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap membayar sebelum tanggal jatuh tempo : <br>{{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }} ( 14 hari dari tanggal invoice ) </div>
-              {{-- <div class="alert alert-danger-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-octagon" class="w-6 h-6 mr-2"></i> Transaksi &nbsp;<b>DIBATALKAN</b>&nbsp; karena melebihi tanggal jatuh tempo ( {{ FunctionsHelp::tgl_indo($data->billing_at) }} ) belum ada pembayaran. </div> --}}
-            @endif
+            <div class="text-theme-1 dark:text-theme-10 font-semibold text-3xl">NOTA PEMBAYARAN</div>
+            @php ($tgl_posting = date_create($pembayaran->paid_at))
+            <div class="alert alert-success-soft show flex items-center mb-2" role="alert"> <i data-feather="check-circle" class="w-6 h-6 mr-2"></i> Pembayaran telah diposting pada sistem tanggal {{ FunctionsHelp::tgl_indo($tgl_posting->format('Y-m-d')) }} oleh {{ $user_bayar->name }} (BDS)</div>
             <div class="mt-2">Transaksi ID <span class="font-medium">#<a href="{{ url('pengajuan',$id) }}">{{ $id }} <i data-feather="external-link" class="w-4 h-4 mb-1"></i></a></span> </div>
-            <div class="mt-1">Tanggal Invoice: {{ FunctionsHelp::tgl_indo($data->billing_at) }}</div>
+            @php ($tgl_terima = date_create($penerimaan->paid_at))
+            <div class="mt-1">Tanggal Terima Dari Bank : {{ FunctionsHelp::tgl_indo($tgl_terima->format('Y-m-d')) }}</div>
+            <div class="mt-1">Tanggal Dibayar ke Asuransi : {{ FunctionsHelp::tgl_indo($tgl_posting->format('Y-m-d')) }}</div>
             <a href="{{ url($dokumen->lokasi_file) }}" target="dokumen_covernote" class="btn btn-sm btn-elevated-rounded-primary w-24 mr-1 mt-2"><i class="fa fa-file-download mr-2"></i>Download</a><br>
           </div>
           <div class="flex flex-col lg:flex-row px-5 sm:px-20">
             <div>
-              <div class="text-base text-gray-600">Ditagihkan Kepada</div>
-              <div class="text-lg font-medium text-theme-1 dark:text-theme-10 mt-2">PT. BANK KB BUKOPIN, TBK.</div>
-              <div class="mt-1">CAB. {{ $data->nama_cabang }}</div>
-              <div class="mt-1">{{ $data->alamat_cabang }}</div>
-            </div>
-            <div class="lg:text-right mt-10 lg:mt-0 lg:ml-auto">
-              <div class="text-base text-gray-600">Ditagih Oleh</div>
-              <div class="text-lg font-medium text-theme-1 dark:text-theme-10 mt-2">PT. BINA DANA SEJAHTERA</div>
+              <div class="text-base text-gray-600">Dibayar Oleh</div>
+              <div class="text-lg font-medium text-theme-1 dark:text-theme-10 mt-2">
+                PT. BINA DANA SEJAHTERA
+              </div>
               <div class="mt-1">
-                <b>Ruko Sentradana Kalimalang</b><br>
+              <b>Ruko Sentradana Kalimalang</b><br>
                 Jl. Seulawah Raya No.B Jakarta Timur - 13620<br>
-                Telp: +62 21 22 32 20 32. Fax: +62 21 22 32 20 17
+                Telp: +62 21 22 32 20 32. Fax: +62 21 22 32 20 17<br>
+                PT. BANK KB BUKOPIN, TBK<br>
+                No. Rekening: <b>101.5266.011 (IDR)</b>
             </div>
           </div>
         </div>
@@ -151,12 +139,33 @@
                   </td>
                   <td class="text-right border-b dark:border-dark-5 w-32 font-medium">{{ number_format($pricing[11]->value,2) }}</td>
                 </tr>
-                <tr style="border-bottom: 3pt double black;">
-                  <td>
+                <tr>
+                  <td class="border-b dark:border-dark-5">
                     <div class="font-medium whitespace-nowrap">Biaya Lain</div>
                     <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Biaya lain-lain yang ditentukan dalam Polis</div>
                   </td>
-                  <td class="text-right w-32 font-medium">{{ number_format($pricing[16]->value,2) }}</td>
+                  <td class="text-right border-b dark:border-dark-5 w-32 font-medium">{{ number_format($pricing[16]->value,2) }}</td>
+                </tr>
+                <tr>
+                  <td class="border-b dark:border-dark-5">
+                    <div class="font-medium whitespace-nowrap">Komisi</div>
+                    <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Biaya yang diterima oleh PT. Bina Dana Sejahtera</div>
+                  </td>
+                  <td class="text-right border-b dark:border-dark-5 w-32 font-medium">- {{ number_format($pricing[13]->value,2) }}</td>
+                </tr>
+                <tr>
+                  <td class="border-b dark:border-dark-5">
+                    <div class="font-medium whitespace-nowrap">PPN</div>
+                    <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Pajak Pertambahan Nilai (10% dari Komisi)</div>
+                  </td>
+                  <td class="text-right border-b dark:border-dark-5 w-32 font-medium">- {{ number_format($pricing[14]->value,2) }}</td>
+                </tr>
+                <tr style="border-bottom: 3pt double black;">
+                  <td>
+                    <div class="font-medium whitespace-nowrap">PPh23</div>
+                    <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Pajak Penghasilan (2% dari Komisi)</div>
+                  </td>
+                  <td class="text-right w-32 font-medium">{{ number_format($pricing[15]->value,2) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -164,17 +173,19 @@
         </div>
         <div class="px-5 sm:px-20 pb-10 sm:pb-20 flex flex-col-reverse sm:flex-row">
           <div class="text-center sm:text-left mt-10 sm:mt-0">
-            <div class="text-base text-gray-600">Bank Transfer</div>
-            <div class="text-lg text-theme-1 dark:text-theme-10 font-medium mt-2">PT. BINA DANA SEJAHTERA</div>
+            <div class="text-base text-gray-600">Dibayarkan Kepada</div>
+            <div class="text-lg text-theme-1 dark:text-theme-10 font-medium mt-2">{{ $asuransi->nama_asuransi }}</div>
             <div class="mt-1">
-              PT. Bank KB Bukopin Capem Bulog II, Jakarta
-              <br>No. Rekening: <b>101.5266.011 (IDR)  </b></div>
+              {{ $asuransi->alamat_asuransi }}<br>
+              {{ $asuransi->bank_asuransi }}<br>
+              No. Rekening: <b>{{ $asuransi->rekening_asuransi }} ({{ $asuransi->matauang_asuransi }})  </b>
+            </div>
           </div>
           <div class="text-center sm:text-right sm:ml-auto">
             <div class="text-base text-gray-600">Gross Net</div>
-            <div class="text-xl text-theme-1 dark:text-theme-10 font-medium mt-2">{{ number_format($pricing[18]->value,2) }}</div>
+            <div class="text-xl text-theme-1 dark:text-theme-10 font-medium mt-2">{{ number_format($pricing[19]->value,2) }}</div>
             {{-- <div class="mt-1 tetx-xs">Sudah termasuk pajak</div> --}}
-            <span class="stamp is-draft">LUNAS</span>
+            <span class="stamp is-draft">{{ FunctionsHelp::tgl_indo($tgl_posting->format('Y-m-d')) }}</span>
           </div>
         </div>
       @endif

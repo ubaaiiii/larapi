@@ -322,6 +322,7 @@ class ProcessController extends Controller
     
                     Pembayaran::create($insert);
                     $transaksi->update($update);
+
                     $this->aktifitas($transaksi->transid, '6', 'Pembayaran Premi Diterima Oleh BDS.');
                     $this->aktifitas($transaksi->transid, '7', 'Menunggu E-Polis untuk diupload oleh Asuransi.');
     
@@ -359,6 +360,9 @@ class ProcessController extends Controller
     
                     Pembayaran::create($insert);
                     $this->aktifitas($transaksi->transid, '9', 'Premi Dibayarkan Oleh BDS ke Asuransi.');
+
+                    $cetak = new CetakController;
+                    $cetak->cetakNotaPembayaran($request->transid);
     
                     return response()->json([
                         'message'   => 'Berhasil input pembayaran atas Nomor Transaksi ' . $transaksi->transid,

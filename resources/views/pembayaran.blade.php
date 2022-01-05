@@ -39,107 +39,30 @@
                             class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                             style="cursor:pointer">
                             <i data-feather="search" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Lihat
+                            Lihat 
                         </a>
-                        @role('maker|checker|adm')
-                        <a id="ps-ubah"
-                            class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
-                            style="cursor:pointer">
-                            <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Ubah
-                        </a>
-                        <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
-                            style="cursor:pointer">
-                            <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Ajukan
-                        </a>
-                        <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
-                            style="cursor:pointer">
-                            <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Setujui
-                        </a>
-                        <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-9"
-                            style="cursor:pointer">
-                            <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Perpanjang
-                        </a>
-                        <a id="ps-rollback"
-                            class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
-                            style="cursor:pointer">
-                            <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Batal Mengajukan
-                        </a>
-                        <a id="ps-hapus"
-                            class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
-                            style="cursor:pointer">
-                            <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Hapus
-                        </a>
-                        @endrole
-                        @role('approver|adm')
-                        <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
-                            style="cursor:pointer">
-                            <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Setujui
-                        </a>
-                        <a id="ps-rollback"
-                            class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
-                            style="cursor:pointer">
-                            <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Kembalikan
-                        </a>
-                        @endrole
-                        @role('broker|adm')
-                        <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
-                            style="cursor:pointer">
-                            <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Verifikasi
-                        </a>
-                        <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
-                            style="cursor:pointer">
-                            <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Input Pembayaran
-                        </a>
-                        <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-8"
-                            style="cursor:pointer">
-                            <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Cek Polis
-                        </a>
-                        <a id="ps-rollback"
-                            class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
-                            style="cursor:pointer">
-                            <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Kembalikan
-                        </a>
-                        @endrole
-                        @role('insurance|adm')
-                        <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
-                            style="cursor:pointer">
-                            <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Setujui
-                        </a>
-                        <a class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
-                            style="cursor:pointer">
-                            <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Upload E-Polis
-                        </a>
-                        <a id="ps-rollback"
-                            class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
-                            style="cursor:pointer">
-                            <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Kembalikan
-                        </a>
+                        @role('finance|adm')
+                            <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
+                                style="cursor:pointer">
+                                <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                Bayar ke Asuransi
+                            </a>
+                            
                         @endrole
                     </div>
-                    @role('checker|maker|broker|adm')
-                    <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 text-theme-9">
-                        <a id="ps-invoice"
-                            class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
-                            style="cursor:pointer">
-                            <i data-feather="file-text" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                            Invoice
-                        </a>
-                    </div>
+                    @role('finance|adm')
+                        <div class="p-2 border-t border-gray-200 dark:border-dark-5 text-theme-6">
+                            <a class="ps-bayar flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
+                                style="cursor:pointer">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                Batal Bayar Bank
+                            </a>
+                            <a class="ps-bayar flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                style="cursor:pointer">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                Batal Bayar Asuransi
+                            </a>
+                        </div>
                     @endrole
                 </div>
             </div>
@@ -157,17 +80,19 @@
         <table id="tb-pembayaran" class="hover table mt-2 table-report table-report--tabulator">
             <thead>
                 <tr>
-                    <th class="whitespace-nowrap">No. App</th>
+                    <th class="whitespace-nowrap">Bayar Dari Bukopin</th>
+                    <th class="whitespace-nowrap">Bayar Ke Asuransi</th>
+                    <th class="whitespace-nowrap">ID Transaksi</th>
+                    <th class="whitespace-nowrap">Covernote</th>
+                    <th class="whitespace-nowrap">No. Polis</th>
                     <th class="whitespace-nowrap">Asuransi</th>
-                    <th class="whitespace-nowrap">Tipe Asuransi</th>
-                    <th class="whitespace-nowrap">Cabang</th>
-                    <th class="whitespace-nowrap">Tertanggung</th>
-                    <th class="whitespace-nowrap">D/C</th>
-                    <th class="whitespace-nowrap">Nominal</th>
-                    <th class="whitespace-nowrap">Tgl Bayar</th>
-                    <th class="whitespace-nowrap">Oleh</th>
-                    <th class="whitespace-nowrap">Deskripsi</th>
-                    <th class="whitespace-nowrap">Tombol</th>
+                    <th class="whitespace-nowrap">No. Rekening</th>
+                    <th class="whitespace-nowrap">Tagihan</th>
+                    <th class="whitespace-nowrap">Komisi</th>
+                    <th class="whitespace-nowrap">PPN</th>
+                    <th class="whitespace-nowrap">PPh</th>
+                    <th class="whitespace-nowrap">Total Payment</th>
+                    <th class="whitespace-nowrap">ID Pembayaran</th>
                 </tr>
             </thead>
             <tbody>
@@ -200,12 +125,12 @@
                         <input type="hidden" name="transid" readonly>
                     </div>
                     <div class="col-span-12 sm:col-span-6">
-                        <label for="nama_insured" class="form-label">Nama Tertanggung</label>
-                        <input id="nama_insured" name="nama_insured" type="text" class="form-control" readonly>
+                        <label for="nama_asuransi" class="form-label">Tujuan Pembayaran</label>
+                        <input id="nama_asuransi" name="nama_asuransi" type="text" class="form-control" readonly>
                     </div>
                     <div class="col-span-12 sm:col-span-6">
-                        <label for="cover_note" class="form-label">Cover Note</label>
-                        <input id="cover_note" name="cover_note" type="text" class="form-control" readonly>
+                        <label for="rekening_asuransi" class="form-label">No. Rekening</label>
+                        <input id="rekening_asuransi" name="rekening_asuransi" type="text" class="form-control" readonly>
                     </div>
                     <div class="col-span-12 sm:col-span-6">
                         <label for="tgl_bayar" class="form-label">Tanggal Bayar</label>
@@ -213,7 +138,7 @@
                             value="{{ date('Y-m-d') }}">
                     </div>
                     <div class="col-span-12 sm:col-span-6">
-                        <label for="tagihan" class="form-label">Tagihan Premi</label>
+                        <label for="tagihan" class="form-label">Gross NET</label>
                         <input id="tagihan" type="text" class="form-control currency allow-decimal masked" readonly>
                         <input name="tagihan" type="hidden">
                     </div>
@@ -302,9 +227,9 @@
 @endsection
 
 @section('script')
-<script>
-    function reloadTable()
-    {
+    <script>
+        function reloadTable()
+        {
             $('#tb-pembayaran').DataTable().ajax.reload();
         }
 
@@ -349,19 +274,27 @@
                     },
                     {
                         "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
                         "className": "border-b text-right",
                     },
                     {
                         "bSortable": true,
-                        "className": "border-b",
+                        "className": "border-b text-right",
                     },
                     {
                         "bSortable": true,
-                        "className": "border-b",
+                        "className": "border-b text-right",
                     },
                     {
                         "bSortable": true,
-                        "className": "border-b"
+                        "className": "border-b text-right",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b text-right",
                     },
                     {
                         "visible": false
@@ -447,34 +380,13 @@
 
             $('#ps-lihat').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
+                var transid = tablenya.row({ selected: true }).data()[2];
                 window.open("{{ url('pengajuan') }}/"+transid);
-            });
-
-            $('.ps-approve').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                $('#frm-method').val('approve');
-                $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
-            });
-
-            $('.ps-renewal').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                $('#frm-method').val('renewal');
-                $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
-            });
-            
-            $('#ps-ubah').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                $('#frm-method').val('update');
-                $('#frm').attr('action',"{{ url('pengajuan') }}/"+transid).submit();
             });
 
             $('.ps-bayar').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
+                var transid = tablenya.row({ selected: true }).data()[2];
                 $.ajax({
                     url:"{{ url('api/caritransaksi') }}",
                     headers: {
@@ -483,10 +395,11 @@
                     type: "GET",
                     data: {transid},
                     success: function(d) {
+                        console.log(d);
                         $('#frm-bayar #transid').val(d.transaksi.transid);
                         $('#frm-bayar [name="transid"]').val(d.transaksi.transid);
-                        $('#frm-bayar #nama_insured').val(d.insured.nama_insured);
-                        $('#frm-bayar #cover_note').val(d.transaksi.cover_note);
+                        $('#frm-bayar #nama_asuransi').val(d.asuransi.nama_asuransi);
+                        $('#frm-bayar #rekening_asuransi').val(d.asuransi.rekening_asuransi);
                         $('#frm-bayar #tagihan').val(d.pricing[18].value);
                         $('.masked').trigger('keyup');
                         cash('#modal-bayar').modal('show');
@@ -497,43 +410,12 @@
                 });
             });
 
-            $('.ps-polis').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                
-            });
-
-
-
-            $('.ps-polis').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                $.ajax({
-                    url:"{{ url('api/caritransaksi') }}",
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                    },
-                    type: "GET",
-                    data: {transid},
-                    success: function(d) {
-                        $('#frm-polis #transid').val(d.transaksi.transid);
-                        $('#frm-polis [name="transid"]').val(d.transaksi.transid);
-                        $('#frm-polis #nama_insured').val(d.insured.nama_insured);
-                        $('#frm-polis #cover_note').val(d.transaksi.cover_note);
-                        cash('#modal-polis').modal('show');
-                    },
-                    error: function(d) {
-                        console.log('d',d);
-                    },
-                });
-            })
-
             $('#frm-bayar').submit(function(e) {
                 e.preventDefault();
                 var data = $(this).serializeArray(),
                     paid = data[6].value,
                     tagihan = data[5].value;
-                data.push({ name: "method", value: "store" });
+                data.push({ name: "method", value: "asuransi" });
                 console.log(data);
                 if (paid == tagihan) {
                     $.ajax({
@@ -570,44 +452,6 @@
                         'error'
                     );
                 }
-            });
-
-            $('#frm-polis').submit(function(e){
-                e.preventDefault();
-                var data = new FormData(this);
-                data.append("method", "store");
-                console.log('data',data);
-                $.ajax({
-                    url: "{{ url('api/polis') }}",
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    },
-                    data: data,
-                    type: "POST",
-                    cache:false,
-                    contentType: false,
-                    processData: false,
-                    success: function(d) {
-                        reloadTable();
-                        $('#frm-polis').trigger('reset');
-                        console.log(d);
-                        Swal.fire(
-                            'Berhasil!',
-                            d.message,
-                            'success'
-                        ).then(function(){
-                            cash('#modal-polis').modal('hide');
-                        });
-                    },
-                    error: function(d) {
-                        console.log(d);
-                        Swal.fire(
-                            'Gagal!',
-                            d.message,
-                            'error'
-                        );
-                    },
-                });
             });
 
             var tableImport = $('#tb-import').DataTable({
@@ -746,126 +590,6 @@
                 });
             });
             
-            $('#ps-hapus').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0],
-                    _token  = "{{ csrf_token() }}",
-                    method  = "delete";
-                Swal.fire({
-                    title: 'Yakin ingin hapus?',
-                    html: "Data <b>"+transid+"</b> tidak akan dapat dikembalikan.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    // confirmButtonColor: '#1C3FAA',
-                    // cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Tidak!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Masukan Alasan Menghapus Data',
-                            input: 'textarea',
-                            showCancelButton: true,
-                            confirmButtonText: 'Konfirmasi',
-                            cancelButtonText: 'Batal'
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                var catatan = "";
-                                if (result.value) {
-                                    catatan = result.value;
-                                }
-                                $.ajax({
-                                    url: "{{ url('api/pengajuan') }}",
-                                    data: {transid,_token,method,catatan},
-                                    type: "POST",
-                                    success: function(d){
-                                        console.log('response :',d);
-                                        d = d.responseJSON;
-                                        Swal.fire(
-                                            'Berhasil!',
-                                            d.message,
-                                            'success'
-                                        ).then(function() {
-                                            reloadTable();
-                                        });
-                                    },
-                                    error:function(d){
-                                        console.log('response :',d);
-                                        d = d.responseJSON;
-                                        Swal.fire(
-                                            'Gagal!',
-                                            d.message,
-                                            'error'
-                                        );
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-
-            $('#ps-rollback').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0],
-                    _token  = "{{ csrf_token() }}",
-                    method  = "rollback";
-                Swal.fire({
-                    title: 'Apakah Anda Yakin?',
-                    html: "Data <b>"+transid+"</b> akan dikembalikan ke status sebelumnya.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Kembalikan!',
-                    cancelButtonText: 'Tidak!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Catatan Pengembalian',
-                            input: 'textarea',
-                            showCancelButton: true,
-                            confirmButtonText: 'Konfirmasi',
-                            cancelButtonText: 'Batal'
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                var catatan = "";
-                                if (result.value) {
-                                    catatan = result.value;
-                                }
-                                $.ajax({
-                                    url: "{{ url('api/pengajuan') }}",
-                                    data: {transid,_token,method,catatan},
-                                    type: "POST",
-                                    success: function(d){
-                                        console.log('response :',d);
-                                        Swal.fire(
-                                            'Berhasil!',
-                                            d.message,
-                                            'success'
-                                        ).then(function() {
-                                            reloadTable();
-                                        });
-                                    },
-                                    error:function(d){
-                                        console.log('response :',d);
-                                        Swal.fire(
-                                            'Gagal!',
-                                            d.message,
-                                            'error'
-                                        );
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-            
-            $('#ps-invoice').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({ selected: true }).data()[0];
-                window.open("{{ url('cetak_invoice') }}/"+transid);
-            });
-
             $('a').click(function() {
                 $('#text-inquiry').click();
             })

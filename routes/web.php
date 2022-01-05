@@ -52,6 +52,7 @@ Route::post('register', [AuthController::class, 'register']);
 Route::get('test/{any}', [CetakController::class, 'cetakAkseptasi']);
 Route::get('cek_invoice/{any}', [CetakController::class, 'cekInvoice']);
 Route::get('cek_covernote/{any}', [CetakController::class, 'cekCoverNote']);
+Route::get('cek_nota_pembayaran/{any}', [CetakController::class, 'cekNotaPembayaran']);
 
 // Notifikasi
 Route::get('/notification/{any}', [NotificationController::class, 'index']);
@@ -69,7 +70,8 @@ Route::group(['middleware' => 'auth'], function () {
   Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 
   // Cetak
-  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('invoice')->middleware('role:maker|checker|adm|broker');
+  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('invoice')->middleware('role:maker|checker|adm|broker|insurance');
+  Route::get('cetak_nota_pembayaran/{any}', [CetakController::class, 'cetakNotaPembayaran'])->name('notapembayaran')->middleware('role:adm|broker');
   Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:maker|checker|adm|broker');
   Route::get('cetak_placing/{any}', [CetakController::class, 'cetakPlacing'])->name('placing')->middleware('role:insurance|adm|broker');
 

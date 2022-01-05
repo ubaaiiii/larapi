@@ -72,12 +72,23 @@
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
-                                <div class="box p-5" onclick="filterInquiry('dibayar')">
+                                <div class="box p-5" onclick="filterInquiry('dibayar bank')">
                                     <div class="flex">
                                         <i class="fa fa-hand-holding-usd text-theme-12" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar">0</div>
-                                    <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-bank">0</div>
+                                    <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar Bank</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                            <div class="report-box zoom-in">
+                                <div class="box p-5" onclick="filterInquiry('dibayar broker')">
+                                    <div class="flex">
+                                        <i class="fa fa-hand-holding-usd text-theme-9" style="font-size: 40px"></i>
+                                    </div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-broker">0</div>
+                                    <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar Broker</div>
                                 </div>
                             </div>
                         </div>
@@ -589,7 +600,8 @@
                     $('#angka-asuransi').text(d.Asuransi);
                     $('#angka-bank').text(d.Bank);
                     $('#angka-tagihan').text(d.Tagihan);
-                    $('#angka-dibayar').text(d.Dibayar);
+                    $('#angka-dibayar-bank').text(d.DibayarBank);
+                    $('#angka-dibayar-broker').text(d.DibayarBroker);
                     $('#angka-polis').text(d.Polis);
                     $('#angka-batal').text(d.Batal);
                     // console.log('success: ',d);

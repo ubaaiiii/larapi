@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Helpers\Functions;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Asuransi;
@@ -209,7 +210,6 @@ class DataController extends Controller
         switch ($user) {
             case 'maker':
                 $statPengajuan  = "0,1";
-                $statDibayar    = "6";
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
                     $customWhere    .= " AND transaksi.id_cabang = " . Auth::user()->id_cabang;
                     $customWhere    .= " AND transaksi.created_by = " . Auth::user()->id;
@@ -217,7 +217,6 @@ class DataController extends Controller
                 break;
             case 'checker':
                 $statPengajuan  = "0,1";
-                $statDibayar    = "6";
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
                     $customWhere    .= " AND transaksi.id_cabang = " . Auth::user()->id_cabang;
                     $customWhere    .= " AND transaksi.created_by = " . Auth::user()->id;
@@ -225,34 +224,29 @@ class DataController extends Controller
                 break;
             case 'approver':
                 $statPengajuan  = "1";
-                $statDibayar    = "6";
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
                     $customWhere    .= " AND transaksi.id_cabang = " . Auth::user()->id_cabang;
                 }
                 break;
             case 'broker':
                 $statPengajuan  = "1";
-                $statDibayar    = "6";
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
                     $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '".Auth::user()->id."' ";
                 }
                 break;
             case 'insurance':
                 $statPengajuan  = "1";
-                $statDibayar    = "9";
                 $customWhere    .= " AND id_asuransi = " . Auth::user()->id_asuransi;
                 break;
             case 'finance':
                 $statPengajuan  = "1";
-                $statDibayar    = "6";
                 break;
             case 'adm':
                 $statPengajuan  = "0,1";
-                $statDibayar    = "6";
                 break;
             
             default:
-                $statDibayar    = "0";
+                
                 break;
         }
         $query = "  SELECT
@@ -261,11 +255,13 @@ class DataController extends Controller
                         IFNULL(SUM(case when transaksi.id_status IN (3) then 1 else 0 end), 0) as Asuransi,
                         IFNULL(SUM(case when transaksi.id_status IN (4) then 1 else 0 end), 0) as Bank,
                         IFNULL(SUM(case when transaksi.id_status IN (5) then 1 else 0 end), 0) as Tagihan,
-                        IFNULL(SUM(case when activities.id_transaksi IS NOT NULL then 1 else 0 end), 0) as Dibayar,
+                        IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL then 1 else 0 end), 0) as DibayarBank,
+                        IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL then 1 else 0 end), 0) as DibayarBank,
                         IFNULL(SUM(case when transaksi.id_status IN (10) then 1 else 0 end), 0) as Polis,
                         IFNULL(SUM(case when transaksi.id_status IN (15) then 1 else 0 end), 0) as Batal
                     FROM `transaksi`
-                    LEFT JOIN activities ON id_transaksi = transid AND activities.id_status = $statDibayar 
+                    LEFT JOIN activities bankPaid ON bankPaid.id_transaksi = transid AND bankPaid.id_status = 6 
+                    LEFT JOIN activities brokerPaid ON brokerPaid.id_transaksi = transid AND brokerPaid.id_status = 9 
                     $customJoin
                     $customWhere";
         $result = (object) DB::select($query)[0];
@@ -382,20 +378,20 @@ class DataController extends Controller
                     $table->where('id_status', "5");
                     break;
 
-                case 'dibayar':
-                    if (in_array($user, ['insurance'])) {
-                        $table->leftJoin('activities as pmby', function ($q) use ($user) {
-                            $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                                ->where('pmby.id_status', '=', "9");
-                        });
-                        $table->whereNotNull('pmby.id_transaksi');
-                    } else {
-                        $table->leftJoin('activities as pmby', function ($q) use ($user) {
-                            $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                                ->where('pmby.id_status', '=', "6");
-                        });
-                        $table->whereNotNull('pmby.id_transaksi');
-                    }
+                case 'dibayar bank':
+                    $table->leftJoin('activities as pmby', function ($q) use ($user) {
+                        $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                            ->where('pmby.id_status', '=', "6");
+                    });
+                    $table->whereNotNull('pmby.id_transaksi');
+                    break;
+
+                case 'dibayar broker':
+                    $table->leftJoin('activities as pmby', function ($q) use ($user) {
+                        $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                            ->where('pmby.id_status', '=', "9");
+                    });
+                    $table->whereNotNull('pmby.id_transaksi');
                     break;
 
                 case 'polis siap':
@@ -462,40 +458,47 @@ class DataController extends Controller
     {
         // sorting column datatables
         $columns = [
+            'pby_bank.paid_at',
+            'pby_broker.paid_at',
             'id_transaksi',
+            'cover_note',
+            'policy_no',
             'nama_asuransi',
-            'instype_name',
-            'nama_cabang',
-            'nama_insured',
-            'dc',
-            'paid_amount',
-            'paid_at',
-            'pby.created_by',
-            'dsk.msdesc',
+            'rekening_asuransi',
+            'tagihan.value',
+            'komisi.value',
+            'ppn.value',
+            'pph.value',
+            'grossnet.value',
         ];
 
         $select = [
-            'pby.*',
+            'pby_bank.*',
+            'pby_bank.paid_at as pby_bank',
+            'pby_broker.paid_at as pby_broker',
+            'cover_note',
+            'policy_no',
+            'id_status',
             'asn.nama_asuransi',
-            'prd.instype_name',
-            'cbg.nama_cabang',
-            'isd.nama_insured',
-            'usr.name',
-            'dsk.msdesc as deskripsi'
+            'asn.rekening_asuransi',
+            'tagihan.value as tagihan',
+            'komisi.value as komisi',
+            'ppn.value as ppn',
+            'pph.value as pph',
+            'grossnet.value as grossnet',
         ];
 
-        $table = DB::table("transaksi_pembayaran as pby")->whereNull('pby.deleted_at');
-
-        $user = Auth::user()->getRoleNames()[0];
+        $table = DB::table("transaksi_pembayaran as pby_bank")->whereNull('pby_bank.deleted_at')->where('pby_bank.paid_type','PD01');
 
         $joins = [
-            ['transaksi as tsk', 'id_transaksi = tsk.transid'],
-            ['insured as isd', 'id_insured = isd.id'],
-            ['instype as prd', 'id_instype = prd.id'],
+            ['transaksi as tsk', 'pby_bank.id_transaksi = tsk.transid'],
             ['asuransi as asn', 'id_asuransi = asn.id'],
-            ['cabang as cbg', 'id_cabang = cbg.id'],
-            ['users as usr', 'pby.created_by = usr.id'],
-            ['masters as dsk', ['paid_type = dsk.msid', "dsk.mstype = paidtype"]],
+            ['transaksi_pembayaran as pby_broker', ['pby_broker.id_transaksi = pby_bank.id_transaksi', 'pby_broker.paid_type = PD02']],
+            ['transaksi_pricing as tagihan', ['tagihan.id_transaksi = tsk.transid','tagihan.id_kodetrans = 18']],
+            ['transaksi_pricing as komisi', ['komisi.id_transaksi = tsk.transid','komisi.id_kodetrans = 13']],
+            ['transaksi_pricing as ppn', ['ppn.id_transaksi = tsk.transid','ppn.id_kodetrans = 14']],
+            ['transaksi_pricing as pph', ['pph.id_transaksi = tsk.transid','pph.id_kodetrans = 15']],
+            ['transaksi_pricing as grossnet', ['grossnet.id_transaksi = tsk.transid','grossnet.id_kodetrans = 19']],
         ];
 
         $query = $this->generateQuery($request, $table, $columns, $select, $joins);
@@ -503,19 +506,21 @@ class DataController extends Controller
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
+            $nestedData[] = !empty($row->pby_bank) ? date_create($row->pby_bank)->format('d-m-Y') : "<i>Belum Dibayar</i>";
+            $nestedData[] = !empty($row->pby_broker) ? date_create($row->pby_broker)->format('d-m-Y') : "<i>Belum Dibayar</i>";
             $nestedData[] = $row->id_transaksi;
+            $nestedData[] = $row->cover_note;
+            $nestedData[] = $row->policy_no;
             $nestedData[] = $row->nama_asuransi;
-            $nestedData[] = $row->instype_name;
-            $nestedData[] = $row->nama_cabang;
-            $nestedData[] = $row->nama_insured;
-            $nestedData[] = $row->dc;
-            $nestedData[] = number_format($row->paid_amount, 2);
-            $nestedData[] = $row->paid_at;
-            $nestedData[] = $row->name;
-            $nestedData[] = $row->deskripsi;
+            $nestedData[] = $row->rekening_asuransi;
+            $nestedData[] = number_format($row->tagihan, 2);
+            $nestedData[] = number_format($row->komisi, 2);
+            $nestedData[] = number_format($row->ppn, 2);
+            $nestedData[] = number_format($row->pph, 2);
+            $nestedData[] = number_format($row->grossnet, 2);
 
             // hidden
-            $nestedData[] = $row->id;
+            $nestedData[] = !empty($row->pby_broker) ? 0 : 1;
 
             $data[] = $nestedData;
         }
@@ -899,7 +904,8 @@ class DataController extends Controller
             'transaksi' => Transaksi::find($request->transid),
             'pricing'   => $pricing,
         ];
-        $data['insured'] = Insured::find($data['transaksi']->id_insured);
+        $data['insured']  = Insured::find($data['transaksi']->id_insured);
+        $data['asuransi'] = Asuransi::find($data['transaksi']->id_asuransi);
         return $data;
     }
 }
