@@ -435,9 +435,10 @@ class ProcessController extends Controller
                         ], 400);
                     }
                     $this->aktifitas($transaksi->transid, '17', $catatan);
+                    // return "masuk sini";
 
                     return response()->json([
-                        'message'   => 'Berhasil membatalkan pembayaran atas Nomor Transaksi ' . $transaksi->transid,
+                        'message'   => 'Berhasil merubah tanggal pembayaran atas Nomor Transaksi ' . $transaksi->transid,
                         'data'      => $transaksi,
                     ], 200);
     

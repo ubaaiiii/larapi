@@ -357,6 +357,7 @@
                         "visible": false
                     },
                 ],
+                "order": [[ 2, "desc" ]],
                 "ajax": {
                     url: "{{ url('api/datapembayaran') }}",
                     headers: {
@@ -601,9 +602,7 @@
 
             $('#frm-ubah').submit(function(e) {
                 e.preventDefault();
-                var data       = $(this).serializeArray(),
-                    tgl_terima = data[6].value,
-                    tgl_bayar  = data[5].value;
+                var data       = $(this).serializeArray();
                 data.push({ name: "method", value: "ubah" });
 
                 $.ajax({
