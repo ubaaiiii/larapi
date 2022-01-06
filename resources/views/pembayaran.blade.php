@@ -41,6 +41,11 @@
                             <i data-feather="search" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                             Lihat 
                         </a>
+                        <a class="ps-ubah flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
+                            style="cursor:pointer">
+                            <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                            Ubah 
+                        </a>
                         @role('finance|adm')
                             <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
                                 style="cursor:pointer">
@@ -52,12 +57,12 @@
                     </div>
                     @role('finance|adm')
                         <div class="p-2 border-t border-gray-200 dark:border-dark-5 text-theme-6">
-                            <a class="ps-bayar flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
+                            <a class="ps-batal flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
                                 style="cursor:pointer">
                                 <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Batal Bayar Bank
                             </a>
-                            <a class="ps-bayar flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                            <a class="ps-batal flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                 style="cursor:pointer">
                                 <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Batal Bayar Asuransi
@@ -80,7 +85,7 @@
         <table id="tb-pembayaran" class="hover table mt-2 table-report table-report--tabulator">
             <thead>
                 <tr>
-                    <th class="whitespace-nowrap">Bayar Dari Bukopin</th>
+                    <th class="whitespace-nowrap">Terima Dari Bukopin</th>
                     <th class="whitespace-nowrap">Bayar Ke Asuransi</th>
                     <th class="whitespace-nowrap">ID Transaksi</th>
                     <th class="whitespace-nowrap">Covernote</th>
@@ -146,6 +151,58 @@
                         <label for="paid" class="form-label">Nominal Dibayar</label>
                         <input id="paid" required type="text" class="form-control currency allow-decimal masked">
                         <input name="paid" required type="hidden">
+                    </div>
+                </div>
+                <!-- END: Modal Body -->
+                <!-- BEGIN: Modal Footer -->
+                <div class="modal-footer text-right">
+                    <button type="button" data-dismiss="modal"
+                        class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
+                    <button type="submit" class="btn btn-primary w-20">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="modal-ubah" class="modal" data-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- BEGIN: Modal Header -->
+            <form id="frm-ubah">
+                @csrf
+                <div class="modal-header">
+                    <h2 class="font-medium text-base mr-auto">
+                        Ubah Pembayaran
+                    </h2>
+                </div>
+                <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                    <div class="col-span-12 sm:col-span-6">
+                        <label for="transid" class="form-label">Nomor Transaksi</label>
+                        <input id="transid" type="text" class="form-control" readonly>
+                        <input type="hidden" name="transid" readonly>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <label for="nama_asuransi" class="form-label">Tujuan Pembayaran</label>
+                        <input id="nama_asuransi" name="nama_asuransi" type="text" class="form-control" readonly>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <label for="diterima" class="form-label">Nominal Terima</label>
+                        <input id="diterima" type="text" class="form-control currency allow-decimal masked" readonly>
+                        <input name="diterima" type="hidden">
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <label for="dibayar" class="form-label">Nominal Bayar</label>
+                        <input id="dibayar" required type="text" class="form-control currency allow-decimal masked" readonly>
+                        <input name="dibayar" required type="hidden">
+                    </div>
+                    <div class="col-span-12 sm:col-span-6">
+                        <label for="tgl_terima" class="form-label">Tanggal Terima</label>
+                        <input id="tgl_terima" name="tgl_terima" type="date" class="form-control" required>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6" id="div_bayar">
+                        <label for="tgl_bayar" class="form-label">Tanggal Bayar</label>
+                        <input id="tgl_bayar" required name="tgl_bayar" type="date" class="form-control">
                     </div>
                 </div>
                 <!-- END: Modal Body -->
@@ -395,12 +452,11 @@
                     type: "GET",
                     data: {transid},
                     success: function(d) {
-                        console.log(d);
                         $('#frm-bayar #transid').val(d.transaksi.transid);
                         $('#frm-bayar [name="transid"]').val(d.transaksi.transid);
                         $('#frm-bayar #nama_asuransi').val(d.asuransi.nama_asuransi);
                         $('#frm-bayar #rekening_asuransi').val(d.asuransi.rekening_asuransi);
-                        $('#frm-bayar #tagihan').val(d.pricing[18].value);
+                        $('#frm-bayar #tagihan').val(d.pricing[19].value);
                         $('.masked').trigger('keyup');
                         cash('#modal-bayar').modal('show');
                     },
@@ -410,20 +466,110 @@
                 });
             });
 
+            $('.ps-ubah').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[2];
+                $.ajax({
+                    url:"{{ url('api/caritransaksi') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    type: "GET",
+                    data: {transid},
+                    success: function(d) {
+                        $('#frm-ubah #transid').val(d.transaksi.transid);
+                        $('#frm-ubah [name="transid"]').val(d.transaksi.transid);
+                        $('#frm-ubah #nama_asuransi').val(d.asuransi.nama_asuransi);
+                        $('#frm-ubah #diterima').val(d.pricing[18].value);
+                        $('#frm-ubah #dibayar').val(d.pricing[19].value);
+                        $('#frm-ubah #tgl_terima').val(d.pembayaran1.paid_at.split(" ")[0]);
+                        if (d.pembayaran2 !== null) {
+                            $('#frm-ubah #tgl_bayar').val(d.pembayaran2.paid_at.split(" ")[0]);
+                            $('#div_bayar').removeAttr('style');
+                        } else {
+                            $('#div_bayar').css('display','none');
+                        }
+                        $('.masked').trigger('keyup');
+                        cash('#modal-ubah').modal('show');
+                    },
+                    error: function(d) {
+                        console.log('d',d);
+                    },
+                });
+            });
+
+            $('.ps-batal').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[2],
+                    _token = "{{ csrf_token() }}",
+                    method = "batal";
+                Swal.fire({
+                    title: 'Apakah Anda Yakin?',
+                    html: "Data <b>" + transid + "</b> akan dihapus pembayarannya.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Tidak!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Catatan Penghapusan',
+                            input: 'textarea',
+                            showCancelButton: true,
+                            confirmButtonText: 'Konfirmasi',
+                            cancelButtonText: 'Batal'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                var catatan = "";
+                                if (result.value) {
+                                    catatan = result.value;
+                                }
+                                $.ajax({
+                                    url: "{{ url('api/pembayaran') }}",
+                                    data: {
+                                        transid,
+                                        _token,
+                                        catatan,
+                                        method,
+                                    },
+                                    type: "POST",
+                                    success: function(d) {
+                                        console.log('response :', d);
+                                        Swal.fire(
+                                            'Berhasil!',
+                                            d.message,
+                                            'success'
+                                        ).then(function() {
+                                            reloadTable();
+                                        });
+                                    },
+                                    error: function(d) {
+                                        console.log('response :', d);
+                                        Swal.fire(
+                                            'Gagal!',
+                                            d.message,
+                                            'error'
+                                        );
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
             $('#frm-bayar').submit(function(e) {
                 e.preventDefault();
                 var data = $(this).serializeArray(),
                     paid = data[6].value,
                     tagihan = data[5].value;
                 data.push({ name: "method", value: "asuransi" });
-                console.log(data);
                 if (paid == tagihan) {
                     $.ajax({
                         url: "{{ url('api/pembayaran') }}",
                         data: data,
                         type: "POST",
                         success: function(d) {
-                            console.log(d);
                             Swal.fire(
                                 'Berhasil!',
                                 d.message,
@@ -437,7 +583,6 @@
                             reloadTable();
                         },
                         error: function(d) {
-                            console.log(d);
                             Swal.fire(
                                 'Gagal!',
                                 d.message,
@@ -452,6 +597,41 @@
                         'error'
                     );
                 }
+            });
+
+            $('#frm-ubah').submit(function(e) {
+                e.preventDefault();
+                var data       = $(this).serializeArray(),
+                    tgl_terima = data[6].value,
+                    tgl_bayar  = data[5].value;
+                data.push({ name: "method", value: "ubah" });
+
+                $.ajax({
+                    url: "{{ url('api/pembayaran') }}",
+                    data: data,
+                    type: "POST",
+                    success: function(d) {
+                        Swal.fire(
+                            'Berhasil!',
+                            d.message,
+                            'success'
+                        );
+                        $(':input','#frm-ubah')
+                            .not(':button, :submit, :reset, :hidden')
+                            .val('');
+                        $('#frm-ubah #tgl_terima').val("{{ date('Y-m-d') }}");
+                        $('#frm-ubah #tgl_bayar').val("{{ date('Y-m-d') }}");
+                        cash('#modal-ubah').modal('hide');
+                        reloadTable();
+                    },
+                    error: function(d) {
+                        Swal.fire(
+                            'Gagal!',
+                            d.message,
+                            'error'
+                        );
+                    },
+                });
             });
 
             var tableImport = $('#tb-import').DataTable({
@@ -519,7 +699,6 @@
             $('#frm-import').submit(function(e){
                 e.preventDefault();
                 var data = new FormData(this);
-                console.log('data',data);
                 $.ajax({
                     url: "{{ url('api/importpembayaran') }}",
                     headers: {
@@ -536,7 +715,6 @@
                         tableImport.draw();
                     },
                     error: function(d) {
-                        console.log(d);
                         Swal.fire(
                             'Gagal!',
                             d.message,
@@ -549,7 +727,6 @@
             $('#btn-import').click(function(){
                 var data  = tableImport.rows('.selected').data().toArray();
                 var total  = tableImport.rows('.selected').count();
-                console.log('data',data);
                 Swal.fire({
                     title: 'Apakah Anda Yakin?',
                     html: "Total "+total+" data akan diimport pembayarannya ke sistem.",
@@ -568,7 +745,6 @@
                             data: {data},
                             dataType: "json",
                             success: function (d) {
-                                console.log('success',d);
                                 Swal.fire(
                                     'Berhasil!',
                                     d.message,

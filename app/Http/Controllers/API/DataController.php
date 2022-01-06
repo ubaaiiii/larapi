@@ -11,6 +11,7 @@ use App\Models\Instype;
 use App\Models\Insured;
 use App\Models\KodePos;
 use App\Models\Okupasi;
+use App\Models\Pembayaran;
 use App\Models\Pricing;
 use App\Models\Transaksi;
 use App\Models\User;
@@ -140,17 +141,25 @@ class DataController extends Controller
 
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
-        DB::enableQueryLog();
+        // DB::enableQueryLog();
 
         if (!empty($joins)) {
             foreach ($joins as $join) {
                 if (is_array($join[1])) {
                     $table->leftJoin($join[0], function ($jn) use ($join) {
                         $pecah = explode(" ", $join[1][0]);
-                        $jn->on($pecah[0], $pecah[1], $pecah[2]);
+                        if (in_array($pecah[1],["=",">",">=","<","<=","<>"])) {
+                            $jn->on($pecah[0], $pecah[1], $pecah[2]);
+                        } else {
+                            $jn->on(DB::raw($join[1][0]), DB::raw(''), DB::raw(''));
+                        }
                         for ($i = 1; $i < count($join[1]); $i++) {
                             $pecah = explode(" ", $join[1][$i]);
-                            $jn->where($pecah[0], $pecah[1], $pecah[2]);
+                            if (in_array($pecah[1],["=",">",">=","<","<=","<>"])) {
+                                $jn->where($pecah[0], $pecah[1], $pecah[2]);
+                            } else {
+                                $jn->whereRaw($join[1][$i]);
+                            }
                         }
                     });
                 } else {
@@ -256,12 +265,12 @@ class DataController extends Controller
                         IFNULL(SUM(case when transaksi.id_status IN (4) then 1 else 0 end), 0) as Bank,
                         IFNULL(SUM(case when transaksi.id_status IN (5) then 1 else 0 end), 0) as Tagihan,
                         IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL then 1 else 0 end), 0) as DibayarBank,
-                        IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL then 1 else 0 end), 0) as DibayarBank,
+                        IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL then 1 else 0 end), 0) as DibayarBroker,
                         IFNULL(SUM(case when transaksi.id_status IN (10) then 1 else 0 end), 0) as Polis,
                         IFNULL(SUM(case when transaksi.id_status IN (15) then 1 else 0 end), 0) as Batal
                     FROM `transaksi`
-                    LEFT JOIN activities bankPaid ON bankPaid.id_transaksi = transid AND bankPaid.id_status = 6 
-                    LEFT JOIN activities brokerPaid ON brokerPaid.id_transaksi = transid AND brokerPaid.id_status = 9 
+                    LEFT JOIN transaksi_pembayaran bankPaid ON bankPaid.id_transaksi = transid AND bankPaid.deleted_at IS NULL AND bankPaid.paid_type = 'PD01' 
+                    LEFT JOIN transaksi_pembayaran brokerPaid ON brokerPaid.id_transaksi = transid AND brokerPaid.deleted_at IS NULL AND brokerPaid.paid_type = 'PD02' 
                     $customJoin
                     $customWhere";
         $result = (object) DB::select($query)[0];
@@ -379,17 +388,19 @@ class DataController extends Controller
                     break;
 
                 case 'dibayar bank':
-                    $table->leftJoin('activities as pmby', function ($q) use ($user) {
+                    $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
                         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                            ->where('pmby.id_status', '=', "6");
-                    });
-                    $table->whereNotNull('pmby.id_transaksi');
-                    break;
-
-                case 'dibayar broker':
-                    $table->leftJoin('activities as pmby', function ($q) use ($user) {
-                        $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                            ->where('pmby.id_status', '=', "9");
+                            ->where('pmby.paid_type', '=', "PD01")
+                            ->whereNull('pmby.deleted_at');
+                        });
+                        $table->whereNotNull('pmby.id_transaksi');
+                        break;
+                        
+                    case 'dibayar broker':
+                        $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
+                            $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                            ->where('pmby.paid_type', '=', "PD02")
+                            ->whereNull('pmby.deleted_at');
                     });
                     $table->whereNotNull('pmby.id_transaksi');
                     break;
@@ -416,7 +427,7 @@ class DataController extends Controller
             ['cabang', 'id_cabang = cabang.id'],
             ['documents as cn', ['transid = cn.id_transaksi', 'cn.jenis_file = COVERNOTE']],
             ['documents as polis', ['transid = polis.id_transaksi', 'polis.jenis_file = POLIS']],
-            ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+            ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1','id_parent_transaksi is null']],
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
 
@@ -460,7 +471,7 @@ class DataController extends Controller
         $columns = [
             'pby_bank.paid_at',
             'pby_broker.paid_at',
-            'id_transaksi',
+            'pby_bank.id_transaksi',
             'cover_note',
             'policy_no',
             'nama_asuransi',
@@ -493,7 +504,7 @@ class DataController extends Controller
         $joins = [
             ['transaksi as tsk', 'pby_bank.id_transaksi = tsk.transid'],
             ['asuransi as asn', 'id_asuransi = asn.id'],
-            ['transaksi_pembayaran as pby_broker', ['pby_broker.id_transaksi = pby_bank.id_transaksi', 'pby_broker.paid_type = PD02']],
+            ['transaksi_pembayaran as pby_broker', ['pby_broker.id_transaksi = pby_bank.id_transaksi', 'pby_broker.paid_type = PD02','pby_broker.deleted_at is null']],
             ['transaksi_pricing as tagihan', ['tagihan.id_transaksi = tsk.transid','tagihan.id_kodetrans = 18']],
             ['transaksi_pricing as komisi', ['komisi.id_transaksi = tsk.transid','komisi.id_kodetrans = 13']],
             ['transaksi_pricing as ppn', ['ppn.id_transaksi = tsk.transid','ppn.id_kodetrans = 14']],
@@ -901,8 +912,10 @@ class DataController extends Controller
             $pricing[$row->id_kodetrans] = $row;
         }
         $data = [
-            'transaksi' => Transaksi::find($request->transid),
-            'pricing'   => $pricing,
+            'transaksi'   => Transaksi::find($request->transid),
+            'pembayaran1' => Pembayaran::select('paid_at')->where('id_transaksi',$request->transid)->where('paid_type','PD01')->first(),
+            'pembayaran2' => Pembayaran::select('paid_at')->where('id_transaksi',$request->transid)->where('paid_type','PD02')->first(),
+            'pricing'     => $pricing,
         ];
         $data['insured']  = Insured::find($data['transaksi']->id_insured);
         $data['asuransi'] = Asuransi::find($data['transaksi']->id_asuransi);

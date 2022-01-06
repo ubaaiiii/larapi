@@ -289,9 +289,10 @@ class ProcessController extends Controller
     {
         $role = Auth::user()->getRoleNames()[0];
         if ($role == "finance") {
-            $transaksi = Transaksi::where('transid', $request->transid)->where('cover_note', $request->cover_note)->first();
+            $transaksi = Transaksi::where('transid', $request->transid);
             switch ($request->method) {
                 case 'bank':
+                    $transaksi = $transaksi->where('cover_note', $request->cover_note)->first();
                     $request->validate([
                         'transid'   => 'required',
                         'paid'      => 'required',
@@ -306,24 +307,19 @@ class ProcessController extends Controller
                         'paid_at'       => $request->tgl_bayar,
                         'created_by'    => Auth::user()->id,
                     ];
-                    if ($transaksi->id_status == 5) {
-                        $cekPembayaran = Pembayaran::where('id_transaksi', $request->tarnsid)->where('paid_type', 'PD01')->first();
-                        if (!empty($cekPembayaran)) {
-                            return response()->json([
-                                'message'   => 'Gagal input pembayaran karena data sudah pernah dibayar pada tanggal ' . Functions::tgl_indo($cekPembayaran->paid_at),
-                                'data'      => $cekPembayaran,
-                            ], 400);
-                        }
-    
-                        $update = [
-                            'id_status' => 7
-                        ];
+
+                    $cekPembayaran = Pembayaran::where('id_transaksi', $request->tarnsid)->where('paid_type', 'PD01')->first();
+                    if (!empty($cekPembayaran)) {
+                        return response()->json([
+                            'message'   => 'Gagal input pembayaran karena data sudah pernah dibayar pada tanggal ' . Functions::tgl_indo($cekPembayaran->paid_at),
+                            'data'      => $cekPembayaran,
+                        ], 400);
                     }
     
                     Pembayaran::create($insert);
-                    $transaksi->update($update);
+                    $transaksi->update(['id_status' => 7]);
 
-                    $this->aktifitas($transaksi->transid, '6', 'Pembayaran Premi Diterima Oleh BDS.');
+                    $this->aktifitas($transaksi->transid, '6', 'Pembayaran Premi Diterima Oleh BDS Pada Tanggal: '. Functions::tgl_indo($request->tgl_bayar));
                     $this->aktifitas($transaksi->transid, '7', 'Menunggu E-Polis untuk diupload oleh Asuransi.');
     
                     return response()->json([
@@ -333,6 +329,7 @@ class ProcessController extends Controller
                     break;
     
                 case 'asuransi':
+                    $transaksi = $transaksi->first();
                     $request->validate([
                         'transid'   => 'required',
                         'paid'      => 'required',
@@ -347,19 +344,17 @@ class ProcessController extends Controller
                         'paid_at'       => $request->tgl_bayar,
                         'created_by'    => Auth::user()->id,
                     ];
-                    if ($transaksi->id_status == 5) {
-                        $cekPembayaran = Pembayaran::where('id_transaksi', $request->tarnsid)->where('paid_type', 'PD02')->first();
-                        if (!empty($cekPembayaran)) {
-                            return response()->json([
-                                'message'   => 'Gagal input pembayaran karena data sudah pernah dibayar pada tanggal ' . Functions::tgl_indo($cekPembayaran->paid_at),
-                                'data'      => $cekPembayaran,
-                            ], 400);
-                        }
-    
+
+                    $cekPembayaran = Pembayaran::where('id_transaksi', $request->tarnsid)->where('paid_type', 'PD02')->first();
+                    if (!empty($cekPembayaran)) {
+                        return response()->json([
+                            'message'   => 'Gagal input pembayaran karena data sudah pernah dibayar pada tanggal ' . Functions::tgl_indo($cekPembayaran->paid_at),
+                            'data'      => $cekPembayaran,
+                        ], 400);
                     }
     
                     Pembayaran::create($insert);
-                    $this->aktifitas($transaksi->transid, '9', 'Premi Dibayarkan Oleh BDS ke Asuransi.');
+                    $this->aktifitas($transaksi->transid, '9', 'Premi Dibayarkan Oleh BDS ke Asuransi Pada Tanggal: '. Functions::tgl_indo($request->tgl_bayar));
 
                     $cetak = new CetakController;
                     $cetak->cetakNotaPembayaran($request->transid);
@@ -369,6 +364,82 @@ class ProcessController extends Controller
                         'data'      => $transaksi,
                     ], 200);
                     break;
+
+                case 'batal':
+                    $transaksi = $transaksi->first();
+                    $request->validate([
+                        'transid'   => 'required',
+                        'catatan'   => 'required'
+                    ]);
+                    $cekPembayaran2 = Pembayaran::where('id_transaksi', $request->transid)->where('paid_type', 'PD02')->first();
+                    $cekPembayaran1 = Pembayaran::where('id_transaksi', $request->transid)->where('paid_type', 'PD01')->first();
+
+                    if (!empty($cekPembayaran2)) {
+                        $cekPembayaran2->forceDelete();
+                        $nota_pembayaran = Document::where('id_transaksi', $request->transid)->where('jenis_file','NOTAPEMBAYARAN');
+                        $path = str_replace("public/","",$nota_pembayaran->first()->lokasi_file);
+                        if (file_exists(public_path($path))) {
+                            unlink(public_path($path));
+                        }
+                        $nota_pembayaran->forceDelete();
+
+                    } elseif (!empty($cekPembayaran1)) {
+                        $cekPembayaran1->forceDelete();
+                        $transaksi->update(['id_status' => 5]);
+                        
+                    } else {
+                        return response()->json([
+                            'message'   => 'Gagal batalkan pembayaran karena tidak ada datanya'
+                        ], 400);
+                    }
+                    $this->aktifitas($transaksi->transid, '16', $request->catatan);
+
+                    return response()->json([
+                        'message'   => 'Berhasil membatalkan pembayaran atas Nomor Transaksi ' . $transaksi->transid,
+                        'data'      => $transaksi,
+                    ], 200);
+
+                    break;
+
+                case 'ubah':
+                    $transaksi = $transaksi->first();
+                    $request->validate([
+                        'transid'    => 'required',
+                    ]);
+                    $cekPembayaran1 = Pembayaran::where('id_transaksi', $request->transid)->where('paid_type', 'PD01')->first();
+                    $cekPembayaran2 = Pembayaran::where('id_transaksi', $request->transid)->where('paid_type', 'PD02')->first();
+                    $catatan = "";
+
+                    if (!empty($cekPembayaran1) or !empty($cekPembayaran2)) {
+                        $catatan .= "Perubahan Tanggal Pembayaran:";
+                        if (!empty($cekPembayaran1)) {
+                            $tgl_sebelumnya = explode(" ",$cekPembayaran1->paid_at)[0];
+                            if ($tgl_sebelumnya !== $request->tgl_terima) {
+                                $catatan .= "<br>- Tgl Terima Dari Bank:
+                                <br> ". Functions::tgl_indo($tgl_sebelumnya) . " Menjadi " . Functions::tgl_indo($request->tgl_terima);
+                                $cekPembayaran1->update(['paid_at'=>$request->tgl_terima]);
+                            }
+                        }
+                        
+                        if (!empty($cekPembayaran2)) {
+                            $tgl_sebelumnya = explode(" ", $cekPembayaran2->paid_at)[0];
+                            if ($tgl_sebelumnya !== $request->tgl_bayar) {
+                                $catatan .= "<br>- Tgl Bayar Ke Asuransi:
+                                <br> " . Functions::tgl_indo($tgl_sebelumnya) . " Menjadi " . Functions::tgl_indo($request->tgl_bayar);
+                                $cekPembayaran2->update(['paid_at' => $request->tgl_bayar]);
+                            }
+                        }
+                    } else {
+                        return response()->json([
+                            'message'   => 'Gagal batalkan pembayaran karena tidak ada datanya'
+                        ], 400);
+                    }
+                    $this->aktifitas($transaksi->transid, '17', $catatan);
+
+                    return response()->json([
+                        'message'   => 'Berhasil membatalkan pembayaran atas Nomor Transaksi ' . $transaksi->transid,
+                        'data'      => $transaksi,
+                    ], 200);
     
                 default:
                     return response()->json([
@@ -635,6 +706,7 @@ class ProcessController extends Controller
                             $status     = 5;
                             $string     = "setujui";
                             $cetakCoverNote = true;
+                            $cetakInvoice   = true;
                         }
                         break;
 
@@ -772,6 +844,9 @@ class ProcessController extends Controller
                 }
                 if (!empty($cetakCoverNote)) {
                     $cetak->cetakCoverNote($request->transid);
+                }
+                if (!empty($cetakInvoice)) {
+                    $cetak->cetakInvoice($request->transid);
                 }
 
                 return response()->json([

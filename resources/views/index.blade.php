@@ -595,6 +595,7 @@
                     'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                 },
                 success: function(d) {
+                    console.log(d);
                     $('#angka-pengajuan').text(d.Pengajuan);
                     $('#angka-verifikasi').text(d.Verifikasi);
                     $('#angka-asuransi').text(d.Asuransi);
