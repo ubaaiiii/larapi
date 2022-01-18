@@ -1168,6 +1168,4 @@ class ProcessController extends Controller
 
         return $cabang;
     }
-
-    public function 
 }

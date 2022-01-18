@@ -510,6 +510,7 @@
                             $('#frm-ubah #tgl_bayar').val(d.pembayaran2.paid_at.split(" ")[0]);
                             $('#div_bayar').removeAttr('style');
                         } else {
+                            $('#frm-ubah #tgl_bayar').removeAttr('required');
                             $('#div_bayar').css('display','none');
                         }
                         $('.masked').trigger('keyup');
