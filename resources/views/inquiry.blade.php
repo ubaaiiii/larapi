@@ -210,7 +210,7 @@
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="tgl_bayar" class="form-label">Tanggal Bayar</label>
-                            <input id="tgl_bayar" required name="tgl_bayar" type="date" class="form-control" value="{{ date('Y-m-d') }}">
+                            <input id="tgl_bayar" required name="tgl_bayar" type="date" class="form-control">
                         </div>
                         <div class="col-span-12 sm:col-span-6">
                             <label for="tagihan" class="form-label">Tagihan Premi</label>

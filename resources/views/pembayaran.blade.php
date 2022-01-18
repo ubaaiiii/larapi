@@ -22,6 +22,27 @@
                 <option>50</option>
                 <option>100</option>
             </select>
+            <div class="ml-3">
+                <div class="flex flex-col sm:flex-row">
+                    <label class="mr-2">Filter Data : </label>
+                    <div class="form-check mr-2">
+                        <input id="belum_dibayar" name="belum_dibayar" class="form-check-input cek-filter" type="checkbox">
+                        <label class="form-check-label" for="belum_dibayar">Belum Dibayar</label>
+                    </div>
+                    <div class="form-check mr-2">
+                        <input id="sudah_dibayar" name="sudah_dibayar" class="form-check-input cek-filter" type="checkbox">
+                        <label class="form-check-label" for="sudah_dibayar">Sudah Dibayar</label>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $('.cek-filter').click(function() {
+                        reloadTable();
+                        console.log('reload table');
+                    });
+                });
+            </script>
         </div>
         @role('broker|adm')
         <a href="javascript:;" data-toggle="modal" data-target="#modal-import"
@@ -139,8 +160,7 @@
                     </div>
                     <div class="col-span-12 sm:col-span-6">
                         <label for="tgl_bayar" class="form-label">Tanggal Bayar</label>
-                        <input id="tgl_bayar" required name="tgl_bayar" type="date" class="form-control"
-                            value="{{ date('Y-m-d') }}">
+                        <input id="tgl_bayar" required name="tgl_bayar" type="date" class="form-control">
                     </div>
                     <div class="col-span-12 sm:col-span-6">
                         <label for="tagihan" class="form-label">Gross NET</label>
@@ -150,7 +170,7 @@
                     <div class="col-span-12 sm:col-span-6">
                         <label for="paid" class="form-label">Nominal Dibayar</label>
                         <input id="paid" required type="text" class="form-control currency allow-decimal masked">
-                        <input name="paid" required type="hidden">
+                        <input name="paid" type="hidden">
                     </div>
                 </div>
                 <!-- END: Modal Body -->
@@ -368,6 +388,8 @@
                         d.search = $("#filterSearch").val();
                         d.length = $("#filterlength").val();
                         d._token = '{{ csrf_token() }}';
+                        d.filter_belum_dibayar = $('#belum_dibayar').is(':checked');
+                        d.filter_sudah_dibayar = $('#sudah_dibayar').is(':checked');
                         @if (!empty($_GET['data']))
                             d.data = '{{ $_GET['data'] }}';
                         @endif

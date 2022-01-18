@@ -174,7 +174,9 @@
             <div class="text-base text-gray-600">Gross Net</div>
             <div class="text-xl text-theme-1 dark:text-theme-10 font-medium mt-2">{{ number_format($pricing[18]->value,2) }}</div>
             {{-- <div class="mt-1 tetx-xs">Sudah termasuk pajak</div> --}}
+            @if (!empty($pembayaran))
             <span class="stamp is-draft">LUNAS</span>
+            @endif
           </div>
         </div>
       @endif

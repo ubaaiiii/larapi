@@ -57,8 +57,20 @@ class PageController extends Controller
         // die;
         // dd($data['hitung']);
         if (!empty($transid)) {
+            $level = Auth::user()->getRoleNames()[0];
             $dataController     = new DataController;
             $transaksi = $dataController->dataPengajuan($transid);
+
+            if (in_array($level,['maker','checker'])) {
+                if ($transaksi->created_by !== Auth::user()->id) {
+                    abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                }
+            }
+            if (in_array($level,['approval'])) {
+                if ($transaksi->id_cabang !== Auth::user()->id_cabang) {
+                    abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                }
+            }
             $data['act']        = 'edit';
             $data['data']       = $transaksi;
             $data['pricing']    = $dataController->dataPricing($transid);
@@ -134,7 +146,6 @@ class PageController extends Controller
                 default:
                     break;
             }
-            
             
             $data = [
                 'cabang'    => $cabang,

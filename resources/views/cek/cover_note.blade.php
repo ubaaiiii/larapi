@@ -80,7 +80,7 @@
         <div class="flex flex-col lg:flex-row px-5 sm:px-20 pt-10 pb-10 sm:pb-20">
           <div>
             <div class="text-base text-gray-600">Disetujui Oleh</div>
-            <img src="{{ url('public/dist/images/Logo') }}/Logo-{{ $asuransi->akronim }}.jpg">
+            <img src="{{ public_path('dist/images/Logo') }}/Logo-{{ $asuransi->akronim }}.jpg">
             <div class="text-lg font-medium text-theme-1 dark:text-theme-10 mt-2">{{ $asuransi->nama_asuransi }}</div>
             <div class="mt-1">{{ $asuransi->alamat_asuransi }}</div>
             <div class="mt-1">Pada tanggal: <strong>{{ FunctionsHelp::tgl_indo($tgl_aktif->created_at->format('Y-m-d'))
@@ -88,79 +88,6 @@
           </div>
         </div>
       </div>
-      {{-- <div class="px-5 sm:px-16 py-10 sm:py-20">
-        <div class="overflow-x-auto">
-          <table class="table">
-            <thead>
-              <tr>
-                <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">DESKRIPSI</th>
-                <th class="border-b-2 dark:border-dark-5 text-right whitespace-nowrap">HARGA</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="border-b dark:border-dark-5">
-                  <div class="font-medium whitespace-nowrap">Premium</div>
-                  <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Biaya pengalihan risiko dari Pemegang
-                    Polis kepada Penyedia Asuransi</div>
-                </td>
-                <td class="text-right border-b dark:border-dark-5 w-32 font-medium">{{
-                  number_format($pricing[1]->value,2) }}</td>
-              </tr>
-              {{ die('berhasil') }}
-              <tr>
-                <td class="border-b dark:border-dark-5">
-                  <div class="font-medium whitespace-nowrap">Biaya Polis</div>
-                  <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Biaya atas pencetakan / pembuatan Polis
-                  </div>
-                </td>
-                <td class="text-right border-b dark:border-dark-5 w-32 font-medium">{{
-                  number_format($pricing[9]->value,2) }}</td>
-              </tr>
-              <tr>
-                <td class="border-b dark:border-dark-5">
-                  <div class="font-medium whitespace-nowrap">Biaya Materai</div>
-                  <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Biaya atas pembelian materai</div>
-                </td>
-                <td class="text-right border-b dark:border-dark-5 w-32 font-medium">{{
-                  number_format($pricing[10]->value,2) }}</td>
-              </tr>
-              <tr>
-                <td class="border-b dark:border-dark-5">
-                  <div class="font-medium whitespace-nowrap">Biaya Admin</div>
-                  <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Biaya administrasi yang telah disepakati
-                    sebelumnya</div>
-                </td>
-                <td class="text-right border-b dark:border-dark-5 w-32 font-medium">{{
-                  number_format($pricing[11]->value,2) }}</td>
-              </tr>
-              <tr style="border-bottom: 3pt double black;">
-                <td>
-                  <div class="font-medium whitespace-nowrap">Biaya Lain</div>
-                  <div class="text-gray-600 text-sm mt-0.5 whitespace-nowrap">Biaya lain-lain yang ditentukan dalam
-                    Polis</div>
-                </td>
-                <td class="text-right w-32 font-medium">{{ number_format($pricing[16]->value,2) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div> --}}
-      {{-- <div class="px-5 sm:px-20 pb-10 sm:pb-20 flex flex-col-reverse sm:flex-row">
-        <div class="text-center sm:text-left mt-10 sm:mt-0">
-          <div class="text-base text-gray-600">Bank Transfer</div>
-          <div class="text-lg text-theme-1 dark:text-theme-10 font-medium mt-2">PT. BINA DANA SEJAHTERA</div>
-          <div class="mt-1">
-            PT. Bank KB Bukopin Capem Bulog II, Jakarta
-            <br>No. Rekening: <b>101.5266.011 (IDR Rupiah) </b>
-          </div>
-        </div>
-        <div class="text-center sm:text-right sm:ml-auto">
-          <div class="text-base text-gray-600">Gross Net</div>
-          <div class="text-xl text-theme-1 dark:text-theme-10 font-medium mt-2">{{ number_format($pricing[18]->value,2)
-            }}</div>
-        </div>
-      </div> --}}
       @endif
     </div>
     <!-- END: Cover Note -->

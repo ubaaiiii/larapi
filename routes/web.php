@@ -70,9 +70,9 @@ Route::group(['middleware' => 'auth'], function () {
   Route::post('laporan', [PageController::class, 'laporan'])->name('laporan')->middleware();
 
   // Cetak
-  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('invoice')->middleware('role:maker|checker|adm|broker|insurance');
-  Route::get('cetak_nota_pembayaran/{any}', [CetakController::class, 'cetakNotaPembayaran'])->name('notapembayaran')->middleware('role:adm|broker');
-  Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:maker|checker|adm|broker');
+  Route::get('cetak_invoice/{any}', [CetakController::class, 'cetakInvoice'])->name('invoice')->middleware('role:maker|checker|adm|broker|finance|insurance');
+  Route::get('cetak_nota_pembayaran/{any}', [CetakController::class, 'cetakNotaPembayaran'])->name('notapembayaran')->middleware('role:adm|broker|finance');
+  Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:maker|checker|adm|broker|finance');
   Route::get('cetak_placing/{any}', [CetakController::class, 'cetakPlacing'])->name('placing')->middleware('role:insurance|adm|broker');
 
   // inquiry
@@ -83,8 +83,8 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('notifikasi', [PageController::class, 'notifikasi'])->name('notifikasi');
 
   // pembayaran
-  Route::get('pembayaran', [PageController::class, 'pembayaran'])->name('pembayaran');
-  Route::get('pembayaran/{any}', [PageController::class, 'pembayaran'])->name('pembayaran');
+  Route::get('pembayaran', [PageController::class, 'pembayaran'])->name('pembayaran')->middleware('role:adm|finance');
+  Route::get('pembayaran/{any}', [PageController::class, 'pembayaran'])->name('pembayaran')->middleware('role:adm|finance');
 
   // pengajuan
   Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:maker|adm');

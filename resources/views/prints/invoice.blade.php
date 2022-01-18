@@ -134,7 +134,8 @@
         <u>PT. BINA DANA SEJAHTERA</u><br>
         <b id="test"></b>
         <br>
-        <img src="data:image/png;base64, {!! $qrcode !!}">
+        {{-- <img src="data:image/png;base64, {!! $qrcode !!}"> --}}
+        <img src="data:image/svg;base64, {!! $qrcode !!} ">
       </td>
     </tr>
   </table>

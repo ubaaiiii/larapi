@@ -57,7 +57,6 @@
                     var konten  = $('#notif-content'),
                         baru = false;
                     
-                    console.log(d);
                     if (d.length > 0) {
                         var notif = "",
                             users = {!! json_encode(App\Models\User::select('id','name','username')->get()) !!},

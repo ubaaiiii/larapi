@@ -259,8 +259,8 @@
                             <div class="form-inline mt-5">
                                 <label for="masa" class="ml-3 form-label sm:w-20">Masa Asuransi</label>
                                 <div class="input-group w-full">
-                                    <input type="text" class="form-control" name="masa"
-                                        id="masa" value="@if (!empty($data->masa)){{ $data->masa }}@endif" required>
+                                    <input type="text" class="form-control" name="masa" id="masa" value="@if (!empty($data->masa)){{ $data->masa }}@endif" required>
+                                    <input type="hidden" class="form-control" id="PRORATA">
                                     <div id="masa" class="input-group-text">Hari</div>
                                 </div>
                             </div>
@@ -403,6 +403,11 @@
                                 <label for="kodetrans_value[11]" class="form-label">Biaya Materai</label>
                                 <input id="kodetrans_value[11]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[11]->value)){{ $pricing[11]->value }}@endif">
                                 <input type="hidden" name="kodetrans_value[11]">
+                            </div>
+                            <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
+                                <label for="kodetrans_value[18]" class="form-label">Gross</label>
+                                <input id="kodetrans_value[18]" d-input="GROSS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Gross" aria-describedby="Gross" value="@if (!empty($pricing[18]->value)){{ $pricing[18]->value }}@endif">
+                                <input type="hidden" name="kodetrans_value[18]">
                             </div>
                         </div>
                     </div>
@@ -610,7 +615,8 @@
 
         function hitung() {
             var OKUPASI = $('#okupasi').val(),
-                _RATE = totalRate();
+                _RATE   = totalRate(),
+                PRORATA = $('#PRORATA').val();
             
             @foreach ($value as $row)
             var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val());
@@ -1121,14 +1127,45 @@
                 cekTSI();
             });
 
+            function prorata(tglAwal, tglAkhir) {
+                var bagi_tahun  = 365,
+                    tahun_awal  = tglAwal.years(),
+                    tahun_akhir = tglAkhir.years(),
+                    durasi      = Math.floor(moment.duration(tglAkhir.diff(tglAwal)).asDays()),
+                    prorata     = 0,
+                    jml_kabisat = 0;
+                
+                for (let $i = tahun_awal; $i <= tahun_akhir; $i++) {
+                    if (moment([$i]).isLeapYear()) {
+                        if ($i == tahun_akhir) {
+                            if (tglAkhir.format('M') == 2 && tglAkhir.format('D') >= 29 || tglAkhir.format('M') > 2) {
+                                jml_kabisat++;
+                            }
+                        } else {
+                            jml_kabisat++;
+                        }
+                    }
+                }
+                durasi = durasi - jml_kabisat;
+                
+                $('#PRORATA').val(durasi / 365);
+                hitung();
+            }
+
             function polis(startPolis, endPolis) {
                 console.log(endPolis.format('DD/MM/YYYY'));
                 $('#periode-polis').html(startPolis.format('DD/MM/YYYY') + ' - ' + endPolis.format('DD/MM/YYYY'));
-                $('#masa').val(Math.round(moment.duration(endPolis.diff(startPolis)).asDays()));
+                // $('#masa').val(Math.round(moment.duration(endPolis.diff(startPolis)).asDays()));
                 $('[name="polis_start"]').val(startPolis.format('YYYY-MM-DD'));
                 $('[name="polis_end"]').val(endPolis.format('YYYY-MM-DD'));
+                var tglAwal = startPolis;
+                var tglAkhir = endPolis;
+                var durasi = moment.duration(tglAkhir.diff(tglAwal));
+                $('#masa').val(Math.floor(durasi.asDays()));
+                console.log(Math.floor(durasi.asYears()));
+                prorata(tglAwal, tglAkhir);
                 if (maxPeriode !== null) {
-                    cekPeriode(startPolis,endPolis);
+                    cekPeriode(startPolis, endPolis);
                 }
             }
 
@@ -1144,13 +1181,14 @@
 
             polis(startPolis,endPolis);
 
-            $('#masa').keyup(function(){
+            $('#masa').keyup(function() {
                 endPolis = startPolis.add($(this).val(), 'days').format('DD/MM/YYYY');
                 startPolis = startPolis.subtract($(this).val(), 'day');
                 $('#periode-polis').data('daterangepicker').setStartDate(startPolis);
                 $('#periode-polis').data('daterangepicker').setEndDate(endPolis);
                 $('[name="polis_start"]').val($('#periode-polis').data('daterangepicker').startDate.format('YYYY-MM-DD'));
                 $('[name="polis_end"]').val($('#periode-polis').data('daterangepicker').endDate.format('YYYY-MM-DD'));
+                prorata($('#periode-polis').data('daterangepicker').startDate, $('#periode-polis').data('daterangepicker').endDate);
             });
 
             @if (empty($method))

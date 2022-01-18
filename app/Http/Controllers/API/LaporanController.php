@@ -544,6 +544,98 @@ class LaporanController extends Controller
                 }
                 break;
 
+            case '10':
+                // Laporan Produksi Finance
+                $select = [
+                    'transid                as "Nomor Transaksi"',
+                    'transaksi.created_at   as "Tanggal Dibuat"',
+                    'sts.msdesc             as "Status"',
+                    DB::raw("CONCAT('PT. KB BUKOPIN, TBk CAB ', nama_cabang, ' QQ ', nama_insured) as Tertanggung"),
+                    'alamat_cabang          as "Alamat Cabang Bukopin"',
+                    'nama_asuransi          as "Nama Asuransi"',
+                    'instype_name           as "Jenis Asuransi"',
+                    'policy_no              as "Nomor Polis"',
+                    'cover_note             as "Covernote"',
+                    'location               as "Lokasi Okupasi"',
+                    'polis_start            as "Polis Mulai"',
+                    'polis_end              as "Polis Selesai"',
+                    'tsi.value              as "Nilai Pertanggungan"',
+                    'premi.value            as "Premium"',
+                    'polis.value            as "By. Polis"',
+                    'materai.value          as "By. Materai"',
+                    'lain.value             as "By. Lain"',
+                    'tagihan.value          as "Tagihan"',
+                    'hutang.value           as "Hutang"',
+                    'komisi.value           as "Komisi"',
+                    'reward.value           as "Reward"',
+                    'ppn.value              as "PPN"',
+                    'pph.value              as "PPh23"',
+                    'netkomisi.value        as "Net Komisi"',
+                    'rekening_asuransi      as "Rekening Asuransi"',
+                    'terima.paid_amount     as "Jumlah Terima"',
+                    'terima.paid_at         as "Tanggal Terima"',
+                    'bayar.paid_amount      as "Jumlah Bayar"',
+                    'bayar.paid_at          as "Tanggal Bayar"',
+                ];
+                if (!empty($request->dtable)) {
+                    $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end]);
+
+                    $column = [
+                        'transid',
+                        'transaksi.created_at',
+                        'sts.msdesc',
+                        'nama_cabang',
+                        'alamat_cabang',
+                        'nama_asuransi',
+                        'instype_name',
+                        'policy_no',
+                        'cover_note',
+                        'location',
+                        'polis_start',
+                        'polis_end',
+                        'tsi.value',
+                        'premi.value',
+                        'polis.value',
+                        'materai.value',
+                        'lain.value',
+                        'tagihan.value',
+                        'hutang.value',
+                        'komisi.value',
+                        'reward.value',
+                        'ppn.value',
+                        'pph.value',
+                        'netkomisi.value',
+                        'rekening_asuransi',
+                        'terima.paid_amount',
+                        'terima.paid_at',
+                        'bayar.paid_amount',
+                        'bayar.paid_at',
+                    ];
+
+                    $joins = [
+                        ['insured', 'id_insured = insured.id'],
+                        ['asuransi', 'id_asuransi = asuransi.id'],
+                        ['instype', 'id_instype = instype.id'],
+                        ['masters as sts', ['id_status = sts.msid', 'sts.mstype = status']],
+                        ['cabang', 'id_cabang = cabang.id'],
+                        ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+                        ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+                        ['transaksi_pricing as polis', ['transid = polis.id_transaksi', 'polis.id_kodetrans = 10']],
+                        ['transaksi_pricing as materai', ['transid = materai.id_transaksi', 'materai.id_kodetrans = 11']],
+                        ['transaksi_pricing as lain', ['transid = lain.id_transaksi', 'lain.id_kodetrans = 16']],
+                        ['transaksi_pricing as tagihan', ['transid = tagihan.id_transaksi', 'tagihan.id_kodetrans = 18']],
+                        ['transaksi_pricing as hutang', ['transid = hutang.id_transaksi', 'hutang.id_kodetrans = 19']],
+                        ['transaksi_pricing as komisi', ['transid = komisi.id_transaksi', 'komisi.id_kodetrans = 13']],
+                        ['transaksi_pricing as reward', ['transid = reward.id_transaksi', 'reward.id_kodetrans = 21']],
+                        ['transaksi_pricing as ppn', ['transid = ppn.id_transaksi', 'ppn.id_kodetrans = 14']],
+                        ['transaksi_pricing as pph', ['transid = pph.id_transaksi', 'pph.id_kodetrans = 15']],
+                        ['transaksi_pricing as netkomisi', ['transid = netkomisi.id_transaksi', 'netkomisi.id_kodetrans = 17']],
+                        ['transaksi_pembayaran as terima', ['transid = terima.id_transaksi', 'terima.paid_type = PD01']],
+                        ['transaksi_pembayaran as bayar', ['transid = bayar.id_transaksi', 'bayar.paid_type = PD02']],
+                    ];
+                }
+                break;
+
             default:
                 return redirect()->route('logout');
                 break;
@@ -571,18 +663,5 @@ class LaporanController extends Controller
         }
 
         return $select;
-    }
-
-    public function dataLaporan(Request $request)
-    {
-        switch ($request->jenis) {
-            case '1':
-                
-                break;
-
-            default:
-                # code...
-                break;
-        }
     }
 }

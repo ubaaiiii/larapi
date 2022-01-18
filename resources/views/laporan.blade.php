@@ -118,8 +118,8 @@
                 
                 $('#range-periode').inputmask("99/99/9999 - 99/99/9999");
                 
-                var start = moment();
-                var end = moment().add(1, 'month');
+                var start = moment().subtract(1, 'month');
+                var end = moment();
 
                 function cb(start, end) {
                     $('#range-periode').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));

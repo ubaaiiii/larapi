@@ -141,7 +141,7 @@ class DataController extends Controller
 
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
-        // DB::enableQueryLog();
+        DB::enableQueryLog();
 
         if (!empty($joins)) {
             foreach ($joins as $join) {
@@ -264,8 +264,8 @@ class DataController extends Controller
                         IFNULL(SUM(case when transaksi.id_status IN (3) then 1 else 0 end), 0) as Asuransi,
                         IFNULL(SUM(case when transaksi.id_status IN (4) then 1 else 0 end), 0) as Bank,
                         IFNULL(SUM(case when transaksi.id_status IN (5) then 1 else 0 end), 0) as Tagihan,
-                        IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL then 1 else 0 end), 0) as DibayarBank,
-                        IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL then 1 else 0 end), 0) as DibayarBroker,
+                        IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL AND brokerPaid.id_transaksi IS NULL then 1 else 0 end), 0) as DibayarBank,
+                        IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL AND transaksi.id_status < 9 then 1 else 0 end), 0) as DibayarBroker,
                         IFNULL(SUM(case when transaksi.id_status IN (10) then 1 else 0 end), 0) as Polis,
                         IFNULL(SUM(case when transaksi.id_status IN (15) then 1 else 0 end), 0) as Batal
                     FROM `transaksi`
@@ -393,16 +393,23 @@ class DataController extends Controller
                             ->where('pmby.paid_type', '=', "PD01")
                             ->whereNull('pmby.deleted_at');
                         });
-                        $table->whereNotNull('pmby.id_transaksi');
-                        break;
+                    $table->leftJoin('transaksi_pembayaran as pmby2', function ($q) use ($user) {
+                        $q->on('transaksi.transid', '=', 'pmby2.id_transaksi')
+                            ->where('pmby2.paid_type', '=', "PD02")
+                            ->whereNull('pmby2.deleted_at');
+                        });
+                    $table->whereNotNull('pmby.id_transaksi')
+                          ->whereNull('pmby2.id_transaksi');
+                    break;
                         
-                    case 'dibayar broker':
-                        $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
-                            $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                            ->where('pmby.paid_type', '=', "PD02")
-                            ->whereNull('pmby.deleted_at');
+                case 'dibayar broker':
+                    $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
+                        $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                        ->where('pmby.paid_type', '=', "PD02")
+                        ->whereNull('pmby.deleted_at');
                     });
-                    $table->whereNotNull('pmby.id_transaksi');
+                    $table->whereNotNull('pmby.id_transaksi')
+                          ->whereRaw('transaksi.id_status < 9');
                     break;
 
                 case 'polis siap':
@@ -500,6 +507,16 @@ class DataController extends Controller
         ];
 
         $table = DB::table("transaksi_pembayaran as pby_bank")->whereNull('pby_bank.deleted_at')->where('pby_bank.paid_type','PD01');
+
+        if (isset($request->filter_sudah_dibayar) && isset($request->filter_belum_dibayar)) {
+            $table->whereRaw('1');
+        } elseif (!isset($request->filter_sudah_dibayar) && isset($request->filter_belum_dibayar)) {
+            $table->whereNull('pby_broker.id_transaksi');
+        } elseif (isset($request->filter_sudah_dibayar) && !isset($request->filter_belum_dibayar)) {
+            $table->whereNotNull('pby_broker.id_transaksi');
+        } else {
+            $table->whereRaw('0');
+        }
 
         $joins = [
             ['transaksi as tsk', 'pby_bank.id_transaksi = tsk.transid'],
