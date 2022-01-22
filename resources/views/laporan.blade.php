@@ -28,7 +28,12 @@
                             <label for="cabang" class="form-label">Cabang</label>
                             <select id="cabang" name="cabang" required style="width:100%" class="pilih">
                                 @role('broker|insurance|checker|approver|adm|finance')
-                                <option value="ALL" selected>Semua Cabang</option>
+                                    <option value="ALL" selected>Semua Cabang</option>
+                                @endrole
+                                @role('maker')
+                                    @if (Auth::user()->id_cabang == 1)
+                                        <option value="ALL" selected>Semua Cabang</option>
+                                    @endif
                                 @endrole
                                 @foreach ($cabang as $val)
                                     <option value="{{ $val->id }}" @if ($val->id === Auth::user()->cabang) selected="true" @endif>{{ $val->nama_cabang }}

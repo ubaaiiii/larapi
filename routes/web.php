@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\ProcessController;
 use App\Http\Controllers\CetakController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
@@ -98,4 +99,5 @@ Route::group(['middleware' => 'auth'], function () {
 
   // master
   Route::get('user', [PageController::class, 'user'])->name('user')->middleware('role:adm|broker');
+  Route::get('gagalBayar', [ProcessController::class, 'cekGagalBayar']);
 });

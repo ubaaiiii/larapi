@@ -136,7 +136,9 @@ class PageController extends Controller
             $asuransi = Asuransi::all();
             switch ($level) {
                 case 'maker':
-                    $cabang = Cabang::where('id',Auth::user()->id_cabang)->get();
+                    if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                        $cabang = Cabang::where('id',Auth::user()->id_cabang)->get();
+                    }
                     break;
 
                 case 'insurance':

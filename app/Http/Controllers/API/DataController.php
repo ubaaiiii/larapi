@@ -267,7 +267,7 @@ class DataController extends Controller
                         IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL AND brokerPaid.id_transaksi IS NULL then 1 else 0 end), 0) as DibayarBank,
                         IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL AND transaksi.id_status < 9 then 1 else 0 end), 0) as DibayarBroker,
                         IFNULL(SUM(case when transaksi.id_status IN (10) then 1 else 0 end), 0) as Polis,
-                        IFNULL(SUM(case when transaksi.id_status IN (15) then 1 else 0 end), 0) as Batal
+                        IFNULL(SUM(case when transaksi.id_status IN (18) then 1 else 0 end), 0) as Batal
                     FROM `transaksi`
                     LEFT JOIN transaksi_pembayaran bankPaid ON bankPaid.id_transaksi = transid AND bankPaid.deleted_at IS NULL AND bankPaid.paid_type = 'PD01' 
                     LEFT JOIN transaksi_pembayaran brokerPaid ON brokerPaid.id_transaksi = transid AND brokerPaid.deleted_at IS NULL AND brokerPaid.paid_type = 'PD02' 
@@ -417,7 +417,7 @@ class DataController extends Controller
                     break;
 
                 case 'covernote batal':
-                    $table->where('id_status', "15");
+                    $table->where('id_status', "18");
                     break;
 
                 default:
