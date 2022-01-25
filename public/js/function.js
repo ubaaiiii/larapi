@@ -182,6 +182,26 @@ function prettyDate(time) {
     );
 }
 
+function prorata(tglAwal, tglAkhir) {
+    var tahun = tglAkhir.diff(tglAwal, 'years');
+    tglAwal.add(tahun, 'years');
+    var hari = tglAkhir.diff(tglAwal, 'days');
+
+    var tahun_awal = tglAwal.years(),
+        tahun_akhir = tglAkhir.years(),
+        pembagi = 365;
+
+    for (let $i = tahun_awal; $i <= tahun_akhir; $i++) {
+        var tglKabisat = moment($i + "-02-29", "YYYY-MM-DD");
+        if (tglKabisat.isBetween(tglAwal, tglAkhir)) { // cari tanggal kabisat di tahun tersebut
+            pembagi = 366;
+        }
+    }
+
+    var _prorata = parseInt(tahun) + parseFloat(hari / pembagi);
+    return _prorata;
+}
+
 $(document).ready(function() {
 
     $(".dark-mode-switcher").removeAttr("style");

@@ -173,13 +173,15 @@ class DataController extends Controller
         $awal = $table->get()->count();
 
         if (!empty($request->search)) {
-            for ($i = 0; $i < count($columns); $i++) {
-                if ($i == 0) {
-                    $table->where($columns[$i], 'like', '%' . $request->search . '%');
-                } else {
-                    $table->orWhere($columns[$i], 'like', '%' . $request->search . '%');
+            $table->where(function ($query) use ($columns, $request){
+                for ($i = 0; $i < count($columns); $i++) {
+                    if ($i == 0) {
+                        $query->where($columns[$i], 'like', '%' . $request->search . '%');
+                    } else {
+                        $query->orWhere($columns[$i], 'like', '%' . $request->search . '%');
+                    }
                 }
-            }
+            });
         }
 
         if (!empty($request->order) && isset($request->order)) {

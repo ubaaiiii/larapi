@@ -108,12 +108,17 @@
       <tr valign="top">
         <td>Jangka Waktu</td>
         <td>:</td>
-        <td>{{ $data['transaksi']->masa }} hari / {{ $data['transaksi']->masa/365 }} tahun</td>
+        <td>{{ $data['transaksi']->masa }} hari</td>
       </tr>
       <tr valign="top">
         <td>Lokasi Objek Pertanggungan</td>
         <td>:</td>
         <td>{{ $data['transaksi']->location }}</td>
+      </tr>
+      <tr valign="top">
+        <td>Nomor {{ $data['jaminan']->msdesc }}</td>
+        <td>:</td>
+        <td>{{ $data['transaksi']->no_jaminan }}</td>
       </tr>
       <tr valign="top">
         <td>Kode / Okupasi</td>

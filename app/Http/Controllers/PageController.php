@@ -62,13 +62,17 @@ class PageController extends Controller
             $transaksi = $dataController->dataPengajuan($transid);
 
             if (in_array($level,['maker','checker'])) {
-                if ($transaksi->created_by !== Auth::user()->id) {
-                    abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                if (Auth::user()->id_cabang !== 1) { // Not All Cabang
+                    if ($transaksi->created_by !== Auth::user()->id) {
+                        abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                    }
                 }
             }
             if (in_array($level,['approval'])) {
-                if ($transaksi->id_cabang !== Auth::user()->id_cabang) {
-                    abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                if (Auth::user()->id_cabang !== 1) { // Not All Cabang
+                    if ($transaksi->id_cabang !== Auth::user()->id_cabang) {
+                        abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                    }
                 }
             }
             $data['act']        = 'edit';

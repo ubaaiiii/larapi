@@ -1083,6 +1083,7 @@
 
             function cekPeriode(startPolis,endPolis) {
                 if (maxPeriode !== null) {
+                    var startPolis_awal = startPolis;
                     var years = endPolis.diff(startPolis,"year");
                     startPolis.add(years,'years');
                     var months = endPolis.diff(startPolis,"months");
@@ -1095,6 +1096,7 @@
                             text: 'Harap cek kembali periode polis',
                             footer: "Maksimal periode untuk tipe asuransi "+$('#type_insurance option:selected').text()+" adalah "+maxPeriode+" tahun"
                         });
+                        polis(startPolis_awal, startPolis_awal.add(maxPeriode, "year"));
                         $('#btn-add').prop('disabled',true);
                     } else {
                         $('#btn-add').prop('disabled',false);
@@ -1126,31 +1128,6 @@
             $('.tsi').keyup(function(){
                 cekTSI();
             });
-
-            function prorata(tglAwal, tglAkhir) {
-                var bagi_tahun  = 365,
-                    tahun_awal  = tglAwal.years(),
-                    tahun_akhir = tglAkhir.years(),
-                    durasi      = Math.floor(moment.duration(tglAkhir.diff(tglAwal)).asDays()),
-                    prorata     = 0,
-                    jml_kabisat = 0;
-                
-                for (let $i = tahun_awal; $i <= tahun_akhir; $i++) {
-                    if (moment([$i]).isLeapYear()) {
-                        if ($i == tahun_akhir) {
-                            if (tglAkhir.format('M') == 2 && tglAkhir.format('D') >= 29 || tglAkhir.format('M') > 2) {
-                                jml_kabisat++;
-                            }
-                        } else {
-                            jml_kabisat++;
-                        }
-                    }
-                }
-                durasi = durasi - jml_kabisat;
-                
-                $('#PRORATA').val(durasi / 365);
-                hitung();
-            }
 
             function polis(startPolis, endPolis) {
                 console.log(endPolis.format('DD/MM/YYYY'));

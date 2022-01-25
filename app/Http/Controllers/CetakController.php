@@ -10,6 +10,7 @@ use App\Models\Document;
 use App\Models\Instype;
 use App\Models\Insured;
 use App\Models\KodePos;
+use App\Models\Master;
 use App\Models\Okupasi;
 use App\Models\Pembayaran;
 use App\Models\Pricing;
@@ -240,6 +241,7 @@ class CetakController extends Controller
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
                     'kodepos'     => KodePos::find($transaksi->id_kodepos),
+                    'jaminan'     => Master::where('msid', $transaksi->id_jaminan)->where('mstype', 'jaminan')->first(),
                     'pricing'     => $pricing,
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi',1)
@@ -329,12 +331,11 @@ class CetakController extends Controller
                     'transaksi'   => $transaksi,
                     'asuransi'    => Asuransi::find($transaksi->id_asuransi),
                     'instype'     => Instype::find($transaksi->id_instype),
-                    'tgl_aktif'   => Activity::where('id_transaksi', $transaksi->transid)->where('id_status', '4')->orderBy('created_at', 'DESC')->first(),
-                    'sequential'  => Sequential::where('seqdesc', 'transid')->first(),
                     'tertanggung' => Insured::find($transaksi->id_insured),
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
                     'kodepos'     => KodePos::find($transaksi->id_kodepos),
+                    'jaminan'     => Master::where('msid', $transaksi->id_jaminan)->where('mstype', 'jaminan')->first(),
                     'pricing'     => $pricing,
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi', 1)
@@ -422,6 +423,7 @@ class CetakController extends Controller
                     'cabang'      => Cabang::find($transaksi->id_cabang),
                     'okupasi'     => Okupasi::find($transaksi->id_okupasi),
                     'kodepos'     => KodePos::find($transaksi->id_kodepos),
+                    'jaminan'     => Master::where('msid', $transaksi->id_jaminan)->where('mstype', 'jaminan')->first(),
                     'pricing'     => $pricing,
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi', 1)
