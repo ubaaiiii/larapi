@@ -201,7 +201,7 @@ class ProcessController extends Controller
                 $name = $file->getClientOriginalName();
                 $type = $file->extension();
                 $size = $file->getSize();
-                $path = 'public/files/' . $request->transid;
+                $path = "public/files/" . $request->transid;
 
                 if (!is_dir($path)) {
                     mkdir($path, 0777, TRUE);
@@ -1085,13 +1085,16 @@ class ProcessController extends Controller
         }
     }
 
-    public function aktifitas($transid, $status, $deskripsi)
+    public function aktifitas($transid, $status, $deskripsi, $user = null)
     {
+        if ($user == null) {
+            $user = Auth::user()->id;
+        }
         Activity::create([
             'id_transaksi'  => $transid,
             'id_status'     => $status,
             'deskripsi'     => $deskripsi,
-            'created_by'    => Auth::user()->id
+            'created_by'    => $user
         ]);
     }
 
@@ -1170,12 +1173,10 @@ class ProcessController extends Controller
     }
 	
 	public function cekGagalBayar() {
-        // DB::enableQueryLog();
-        // $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`created_at`) > 30')->where('id_status','<','7');
         
         $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`created_at`) > 30')->where('id_status','<','7');
         foreach ($transaksi->get() as $row) {
-            $this->aktifitas($row->transid, 18, 'Pembayaran tidak diterima BDS selama 30 hari. Covernote Dibatalkan.');
+            $this->aktifitas($row->transid, 18, "Pembayaran tidak diterima BDS selama 30 hari. Covernote Dibatalkan.", "1");
             // echo $row->transid;
         }
         $transaksi->update(['id_status' => '18']);

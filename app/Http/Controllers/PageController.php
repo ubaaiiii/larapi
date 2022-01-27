@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\LaporanController;
+use App\Http\Controllers\API\ProcessController;
 use App\Models\Asuransi;
 use App\Models\Cabang;
 use App\Models\Instype;
@@ -24,6 +25,8 @@ class PageController extends Controller
 {
     function dashboard()
     {
+        $proses = new ProcessController;
+        $proses->cekGagalBayar();
         return view('index');
     }
 
