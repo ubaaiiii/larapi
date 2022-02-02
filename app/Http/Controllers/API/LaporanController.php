@@ -34,20 +34,19 @@ class LaporanController extends Controller
                     'transid                as "Nomor Transaksi"',
                     'cif                    as "CIF"',
                     'nopinjaman             as "Nomor Pinjaman"',
-                    'nama_insured           as "Tertanggung"',
-                    'alamat_insured         as "Alamat Tertanggung"',
                     'nama_cabang            as "Cabang KB Bukopin"',
-                    'nama_asuransi          as "Asuransi"',
+                    'nama_insured           as "Nama Tertanggung"',
                     'plafond_kredit         as "Plafond"',
-                    'cover_note             as "Covernote"',
-                    'policy_no              as "Nomor Polis"',
-                    'instype_name           as "Tipe Asuransi"',
-                    'polis_start            as "Polis Mulai"',
-                    'polis_end              as "Polis Selesai"',
+                    'outstanding_kredit     as "Outstanding"',
+                    'alamat_insured         as "Alamat Tertanggung"',
                     'nama_okupasi           as "Okupasi"',
                     'location               as "Lokasi Okupasi"',
+                    'nama_asuransi          as "Asuransi"',
+                    'instype_name           as "Tipe Asuransi"',
                     'tsi.value              as "Nilai Pertanggungan"',
                     'premi.value            as "Premium"',
+                    'polis_start            as "Polis Mulai"',
+                    'polis_end              as "Polis Selesai"',
                     'sts.msdesc             as "Status"',
                     'catatan                as "Catatan"',
                 ];
@@ -139,6 +138,7 @@ class LaporanController extends Controller
                         'sts.msdesc',
                         'catatan',
                     ];
+                    
                     $joins = [
                         ['transaksi_pembayaran as pd', 'transid = pd.id_transaksi'],
                         ['insured', 'id_insured = insured.id'],
@@ -670,6 +670,128 @@ class LaporanController extends Controller
                         ['transaksi_pembayaran as bayar', ['transid = bayar.id_transaksi', 'bayar.paid_type = PD02']],
                     ];
                 }
+                break;
+
+            case '11':
+                // Laporan CN Belum Dibayar
+                $select = [
+                    'transaksi.created_at   as "Tanggal Produksi"',
+                    'transid                as "Nomor Transaksi"',
+                    'cif                    as "CIF"',
+                    'nopinjaman             as "Nomor Pinjaman"',
+                    'nama_cabang            as "Cabang KB Bukopin"',
+                    'cover_note             as "Covernote"',
+                    'nama_insured           as "Nama Tertanggung"',
+                    'nama_asuransi          as "Asuransi Penanggung"',
+                    'nama_okupasi           as "Okupasi"',
+                    'location               as "Lokasi Okupasi"',
+                    'instype_name           as "Tipe Asuransi"',
+                    'tsi.value              as "Nilai Pertanggungan"',
+                    'premi.value            as "Tag Premium"',
+                    'polis_start            as "Polis Mulai"',
+                    'polis_end              as "Polis Selesai"',
+                    'catatan                as "Keterangan"',
+                ];
+                if (!empty($request->dtable)) {
+                    $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end])
+                        ->where('transaksi.id_status', 5);
+
+                    $column = [
+                        'transaksi.created_at',
+                        'transid',
+                        'cif',
+                        'nopinjaman',
+                        'nama_insured',
+                        'alamat_insured',
+                        'nama_cabang',
+                        'nama_asuransi',
+                        'plafond_kredit',
+                        'cover_note',
+                        'policy_no',
+                        'instype_name',
+                        'polis_start',
+                        'polis_end',
+                        'nama_okupasi',
+                        'location',
+                        'tsi.value',
+                        'premi.value',
+                        'sts.msdesc',
+                        'catatan',
+                    ];
+                    $joins = [
+                        ['insured', 'id_insured = insured.id'],
+                        ['okupasi', 'id_okupasi = okupasi.id'],
+                        ['asuransi', 'id_asuransi = asuransi.id'],
+                        ['instype', 'id_instype = instype.id'],
+                        ['masters as sts', ['id_status = sts.msid', 'sts.mstype = status']],
+                        ['cabang', 'id_cabang = cabang.id'],
+                        ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+                        ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+                    ];
+                }
+                
+                break;
+
+            case '12':
+                // Laporan CN Dibayar
+                $select = [
+                    'transaksi.created_at   as "Tanggal Produksi"',
+                    'transid                as "Nomor Transaksi"',
+                    'cif                    as "CIF"',
+                    'nopinjaman             as "Nomor Pinjaman"',
+                    'nama_cabang            as "Cabang KB Bukopin"',
+                    'cover_note             as "Covernote"',
+                    'nama_insured           as "Nama Tertanggung"',
+                    'nama_asuransi          as "Asuransi Penanggung"',
+                    'nama_okupasi           as "Okupasi"',
+                    'location               as "Lokasi Okupasi"',
+                    'instype_name           as "Tipe Asuransi"',
+                    'tsi.value              as "Nilai Pertanggungan"',
+                    'premi.value            as "Tag Premium"',
+                    'polis_start            as "Polis Mulai"',
+                    'polis_end              as "Polis Selesai"',
+                    'pemb.paid_at           as "Tanggal Dibayar"',
+                    'catatan                as "Keterangan"',
+                ];
+                if (!empty($request->dtable)) {
+                    $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end])
+                        ->whereRaw('pemb.id IS NOT NULL');
+
+                    $column = [
+                        'transaksi.created_at',
+                        'transid',
+                        'cif',
+                        'nopinjaman',
+                        'nama_insured',
+                        'alamat_insured',
+                        'nama_cabang',
+                        'nama_asuransi',
+                        'plafond_kredit',
+                        'cover_note',
+                        'policy_no',
+                        'instype_name',
+                        'polis_start',
+                        'polis_end',
+                        'nama_okupasi',
+                        'location',
+                        'tsi.value',
+                        'premi.value',
+                        'sts.msdesc',
+                        'catatan',
+                    ];
+                    $joins = [
+                        ['insured', 'id_insured = insured.id'],
+                        ['okupasi', 'id_okupasi = okupasi.id'],
+                        ['asuransi', 'id_asuransi = asuransi.id'],
+                        ['instype', 'id_instype = instype.id'],
+                        ['masters as sts', ['id_status = sts.msid', 'sts.mstype = status']],
+                        ['cabang', 'id_cabang = cabang.id'],
+                        ['transaksi_pembayaran as pemb', ['pemb.id_transaksi = transid', 'pemb.paid_type = PD01']],
+                        ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+                        ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+                    ];
+                }
+                
                 break;
 
             default:
