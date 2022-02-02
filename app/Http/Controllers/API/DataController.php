@@ -924,6 +924,10 @@ class DataController extends Controller
         return response()->json($rowdata);
     }
 
+    public function getBiayaKlausula(Request $request) {
+        return $request->all();
+    }
+
     public function cariTransaksi(Request $request) {
         $dataPricing = Pricing::where('id_transaksi', $request->transid)->orderBy('id_kodetrans')->get();
         foreach ($dataPricing as $row) {

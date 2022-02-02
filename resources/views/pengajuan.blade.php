@@ -645,6 +645,25 @@
             console.log("Materai: ", MATERAI);
             console.log("Biaya Lain: ", LAIN);
             $('.masked').trigger('keyup');
+
+            $.ajax({
+                "url": "{{ url('api/biayaKlausula') }}",
+                "type": "GET",
+                "data": {
+                    'id_insurance'  : $('#asuransi').val(),
+                    'id_okupasi'    : OKUPASI,
+                    'premium'       : PREMI,
+                    'tsi'           : TSI,
+                    'masa_tenor'    : PRORATA,
+
+                },
+                "success": function(response) {
+                    console.log('success',response);
+                },
+                "error": function(response) {
+                    console.log('error',response);
+                },
+            })
         }
 
         function disableInput() {
@@ -1081,7 +1100,7 @@
 
             kjpp(startKJPP,endKJPP);
 
-            function cekPeriode(startPolis,endPolis) {
+            function cekPeriode(startPolis, endPolis) {
                 if (maxPeriode !== null) {
                     var startPolis_awal = startPolis;
                     var years = endPolis.diff(startPolis,"year");
@@ -1140,7 +1159,7 @@
                 var durasi = moment.duration(tglAkhir.diff(tglAwal));
                 $('#masa').val(Math.floor(durasi.asDays()));
                 console.log(Math.floor(durasi.asYears()));
-                prorata(tglAwal, tglAkhir);
+                $('#PRORATA').val(prorata(tglAwal, tglAkhir));
                 if (maxPeriode !== null) {
                     cekPeriode(startPolis, endPolis);
                 }
@@ -1165,7 +1184,7 @@
                 $('#periode-polis').data('daterangepicker').setEndDate(endPolis);
                 $('[name="polis_start"]').val($('#periode-polis').data('daterangepicker').startDate.format('YYYY-MM-DD'));
                 $('[name="polis_end"]').val($('#periode-polis').data('daterangepicker').endDate.format('YYYY-MM-DD'));
-                prorata($('#periode-polis').data('daterangepicker').startDate, $('#periode-polis').data('daterangepicker').endDate);
+                $('#PRORATA').val(prorata($('#periode-polis').data('daterangepicker').startDate, $('#periode-polis').data('daterangepicker').endDate));
             });
 
             @if (empty($method))
@@ -1439,6 +1458,9 @@
                                 cancelButtonText: 'Batal'
                             }).then(function(result) {
                                 if (result.isConfirmed) {
+                                    if (result.value) {
+                                        catatan = result.value;
+                                    }
                                     $.ajax({
                                         url: "{{ url('api/pengajuan') }}",
                                         method: "POST",

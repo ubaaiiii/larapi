@@ -47,6 +47,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
     // data notif
     Route::get('/notifikasi', 'API\DataController@dataNotifikasi');
+
+    // cek biaya sama klausula asuransi
+    Route::get('/biayaKlausula', 'API\DataController@getBiayaKlausula');
     
     // proses data
     Route::post('/user', 'API\ProcessController@user');
