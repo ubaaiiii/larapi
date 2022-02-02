@@ -521,7 +521,7 @@ class ProcessController extends Controller
 
     public function pengajuan(Request $request)
     {
-        // return $request->all();
+        return $request->all();
         $role = Auth::user()->getRoleNames()[0];
         switch ($request->method) {
             case 'store':
@@ -655,9 +655,9 @@ class ProcessController extends Controller
                         $catatan = ". Catatan: " . $request->catatan;
                     }
 
-                    $this->aktifitas($request->transid, '11', 'Penghapusan data ' . $request->transid . $catatan);
+                    $this->aktifitas($request->transid, '13', 'Penghapusan data ' . $request->transid . $catatan);
                     $data->update([
-                        'id_status' => 11,
+                        'id_status' => 13,
                         'catatan'   => $request->catatan
                     ]);
                     $data->delete();
@@ -691,7 +691,7 @@ class ProcessController extends Controller
                                 'cif'               => $request->cif,
                                 'id_insured'        => $insured->id,
                                 'plafond_kredit'    => round($request->plafond_kredit, 2),
-                                'outstanding_kredit' => round($request->outstanding_kredit, 2),
+                                'outstanding_kredit'=> round($request->outstanding_kredit, 2),
                                 'policy_parent'     => $request->nopolis_lama,
                                 'polis_start'       => $request->polis_start,
                                 'polis_end'         => $request->polis_end,
@@ -701,6 +701,7 @@ class ProcessController extends Controller
                                 'agunan_kjpp'       => $request->agunan_kjpp,
                                 'id_jaminan'        => $request->jaminan,
                                 'no_jaminan'        => $request->no_jaminan,
+                                'location'          => $request->lokasi_okupasi,
                                 'catatan'           => $request->catatan,
                             ];
                         } else if ($transaksi->id_status == 4) {
