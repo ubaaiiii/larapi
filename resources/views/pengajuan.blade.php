@@ -84,9 +84,9 @@
                     </h2>
                     @role('broker|insurance|adm')
                     <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2"><i class="fa fa-file-alt mr-2"></i>Klausula</a>
-                    @role('insurance')
-                    <a class="btn btn-primary mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i>Placing</a>
-                    @endrole
+                        @role('insurance|adm')
+                        <a class="btn btn-primary mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i>Placing</a>
+                        @endrole
                     @endrole
                 </div>
                 {{-- <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div> --}}
@@ -94,21 +94,30 @@
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1>Klausula</h1>
+                                <h2><b><i class="fa fa-edit mr-2 icon-klausula" style="display: none;"></i>Klausula</b></h2>
                             </div>
                             <div class="modal-body">
                                 <div class="p-5" id="editor">
                                     <p>@if(!empty($data->klausula)){!! $data->klausula !!}@endif</p>
                                 </div>
                             </div>
-                            <div class="modal-footer text-right">
-                                <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
-                                    Cancel
-                                </button>
-                                <button type="button" id="btn-klausula" class="btn btn-primary w-20">
-                                    Save
-                                </button>
-                            </div>
+                            @role('insurance|broker|adm')
+                                @if (!empty($data) && in_array($data->id_status, [2,3]))
+                                    @if ($act !== 'edit')
+                                    <script>
+                                        $('.icon-klausula').show();
+                                    </script>
+                                    <div class="modal-footer text-right">
+                                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
+                                            Cancel
+                                        </button>
+                                        <button type="button" id="btn-klausula" class="btn btn-primary w-20">
+                                            Save
+                                        </button>
+                                    </div>
+                                    @endif
+                                @endif
+                            @endrole
                         </div>
                     </div>
                 </div>
@@ -148,7 +157,7 @@
                             @if (!empty($data) && $data->id_status >= 2)
                             <div class="form-inline mt-5">
                                 <label for="asuransi" class="ml-3 form-label sm:w-20">Asuransi</label>
-                                <select id="asuransi" name="asuransi" required style="width:100%">
+                                <select id="asuransi" name="asuransi" required style="width:100%" onchange="asuransiConfig()">
                                     {{-- @foreach ($asuransi as $val)
                                         <option value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
                                             {{ $val->nama_asuransi }}
@@ -272,8 +281,8 @@
                                 <input type="hidden" name="kjpp_end" value="@if(!empty($data->kjpp_start)){{ $data->kjpp_start }}@endif">
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="agunan_kjpp" class="form-label sm:w-20">Nilai Pasar KJPP</label>
-                                <input type="text" class="form-control allow-decimal currency masked" placeholder="Nilai Pasar KJPP"
+                                <label for="agunan_kjpp" class="form-label sm:w-20">Nilai Pasar KJPP / Taksasi CI / Retaksasi CI</label>
+                                <input type="text" class="form-control allow-decimal currency masked" placeholder="Nilai Pasar KJPP / Taksasi CI / Retaksasi CI"
                                 id="agunan_kjpp" value="@if (!empty($data->agunan_kjpp)){{ $data->agunan_kjpp }}@endif">
                                 <input type="hidden" name="agunan_kjpp" @if (!empty($data->agunan_kjpp)) value="{{ $data->agunan_kjpp }}" @endif>
                             </div>
@@ -591,17 +600,17 @@
         @endif
 
         function totalRate() {
-            console.log('RATE',RATE);
-            console.log('TSFWD',TSFWD);
-            console.log('RSMDCC',RSMDCC);
-            console.log('OTHERS',OTHERS);
+            // console.log('RATE',RATE);
+            // console.log('TSFWD',TSFWD);
+            // console.log('RSMDCC',RSMDCC);
+            // console.log('OTHERS',OTHERS);
             if (isNaN(RATE) || isNaN(TSFWD) || isNaN(RSMDCC)|| isNaN(OTHERS)) {
                 return null;
             }
 
             var instype = $("#type_insurance").val(),
                 total = parseFloat(RATE);
-            console.log('total',total);
+            // console.log('total',total);
             
             if (instype == "PAR") {
                 total += parseFloat(TSFWD) + parseFloat(RSMDCC) + parseFloat(OTHERS);
@@ -622,12 +631,13 @@
             var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val());
             @endforeach
             if (_RATE == null || OKUPASI == null || TSI == null) {
-                console.log('Rate: ',_RATE);
-                console.log('Okupasi: ',OKUPASI);
-                console.log('TSI: ',TSI);
+                // console.log('Rate: ',_RATE);
+                // console.log('Okupasi: ',OKUPASI);
+                // console.log('TSI: ',TSI);
                 return false;
             }
             
+            // Mulai Hitung Gross
             @foreach ($formula as $row)
                 var {!! $row->kodetrans_input !!} = {!! $row->kodetrans_formula !!};
             @endforeach
@@ -635,35 +645,44 @@
             @foreach ($formula as $row)
                 $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }});
             @endforeach
+            // Selesai Hitung Gross
 
-            @foreach ($formula as $row)
-                console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
-            @endforeach
-            console.log('TSI: ', TSI);
-            console.log('Premium: ', PREMI);
-            console.log("Rate: ", RATE);
-            console.log("Materai: ", MATERAI);
-            console.log("Biaya Lain: ", LAIN);
+            // @foreach ($formula as $row)
+            //     console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+            // @endforeach
+            // console.log('TSI: ', TSI);
+            // console.log('Premium: ', PREMI);
+            // console.log("Rate: ", RATE);
+            // console.log("Materai: ", MATERAI);
+            // console.log("Biaya Lain: ", LAIN);
             $('.masked').trigger('keyup');
+            asuransiConfig();
+        }
 
-            $.ajax({
-                "url": "{{ url('api/biayaKlausula') }}",
-                "type": "GET",
-                "data": {
-                    'id_insurance'  : $('#asuransi').val(),
-                    'id_okupasi'    : OKUPASI,
-                    'premium'       : PREMI,
-                    'tsi'           : TSI,
-                    'masa_tenor'    : PRORATA,
-
-                },
-                "success": function(response) {
-                    console.log('success',response);
-                },
-                "error": function(response) {
-                    console.log('error',response);
-                },
-            })
+        function asuransiConfig() {
+            var id_insurance    = $('#asuransi').val(),
+                id_instype      = $("#type_insurance").val(),
+                premi           = $('[d-input=PREMI').closest('div').find(':hidden').val(),
+                tsi             = $('[d-input=TSI').closest('div').find(':hidden').val(),
+                periode_tahun   = $('#PRORATA').val();
+            if (id_insurance !== null && id_instype !== null && premi !== null && tsi !== null && periode_tahun !== null) {
+                $.ajax({
+                    "url": "{{ url('api/biayaKlausula') }}",
+                    "type": "GET",
+                    "data": {id_insurance, id_instype, premi, tsi, periode_tahun},
+                    "success": function(data) {
+                        // console.log('data',data);
+                        $('[d-input=LAIN').val(data.by_lain);
+                        $('[d-input=MATERAI').val(data.by_materai);
+                        $('[d-input=POLIS').val(data.by_polis);
+                        $('.ql-editor').html(data.klausula_template);
+                        $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
+                    },
+                    "error": function(response) {
+                        console.log('error biaya:',response);
+                    },
+                });
+            }
         }
 
         function disableInput() {
@@ -1046,12 +1065,12 @@
                 var data = e.params.data;
                 $('.ql-editor').html("");
                 $('[d-input="BROKERPERC"]').val("").trigger('keyup');
-                if (data.klausula_template !== undefined) {
-                    $('.ql-editor').html(data.klausula_template);
-                }
-                if (data.brokerage_percent !== undefined) {
-                    $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
-                }
+                // if (data.klausula_template !== undefined) {
+                //     $('.ql-editor').html(data.klausula_template);
+                // }
+                // if (data.brokerage_percent !== undefined) {
+                //     $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
+                // }
                 if (data.max_tsi !== undefined) {
                     maxTSI = parseFloat(data.max_tsi);
                 }
@@ -1124,9 +1143,9 @@
             }
 
             function cekTSI() {
-                console.log('cekTSI',maxTSI);
+                // console.log('cekTSI',maxTSI);
                 var TSI = parseFloat($('[d-input="TSI"]').inputmask("unmaskedvalue"));
-                console.log('TSI',TSI);
+                // console.log('TSI',TSI);
                 if (maxTSI !== null) {
                     if (TSI > maxTSI) {
                         Swal.fire({
@@ -1149,7 +1168,7 @@
             });
 
             function polis(startPolis, endPolis) {
-                console.log(endPolis.format('DD/MM/YYYY'));
+                // console.log(endPolis.format('DD/MM/YYYY'));
                 $('#periode-polis').html(startPolis.format('DD/MM/YYYY') + ' - ' + endPolis.format('DD/MM/YYYY'));
                 // $('#masa').val(Math.round(moment.duration(endPolis.diff(startPolis)).asDays()));
                 $('[name="polis_start"]').val(startPolis.format('YYYY-MM-DD'));
@@ -1158,7 +1177,7 @@
                 var tglAkhir = endPolis;
                 var durasi = moment.duration(tglAkhir.diff(tglAwal));
                 $('#masa').val(Math.floor(durasi.asDays()));
-                console.log(Math.floor(durasi.asYears()));
+                // console.log(Math.floor(durasi.asYears()));
                 $('#PRORATA').val(prorata(tglAwal, tglAkhir));
                 if (maxPeriode !== null) {
                     cekPeriode(startPolis, endPolis);
@@ -1227,7 +1246,7 @@
                         $('[d-input="MATERAI"]').prop('readonly', false);
                         $('[d-input="ADMIN"]').prop('readonly', false);
                         $('[d-input="LAIN"]').prop('readonly', false);
-                        $('[d-input="BROKERPERC"]').prop('disabled', false);
+                        $('[d-input="BROKERPERC"]').prop('readonly', false);
                         $('#frm-document :input').prop('disabled',false);
                         $('.dz-hidden-input').prop('disabled',false);
                         @break
@@ -1240,6 +1259,7 @@
                         $('[d-input="MATERAI"]').prop('readonly', false);
                         $('[d-input="ADMIN"]').prop('readonly', false);
                         $('[d-input="LAIN"]').prop('readonly', false);
+                        $('[d-input="BROKERPERC"]').prop('readonly', false);
                         $('#frm-document :input').prop('disabled',false);
                         $('.dz-hidden-input').prop('disabled',false);
                         @break

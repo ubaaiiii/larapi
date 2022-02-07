@@ -1175,7 +1175,7 @@ class ProcessController extends Controller
 	
 	public function cekGagalBayar() {
         
-        $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`created_at`) > 30')->where('id_status','<','7');
+        $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`billing_at`) > 30')->where('id_status','<','7');
         foreach ($transaksi->get() as $row) {
             $this->aktifitas($row->transid, 18, "Pembayaran tidak diterima BDS selama 30 hari. Covernote Dibatalkan.", "1");
             // echo $row->transid;

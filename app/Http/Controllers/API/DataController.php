@@ -923,9 +923,27 @@ class DataController extends Controller
 
         return response()->json($rowdata);
     }
-
+    
     public function getBiayaKlausula(Request $request) {
-        return $request->all();
+        // return $request->all();
+        if ($request->premi !== 0 || $request->tsi !== 0 || $request->periode_tahun !== 0) {
+            $config = DB::table('asuransi_config')
+                ->where('id_insurance', $request->id_insurance)
+                ->where('id_instype', $request->id_instype)
+                ->whereRaw($request->premi . " BETWEEN `min_premi` AND `max_premi`")
+                ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`")
+                ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
+            
+            $data = $config->first();
+        } else {
+            $data = [
+                'by_lain'           => 0,
+                'by_materai'        => 0,
+                'by_polis'          => 0,
+                'klausula_template' => ''
+            ];
+        }
+        return response()->json($data);
     }
 
     public function cariTransaksi(Request $request) {
