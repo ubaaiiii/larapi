@@ -82,12 +82,14 @@
                             <span class="px-2 py-1 rounded-full border text-gray-700 dark:text-gray-600 dark:border-dark-5 mr-1">{{ $status->msdesc }}</span>
                         @endif
                     </h2>
-                    @role('broker|insurance|adm')
-                    <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2"><i class="fa fa-file-alt mr-2"></i>Klausula</a>
-                        @role('insurance|adm')
-                        <a class="btn btn-primary mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i>Placing</a>
+                    @if(!empty($data))
+                        @role('broker|insurance|adm')
+                        <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2"><i class="fa fa-file-alt mr-2"></i>Klausula</a>
+                            @role('insurance|adm')
+                            <a class="btn btn-primary mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i>Placing</a>
+                            @endrole
                         @endrole
-                    @endrole
+                    @endif
                 </div>
                 {{-- <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div> --}}
                 <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
