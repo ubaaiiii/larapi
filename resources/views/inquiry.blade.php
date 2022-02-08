@@ -156,6 +156,8 @@
             <table id="tb-inquiry" class="hover table mt-2 table-report table-report--tabulator">
                 <thead>
                     <tr>
+                        <th class="whitespace-nowrap">Lokasi Okupasi</th>
+                        <th class="whitespace-nowrap">Nama Okupasi</th>
                         <th class="whitespace-nowrap">No. App</th>
                         <th class="whitespace-nowrap">Asuransi</th>
                         <th class="whitespace-nowrap">Tipe Asuransi</th>
@@ -311,7 +313,16 @@
                 "processing": true,
                 "serverSide": true,
                 "bLengthChange": true,
+                "order": [[ 2, "desc" ]],
                 "aoColumns": [{
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
+                        "bSortable": true,
+                        "className": "border-b",
+                    },
+                    {
                         "bSortable": true,
                         "className": "border-b",
                     },

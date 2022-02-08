@@ -283,6 +283,8 @@ class DataController extends Controller
     {
         // sorting column datatables
         $columns = [
+            'kode_okupasi',
+            'nama_okupasi',
             'transid',
             'nama_asuransi',
             'instype_name',
@@ -299,6 +301,7 @@ class DataController extends Controller
         ];
 
         $select = [
+            'okupasi.*',
             'transaksi.*',
             'nama_asuransi',
             'instype_name',
@@ -431,6 +434,7 @@ class DataController extends Controller
         $joins = [
             ['insured', 'id_insured = insured.id'],
             ['instype', 'id_instype = instype.id'],
+            ['okupasi', 'id_okupasi = okupasi.id'],
             ['asuransi', 'id_asuransi = asuransi.id'],
             ['masters as sts', ['transaksi.id_status = sts.msid', "sts.mstype = status"]],
             ['cabang', 'id_cabang = cabang.id'],
@@ -445,6 +449,8 @@ class DataController extends Controller
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
+            $nestedData[] = $row->location;
+            $nestedData[] = $row->nama_okupasi;
             $nestedData[] = $row->transid;
             $nestedData[] = $row->nama_asuransi;
             $nestedData[] = $row->instype_name;
@@ -923,9 +929,8 @@ class DataController extends Controller
 
         return response()->json($rowdata);
     }
-    
+
     public function getBiayaKlausula(Request $request) {
-        // return $request->all();
         if ($request->premi !== 0 || $request->tsi !== 0 || $request->periode_tahun !== 0) {
             $config = DB::table('asuransi_config')
                 ->where('id_insurance', $request->id_insurance)

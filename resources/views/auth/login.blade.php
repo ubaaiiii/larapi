@@ -22,6 +22,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <meta name="author" content="LEFT4CODE">
     <title>Login | BDS General</title>
     <!-- BEGIN: CSS Assets-->
+    <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/fontawesome/all.css') }}" />
     <link rel="stylesheet" href="{{ url('public/dist/css/app.css') }}" />
     <!-- END: CSS Assets-->
 </head>
@@ -61,9 +62,9 @@ License: You must have a valid license purchased only from themeforest(the above
                         <div class="intro-x mt-2 text-gray-500 xl:hidden text-center">Bina Dana Sejahtera. Sistem
                             Informasi Asuransi Perbankan</div>
                         <div class="intro-x mt-8">
-                            <input type="text" class="intro-x login__input form-control py-3 px-4 border-gray-300 block"
+                            <input type="text" class="intro-x login__input form-control py-3 px-4 border-gray-300 block" required
                                 name="username" placeholder="Username">
-                            <input type="password"
+                            <input type="password" required
                                 class="intro-x login__input form-control py-3 px-4 border-gray-300 block mt-4"
                                 name="password" placeholder="Password">
                             @if ($errors->any())
@@ -79,8 +80,11 @@ License: You must have a valid license purchased only from themeforest(the above
                             {{-- <a href="">Forgot Password?</a> --}}
                         </div>
                         <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
-                            <button type="submit"
-                                class="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Masuk</button>
+                            <button type="submit" class="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top"><i class="fa fa-unlock-alt mr-2 mb-2"></i>Masuk</button>
+                            <a href="https://api.whatsapp.com/send/?phone=6287877200523&text=Hai%2C%20saya%20ingin%20mengajukan%20permohonan%20user%20DigiSIAP%3A%0ANama%20%3A%20%0AUsername%20%3A%20%0AEmail%20%3A%20%0ANo.%20Telp%20%3A%20%0ANama%20Mitra%20(%20Asuransi%20%2F%20Bank%20)%20%3A%20%0ACabang%20Mitra%20%3A%20%0ANama%20Broker%20yg%20Dikenal%20%3A%20%0A%0ATerima%20Kasih"
+                                target="_blank" class="btn btn-outline-secondary py-3 px-4 w-full xl:w-32 mt-3 xl:mt-0 align-top"><i class="fa fa-id-card mr-2"></i>Daftar</a>
+                        </div>
+                        <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
                         </div>
                     </form>
                 </div>

@@ -21,7 +21,7 @@
                                     <div class="flex">
                                         <i class="fa fa-file-medical text-theme-10" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengajuan">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengajuan"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1" id="text-pengajuan">Pengajuan Bank</div>
                                 </div>
                             </div>
@@ -32,7 +32,7 @@
                                     <div class="flex">
                                         <i class="fa fa-tasks text-theme-11" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-verifikasi">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-verifikasi"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1" id="text-approval">Verifikasi Broker</div>
                                 </div>
                             </div>
@@ -43,7 +43,7 @@
                                     <div class="flex">
                                         <i class="fa fa-check text-theme-11" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-asuransi">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-asuransi"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1">Persetujuan Asuransi</div>
                                 </div>
                             </div>
@@ -54,7 +54,7 @@
                                     <div class="flex">
                                         <i class="fa fa-check-double text-theme-11" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-bank">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-bank"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1">Persetujuan Bank</div>
                                 </div>
                             </div>
@@ -65,7 +65,7 @@
                                     <div class="flex">
                                         <i class="fa fa-money-check-alt text-theme-12" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-tagihan">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-tagihan"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1">Tagihan Premi</div>
                                 </div>
                             </div>
@@ -76,7 +76,7 @@
                                     <div class="flex">
                                         <i class="fa fa-hand-holding-usd text-theme-12" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-bank">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-bank"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar Bank</div>
                                 </div>
                             </div>
@@ -87,7 +87,7 @@
                                     <div class="flex">
                                         <i class="fa fa-hand-holding-usd text-theme-9" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-broker">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-broker"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar Broker</div>
                                 </div>
                             </div>
@@ -98,7 +98,7 @@
                                     <div class="flex">
                                         <i class="fa fa-file-invoice text-theme-9" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-polis">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-polis"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1">Polis SIAP</div>
                                 </div>
                             </div>
@@ -109,16 +109,133 @@
                                     <div class="flex">
                                         <i class="fa fa-exclamation-triangle text-theme-6" style="font-size: 40px"></i>
                                     </div>
-                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-batal">0</div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-batal"><i class="fas fa-spinner fa-pulse"></i></div>
                                     <div class="text-base text-gray-600 mt-1">Cover Note Dibatalkan</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {{-- <div class="col-span-12 xl:col-span-4 mt-6">
+                    <div class="intro-y flex items-center h-10">
+                        <h2 class="text-lg font-medium truncate mr-5">
+                            Penutupan Asuransi
+                        </h2>
+                    </div>
+                    <div class="mt-5">
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-file-medical text-theme-10" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Pengajuan Bank</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-tasks text-theme-11" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Verifikasi Broker</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-check text-theme-11" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Persetujuan Asuransi</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-check-double text-theme-11" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Persetujuan Bank</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-money-check-alt text-theme-12" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Tagihan Premi</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-hand-holding-usd text-theme-12" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Premi Dibayar Bank</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-hand-holding-usd text-theme-9" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Premi Dibayar Broker</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-file-invoice text-theme-9" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Polis SIAP</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                        <div class="intro-y">
+                            <div class="box px-4 py-4 mb-3 flex items-center zoom-in">
+                                <div class="w-10 h-10 flex-none image-fit rounded-md overflow-hidden">
+                                    <i class="fa fa-exclamation-triangle text-theme-6" style="font-size: 40px"></i>
+                                </div>
+                                <div class="ml-4 mr-auto">
+                                    <div class="font-medium">Cover Note Dibatalkan</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">100 Data</div>
+                                </div>
+                                <div class="py-1 px-2 rounded-full text-xs bg-success cursor-pointer font-medium">IDR 1.000.000.000</div>
+                            </div>
+                        </div>
+                    </div>
+                </div> --}}
                 <!-- END: General Report -->
-                {{-- <!-- BEGIN: Sales Report -->
-                <div class="col-span-12 lg:col-span-6 mt-8">
+                <!-- BEGIN: Sales Report -->
+                {{-- <div class="col-span-12 lg:col-span-6 mt-8">
                     <div class="intro-y block sm:flex items-center h-10">
                         <h2 class="text-lg font-medium truncate mr-5">
                             Sales Report
@@ -240,8 +357,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- END: Sales Report --> --}}
+                </div> --}}
+                <!-- END: Sales Report -->
             </div>
         </div>
         {{-- <div class="col-span-12 2xl:col-span-3">

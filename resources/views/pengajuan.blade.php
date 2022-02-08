@@ -157,7 +157,7 @@
                             @if (!empty($data) && $data->id_status >= 2)
                             <div class="form-inline mt-5">
                                 <label for="asuransi" class="ml-3 form-label sm:w-20">Asuransi</label>
-                                <select id="asuransi" name="asuransi" required style="width:100%" onchange="asuransiConfig()">
+                                <select id="asuransi" name="asuransi" required style="width:100%" onchange="hitung()">
                                     {{-- @foreach ($asuransi as $val)
                                         <option value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
                                             {{ $val->nama_asuransi }}
@@ -623,40 +623,42 @@
         }
 
         function hitung() {
-            var OKUPASI = $('#okupasi').val(),
-                _RATE   = totalRate(),
-                PRORATA = $('#PRORATA').val();
-            
-            @foreach ($value as $row)
-            var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val());
-            @endforeach
-            if (_RATE == null || OKUPASI == null || TSI == null) {
-                // console.log('Rate: ',_RATE);
-                // console.log('Okupasi: ',OKUPASI);
-                // console.log('TSI: ',TSI);
-                return false;
-            }
-            
-            // Mulai Hitung Gross
-            @foreach ($formula as $row)
-                var {!! $row->kodetrans_input !!} = {!! $row->kodetrans_formula !!};
-            @endforeach
-
-            @foreach ($formula as $row)
-                $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }});
-            @endforeach
-            // Selesai Hitung Gross
-
-            // @foreach ($formula as $row)
-            //     console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
-            // @endforeach
-            // console.log('TSI: ', TSI);
-            // console.log('Premium: ', PREMI);
-            // console.log("Rate: ", RATE);
-            // console.log("Materai: ", MATERAI);
-            // console.log("Biaya Lain: ", LAIN);
-            $('.masked').trigger('keyup');
-            asuransiConfig();
+            $.when( asuransiConfig() ).done(function() {
+                var OKUPASI = $('#okupasi').val(),
+                    _RATE   = totalRate(),
+                    PRORATA = $('#PRORATA').val();
+                
+                @foreach ($value as $row)
+                var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val());
+                @endforeach
+                if (_RATE == null || OKUPASI == null || TSI == null) {
+                    // console.log('Rate: ',_RATE);
+                    // console.log('Okupasi: ',OKUPASI);
+                    // console.log('TSI: ',TSI);
+                    return false;
+                }
+                
+                // Mulai Hitung Gross
+                @foreach ($formula as $row)
+                    var {!! $row->kodetrans_input !!} = {!! $row->kodetrans_formula !!};
+                @endforeach
+    
+                @foreach ($formula as $row)
+                    $('[d-input="{{ $row->kodetrans_input }}"]').val({{ $row->kodetrans_input }});
+                @endforeach
+                // Selesai Hitung Gross
+    
+                // @foreach ($formula as $row)
+                //     console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+                // @endforeach
+                // console.log('TSI: ', TSI);
+                // console.log('Premium: ', PREMI);
+                // console.log("Rate: ", RATE);
+                // console.log("Materai: ", MATERAI);
+                // console.log("Polis: ", POLIS);
+                // console.log("Biaya Lain: ", LAIN);
+                $('.masked').trigger('keyup');
+            });
         }
 
         function asuransiConfig() {
@@ -672,10 +674,12 @@
                     "data": {id_insurance, id_instype, premi, tsi, periode_tahun},
                     "success": function(data) {
                         // console.log('data',data);
-                        $('[d-input=LAIN').val(data.by_lain);
-                        $('[d-input=MATERAI').val(data.by_materai);
-                        $('[d-input=POLIS').val(data.by_polis);
-                        $('.ql-editor').html(data.klausula_template);
+                        $('[d-input=LAIN').val(data.by_lain).trigger('keyup');
+                        $('[d-input=MATERAI').val(data.by_materai).trigger('keyup');
+                        $('[d-input=POLIS').val(data.by_polis).trigger('keyup');
+                        @if(empty($data->klausula))
+                            $('.ql-editor').html(data.klausula_template);
+                        @endif
                         $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
                     },
                     "error": function(response) {
