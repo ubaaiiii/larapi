@@ -156,7 +156,7 @@
             <table id="tb-inquiry" class="hover table mt-2 table-report table-report--tabulator">
                 <thead>
                     <tr>
-                        <th class="whitespace-nowrap">Lokasi Okupasi</th>
+                        <th class="whitespace-nowrap">Kode Okupasi</th>
                         <th class="whitespace-nowrap">Nama Okupasi</th>
                         <th class="whitespace-nowrap">No. App</th>
                         <th class="whitespace-nowrap">Asuransi</th>

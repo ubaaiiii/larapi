@@ -235,7 +235,7 @@ class CetakController extends Controller
                     'transaksi'   => $transaksi,
                     'asuransi'    => Asuransi::find($transaksi->id_asuransi),
                     'instype'     => Instype::find($transaksi->id_instype),
-                    'tgl_aktif'   => Activity::where('id_transaksi',$transaksi->transid)->where('id_status','5')->orderBy('created_at','DESC')->first(),
+                    'tgl_aktif'   => Activity::where('id_transaksi',$transaksi->transid)->where('id_status','4')->orderBy('created_at','DESC')->first(),
                     'sequential'  => Sequential::where('seqdesc','transid')->first(),
                     'tertanggung' => Insured::find($transaksi->id_insured),
                     'cabang'      => Cabang::find($transaksi->id_cabang),

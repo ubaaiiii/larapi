@@ -101,23 +101,17 @@
                                     <p>@if(!empty($data->klausula)){!! $data->klausula !!}@endif</p>
                                 </div>
                             </div>
-                            @role('insurance|broker|adm')
-                                @if (!empty($data) && in_array($data->id_status, [2,3]))
-                                    @if ($act !== 'edit')
-                                    <script>
-                                        $('.icon-klausula').show();
-                                    </script>
-                                    <div class="modal-footer text-right">
-                                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
-                                            Cancel
-                                        </button>
-                                        <button type="button" id="btn-klausula" class="btn btn-primary w-20">
-                                            Save
-                                        </button>
-                                    </div>
-                                    @endif
-                                @endif
-                            @endrole
+                            <script>
+								$('.icon-klausula').show();
+							</script>
+							<div class="modal-footer text-right">
+								<button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
+									Cancel
+								</button>
+								<button type="button" id="btn-klausula" class="btn btn-primary w-20">
+									Save
+								</button>
+							</div>
                         </div>
                     </div>
                 </div>
@@ -648,15 +642,15 @@
                 @endforeach
                 // Selesai Hitung Gross
     
-                // @foreach ($formula as $row)
-                //     console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
-                // @endforeach
-                // console.log('TSI: ', TSI);
-                // console.log('Premium: ', PREMI);
-                // console.log("Rate: ", RATE);
-                // console.log("Materai: ", MATERAI);
-                // console.log("Polis: ", POLIS);
-                // console.log("Biaya Lain: ", LAIN);
+                @foreach ($formula as $row)
+                    console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+                @endforeach
+                console.log('TSI: ', TSI);
+                console.log('Premium: ', PREMI);
+                console.log("Rate: ", RATE);
+                console.log("Materai: ", MATERAI);
+                console.log("Polis: ", POLIS);
+                console.log("Biaya Lain: ", LAIN);
                 $('.masked').trigger('keyup');
             });
         }
