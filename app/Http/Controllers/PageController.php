@@ -180,6 +180,55 @@ class PageController extends Controller
         return view('laporan', $data);
     }
 
+    function klaim(Request $request)
+    {
+        // $role = Role::create(['name' => 'finance']);
+        // $permission = Permission::create(['name' => 'edit articles']);
+        // $permission->assignRole('');
+        // die;
+        $level = Auth::user()->getRoleNames()[0];
+        if (count($request->all()) == 0) {
+            $cabang = Cabang::all();
+            $asuransi = Asuransi::all();
+            switch ($level) {
+                case 'maker':
+                    if (Auth::user()->id_cabang !== 1) {    // All Cabang
+                        $cabang = Cabang::where('id',Auth::user()->id_cabang)->get();
+                    }
+                    break;
+
+                case 'insurance':
+                    $asuransi = Asuransi::where('id',Auth::user()->id_asuransi)->get();
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+            $data = [
+                'cabang'    => $cabang,
+                'asuransi'  => $asuransi,
+                'laporan'   => Laporan::join('role_has_laporan as rl','laporan.id','=','rl.laporan_id')
+                ->join('model_has_roles as mr','rl.role_id','=','mr.role_id')
+                ->where('mr.model_id','=',Auth::user()->id)
+                ->get(),
+                'instype'   => Instype::all(),
+            ];
+            
+        } else {
+            // return $request->all();
+            $laporan     = new LaporanController;
+            $data = [
+                'data'      => $request,
+                'columns'   => $laporan->tableLaporan($request),
+                // 'dataLaporan'   => $dataController->dataLaporan($request),
+            ];
+            // return "nyampe sini";
+        }
+
+        return view('laporan', $data);
+    }
+
     function inquiry(Request $request, $search = null)
     {
         $data = [

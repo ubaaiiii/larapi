@@ -87,6 +87,10 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('pembayaran', [PageController::class, 'pembayaran'])->name('pembayaran')->middleware('role:adm|finance');
   Route::get('pembayaran/{any}', [PageController::class, 'pembayaran'])->name('pembayaran')->middleware('role:adm|finance');
 
+  // klaim
+  Route::get('klaim', [PageController::class, 'klaim'])->name('klaim')->middleware('role:adm|broker|maker|checker|approver|insurance');
+  Route::get('klaim/{any}', [PageController::class, 'klaim'])->name('klaim')->middleware('role:adm|broker|maker|checker|approver|insurance');
+
   // pengajuan
   Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:maker|adm');
   Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
