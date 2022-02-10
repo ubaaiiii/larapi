@@ -449,7 +449,7 @@ class DataController extends Controller
         $data = array();
         foreach ($query[0] as $row) {
             $nestedData = array();
-            $nestedData[] = $row->location;
+            $nestedData[] = $row->kode_okupasi;
             $nestedData[] = $row->nama_okupasi;
             $nestedData[] = $row->transid;
             $nestedData[] = $row->nama_asuransi;
