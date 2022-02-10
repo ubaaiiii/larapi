@@ -452,7 +452,7 @@
                         $('.ps-st').css('display', 'none');
                     }
                 }, 64);
-                var statusnya = tablenya.row(this).data()[13];
+                var statusnya = tablenya.row(this).data()[15];
                 $('.ps-st').css('display', 'none');
                 $('.st-' + statusnya).css('display', 'block');
             });
@@ -461,7 +461,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                     selected: true
-                }).data()[0];
+                }).data()[2];
                 window.open("{{ url('pengajuan') }}/" + transid);
             });
 
@@ -473,7 +473,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                     selected: true
-                }).data()[0];
+                }).data()[2];
                 $('#frm-method').val('approve');
                 $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
             });
@@ -482,7 +482,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                     selected: true
-                }).data()[0];
+                }).data()[2];
                 $('#frm-method').val('renewal');
                 $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
             });
@@ -491,7 +491,7 @@
             //     e.preventDefault();
             //     var transid = tablenya.row({
             //         selected: true
-            //     }).data()[0];
+            //     }).data()[2];
             //     $('#frm-method').val('update');
             //     $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
             // });
@@ -500,7 +500,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                     selected: true
-                }).data()[0];
+                }).data()[2];
                 $.ajax({
                     url: "{{ url('api/caritransaksi') }}",
                     headers: {
@@ -529,7 +529,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                     selected: true
-                }).data()[0];
+                }).data()[2];
 
             });
 
@@ -541,7 +541,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                     selected: true
-                }).data()[0];
+                }).data()[2];
                 $.ajax({
                     url: "{{ url('api/caritransaksi') }}",
                     headers: {
@@ -654,7 +654,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                         selected: true
-                    }).data()[0],
+                    }).data()[2],
                     _token = "{{ csrf_token() }}",
                     method = "delete";
                 Swal.fire({
@@ -720,7 +720,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                         selected: true
-                    }).data()[0],
+                    }).data()[2],
                     _token = "{{ csrf_token() }}",
                     method = "rollback";
                 Swal.fire({
@@ -782,7 +782,7 @@
                 e.preventDefault();
                 var transid = tablenya.row({
                     selected: true
-                }).data()[0];
+                }).data()[2];
                 window.open("{{ url('cetak_invoice') }}/" + transid);
             });
 
