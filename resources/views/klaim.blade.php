@@ -1,110 +1,91 @@
 @extends('layouts.master')
-@section('title', 'Laporan')
-@section('breadcrumb', 'Laporan')
-@section('menu', 'Laporan')
+@section('title', 'Klaim')
+@section('breadcrumb', 'Klaim')
+@section('menu', 'Klaim')
 @section('content')
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
             Data Klaim
         </h2>
     </div>
-    @if(empty($data))
-        <div class="intro-y box py-10 sm:py-20 mt-5">
-            <form action="{{ url('laporan') }}" method="POST">
-                @csrf
-                <input type="hidden" name="judul">
-                <div class="px-5 sm:px-20 dark:border-dark-5">
-                    <div class="grid grid-cols-12 gap-4 gap-y-5">
-                        <div class="intro-y col-span-12 sm:col-span-6">
-                            <label for="instype" class="form-label">Tipe Asuransi</label>
-                            <select id="instype" name="instype" required style="width:100%" class="pilih">
-                                <option value="ALL" selected>Semua Tipe Asuransi</option>
-                                @foreach ($instype as $val)
-                                    <option value="{{ $val->id }}">{{ $val->instype_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="intro-y col-span-12 sm:col-span-6">
-                            <label for="cabang" class="form-label">Cabang</label>
-                            <select id="cabang" name="cabang" required style="width:100%" class="pilih">
-                                @role('broker|insurance|checker|approver|adm|finance')
-                                    <option value="ALL" selected>Semua Cabang</option>
-                                @endrole
-                                @role('maker')
-                                    @if (Auth::user()->id_cabang == 1)
-                                        <option value="ALL" selected>Semua Cabang</option>
-                                    @endif
-                                @endrole
-                                @foreach ($cabang as $val)
-                                    <option value="{{ $val->id }}" @if ($val->id === Auth::user()->cabang) selected="true" @endif>{{ $val->nama_cabang }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="intro-y col-span-12 sm:col-span-6">
-                            <label for="asuransi" class="form-label">Asuransi</label>
-                            <select id="asuransi" name="asuransi" required style="width:100%" class="pilih">
-                                @role('maker|checker|broker|approver|adm|finance')
-                                <option value="ALL" selected>Semua Asuransi</option>
-                                @endrole
-                                @foreach ($asuransi as $val)
-                                    <option value="{{ $val->id }}">
-                                        {{ $val->nama_asuransi }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="intro-y col-span-12 sm:col-span-6">
-                            <label for="range-periode" class="form-label">Periode</label>
-                            <input id="range-periode" class="form-control w-full block mx-auto">
-                            <input name="periode_start" type="hidden">
-                            <input name="periode_end" type="hidden">
-                        </div>
-                        <div class="intro-y col-span-12 sm:col-span-6">
-                            <label for="jenis" class="form-label">Jenis Laporan</label>
-                            <select id="jenis" name="jenis" required style="width:100%" class="pilih">
-                                @foreach ($laporan as $val)
-                                    <option value="{{ $val->id }}" d-date="{{ $val->lapdate }}">
-                                        {{ $val->lapdesc }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="intro-y col-span-12 flex items-center justify-center sm:justify-end mt-5">
-                            <button type="submit" class="btn btn-primary w-24 ml-2">Cetak</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    @endif
-    @if (!empty($data))
     {{-- {{ dd($tableLaporan) }} --}}
-        <div class="intro-y box mt-5">
-            <div class="flex flex-col sm:flex-row items-center p-5 border-b border-gray-200">
-                <h2 class="font-medium text-base mr-auto">
-                    {{ $data->judul }}
-                </h2>
-            </div>
-            <div class="p-5" id="hoverable-table">
-                <div class="preview">
-                    <div class="overflow-x-auto">
-                        <table class="table nowrap">
-                            <thead>
-                                <tr>
-                                    @foreach ($columns as $i => $v)    
-                                        <th class="border border-b-2 dark:border-dark-5 whitespace-nowrap">{!! (preg_match('!\"([^\)]+)\"!',$v,$m))?($m[1]):("") !!}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+    <div class="grid grid-cols-12 gap-6 mt-5">
+        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="report-box zoom-in">
+                <div class="box p-5">
+                    <div class="flex">
+                        <i data-feather="umbrella" class="report-box__icon text-theme-10"></i> 
+                        <div class="ml-auto">
+                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"> 33% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up w-4 h-4 ml-0.5"><polyline points="18 15 12 9 6 15"></polyline></svg> </div>
+                        </div>
                     </div>
+                    <div class="text-3xl font-medium leading-8 mt-6">4.710</div>
+                    <div class="text-base text-gray-600 mt-1">Klaim Diajukan</div>
                 </div>
             </div>
         </div>
-    @endif
+        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="report-box zoom-in">
+                <div class="box p-5">
+                    <div class="flex">
+                        <i data-feather="user-check" class="report-box__icon text-theme-6"></i> 
+                        <div class="ml-auto">
+                            <div class="report-box__indicator bg-theme-6 tooltip cursor-pointer"> 2% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down w-4 h-4 ml-0.5"><polyline points="6 9 12 15 18 9"></polyline></svg> </div>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-medium leading-8 mt-6">3.721</div>
+                    <div class="text-base text-gray-600 mt-1">Klaim Disetujui</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="report-box zoom-in">
+                <div class="box p-5">
+                    <div class="flex">
+                        <i data-feather="award" class="report-box__icon text-theme-11"></i> 
+                        <div class="ml-auto">
+                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"> 12% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up w-4 h-4 ml-0.5"><polyline points="18 15 12 9 6 15"></polyline></svg> </div>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-medium leading-8 mt-6">2.149</div>
+                    <div class="text-base text-gray-600 mt-1">Klaim Dinilai</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="report-box zoom-in">
+                <div class="box p-5">
+                    <div class="flex">
+                        <i data-feather="shield" class="report-box__icon text-theme-9"></i> 
+                        <div class="ml-auto">
+                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"> 22% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up w-4 h-4 ml-0.5"><polyline points="18 15 12 9 6 15"></polyline></svg> </div>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-medium leading-8 mt-6">152.040</div>
+                    <div class="text-base text-gray-600 mt-1">Klaim Selesai</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="intro-y box mt-5">
+        <div class="p-5" id="hoverable-table">
+            <div class="preview">
+                <div class="overflow-x-auto">
+                    <table class="table nowrap">
+                        <thead>
+                            <tr>
+                                @foreach ($columns as $i => $v)    
+                                    <th class="border border-b-2 dark:border-dark-5 whitespace-nowrap">{!! (preg_match('!\"([^\)]+)\"!',$v,$m))?($m[1]):("") !!}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -123,8 +104,8 @@
                 
                 $('#range-periode').inputmask("99/99/9999 - 99/99/9999");
                 
-                var start = moment().subtract(1, 'month');
-                var end = moment();
+                var start = moment().subtract(1, 'month'),
+                    end   = moment();
 
                 function cb(start, end) {
                     $('#range-periode').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
@@ -205,7 +186,7 @@
                         },
                     ],
                     "ajax": {
-                        url: "{{ url('api/datalaporan') }}",
+                        url: "{{ url('api/dataklaim') }}",
                         headers: {
                             'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                         },

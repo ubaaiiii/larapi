@@ -570,6 +570,101 @@ class DataController extends Controller
         ], 200);
     }
 
+    public function dataKlaim(Request $request)
+    {
+        $table = DB::table("transaksi");
+
+        switch ($request->jenis) {
+            case '1':
+                
+                break;
+
+            default:
+                $select = [
+                    'transaksi.created_at   AS "Tanggal Dibuat"',
+                    'transid                AS "Nomor Transaksi"',
+                    'cif                    AS "CIF"',
+                    'nopinjaman             AS "Nomor Pinjaman"',
+                    'nama_cabang            AS "Cabang KB Bukopin"',
+                    'nama_insured           AS "Nama Tertanggung"',
+                    'plafond_kredit         AS "Plafond"',
+                    'outstanding_kredit     AS "Outstanding"',
+                    'alamat_insured         AS "Alamat Tertanggung"',
+                    'nama_okupasi           AS "Okupasi"',
+                    'location               AS "Lokasi Okupasi"',
+                    'nama_asuransi          AS "Asuransi"',
+                    'instype_name           AS "Tipe Asuransi"',
+                    'tsi.value              AS "Nilai Pertanggungan"',
+                    'premi.value            AS "Premium"',
+                    'polis_start            AS "Polis Mulai"',
+                    'polis_end              AS "Polis Selesai"',
+                    'sts.msdesc             AS "Status"',
+                    'catatan                AS "Catatan"',
+                ];
+                if (!empty($request->dtable)) {
+                    // $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end]);
+
+                    $column = [
+                        'transaksi.created_at',
+                        'transid',
+                        'cif',
+                        'nopinjaman',
+                        'nama_insured',
+                        'alamat_insured',
+                        'nama_cabang',
+                        'nama_asuransi',
+                        'plafond_kredit',
+                        'cover_note',
+                        'policy_no',
+                        'instype_name',
+                        'polis_start',
+                        'polis_end',
+                        'nama_okupasi',
+                        'location',
+                        'tsi.value',
+                        'premi.value',
+                        'sts.msdesc',
+                        'catatan',
+                    ];
+                    $joins = [
+                        ['insured', 'id_insured = insured.id'],
+                        ['okupasi', 'id_okupasi = okupasi.id'],
+                        ['asuransi', 'id_asuransi = asuransi.id'],
+                        ['instype', 'id_instype = instype.id'],
+                        ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
+                        ['cabang', 'id_cabang = cabang.id'],
+                        ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
+                        ['transaksi_pricing AS premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+                    ];
+                }
+                // return redirect()->route('logout');
+                break;
+        }
+
+        if (!empty($request->dtable)) {
+            $query = $this->generateQuery($request, $table, $column, $select, $joins);
+
+            $data = [];
+            foreach ($query[0] as $row) {
+                $nestedData = array();
+                foreach ($row as $item) {
+                    $nestedData[] = $item;
+                }
+                $data[] = $nestedData;
+            }
+
+            return response()->json([
+                "draw"            => intval($request->draw),
+                "recordsTotal"    => intval($query[1]),
+                "recordsFiltered" => intval($query[2]),
+                "data"            => $data,
+                "sql"             => $query[3],
+            ], 200);
+        }
+
+        return $select;
+    }
+
     public function dataBelumDibayar(Request $request)
     {
         // sorting column datatables

@@ -41,6 +41,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/dataaktifitas', 'API\DataController@dataAktifitas');
     Route::post('/datauser', 'API\DataController@dataUser');
     Route::post('/datalaporan', 'API\LaporanController@tableLaporan');
+    Route::post('/dataklaim', 'API\DataController@dataKlaim');
     
     // cari data
     Route::get('/caritransaksi', 'API\DataController@cariTransaksi');
