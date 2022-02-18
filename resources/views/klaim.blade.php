@@ -3,6 +3,10 @@
 @section('breadcrumb', 'Klaim')
 @section('menu', 'Klaim')
 @section('content')
+{{-- @dd($data) --}}
+@if (empty($data))
+
+@else
     <div class="intro-y flex items-center mt-4">
         <h2 class="text-lg font-medium mr-auto">
             Data Klaim
@@ -12,57 +16,45 @@
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5" onclick="filterInquiry('pengajuan')">
                     <div class="flex">
-                        <i data-feather="umbrella" class="report-box__icon text-theme-10"></i> 
-                        <div class="ml-auto">
-                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"> 33% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up w-4 h-4 ml-0.5"><polyline points="18 15 12 9 6 15"></polyline></svg> </div>
-                        </div>
+                        <i class="fa fa-file-medical text-theme-10" style="font-size: 40px"></i>
                     </div>
-                    <div class="text-3xl font-medium leading-8 mt-6">4.710</div>
-                    <div class="text-base text-gray-600 mt-1">Klaim Diajukan</div>
+                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengajuan-klaim"><i class="fas fa-spinner fa-pulse"></i></div>
+                    <div class="text-base text-gray-600 mt-1" id="text-pengajuan">Klaim Diajukan</div>
                 </div>
             </div>
         </div>
         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5" onclick="filterInquiry('persetujuan klaim')">
                     <div class="flex">
-                        <i data-feather="user-check" class="report-box__icon text-theme-6"></i> 
-                        <div class="ml-auto">
-                            <div class="report-box__indicator bg-theme-6 tooltip cursor-pointer"> 2% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down w-4 h-4 ml-0.5"><polyline points="6 9 12 15 18 9"></polyline></svg> </div>
-                        </div>
+                        <i class="fa fa-check text-theme-11" style="font-size: 40px"></i>
                     </div>
-                    <div class="text-3xl font-medium leading-8 mt-6">3.721</div>
+                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-klaim-disetujui"><i class="fas fa-spinner fa-pulse"></i></div>
                     <div class="text-base text-gray-600 mt-1">Klaim Disetujui</div>
                 </div>
             </div>
         </div>
         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5" onclick="filterInquiry('tagihan')">
                     <div class="flex">
-                        <i data-feather="award" class="report-box__icon text-theme-11"></i> 
-                        <div class="ml-auto">
-                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"> 12% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up w-4 h-4 ml-0.5"><polyline points="18 15 12 9 6 15"></polyline></svg> </div>
-                        </div>
+                        <i class="fa fa-award text-theme-12" style="font-size: 40px"></i>
                     </div>
-                    <div class="text-3xl font-medium leading-8 mt-6">2.149</div>
+                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-klaim-dinilai"><i class="fas fa-spinner fa-pulse"></i></div>
                     <div class="text-base text-gray-600 mt-1">Klaim Dinilai</div>
                 </div>
             </div>
         </div>
         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5" onclick="filterInquiry('dibayar broker')">
                     <div class="flex">
-                        <i data-feather="shield" class="report-box__icon text-theme-9"></i> 
-                        <div class="ml-auto">
-                            <div class="report-box__indicator bg-theme-9 tooltip cursor-pointer"> 22% <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up w-4 h-4 ml-0.5"><polyline points="18 15 12 9 6 15"></polyline></svg> </div>
-                        </div>
+                        <i class="fa fa-user-shield text-theme-9" style="font-size: 40px"></i>
                     </div>
-                    <div class="text-3xl font-medium leading-8 mt-6">152.040</div>
-                    <div class="text-base text-gray-600 mt-1">Klaim Selesai</div>
+                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-klaim-selesai"><i class="fas fa-spinner fa-pulse"></i></div>
+                    <div class="text-base text-gray-600 mt-1" id="text-dibayar">Klaim Selesai</div>
                 </div>
             </div>
         </div>
@@ -86,6 +78,7 @@
             </div>
         </div>
     </div>
+@endif
 @endsection
 
 @section('script')
@@ -181,8 +174,14 @@
                     buttons: [
                         {
                             extend: 'excel',
-                            text: "<i class='fa fa-file-excel' class='mr-2'></i> Export to Excel",
+                            text: "<i class='fa fa-file-excel text-theme-9' class='mr-2'></i>&nbsp; Export to Excel",
                             action: newExportAction
+                        },
+                        {
+                            text: "<i class='fa fa-plus text-theme-10' class='mr-2'></i>&nbsp; Tambah Klaim",
+                            action: function () {
+                                window.location.href = "{{ url('inquiry?data=polis+siap') }}";
+                            }
                         },
                     ],
                     "ajax": {
