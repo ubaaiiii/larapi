@@ -40,6 +40,16 @@
                 <div id="notif-content">
 
                 </div>
+                {{-- <div id="all-notif"> --}}
+                    <div class="cursor-pointer relative flex items-center mt-5" onClick="window.location.href='{{ url('notifikasi') }}';">
+                        <div class="ml-2 overflow-hidden">
+                            <div class="flex items-center">
+                                <a href="javascript:;" class="font-medium truncate mr-5"><i data-feather="inbox" class="mr-2"></i> Lihat
+                                    Semua..</a>
+                            </div>
+                        </div>
+                    </div>
+                {{-- </div> --}}
             </div>
         </div>
     </div>
@@ -51,7 +61,7 @@
                     'Authorization': `Bearer {{ Auth::user()->api_token }}`,
                 },
                 type: "GET",
-                data: {"id":"{{ Auth::user()->id }}","limit":6},
+                data: {"id":"{{ Auth::user()->id }}","limit":10},
                 success: function(d) {
                     // console.log('d',d.length);
                     var konten  = $('#notif-content'),
@@ -69,7 +79,7 @@
                                 diff = (datee.getTime() + datee.getTimezoneOffset() * 60000 - datte.getTime()) / 1000;
                             console.log(Math.floor(diff / 86400));
                             var data = JSON.parse(d[i].data);
-                            if (i < 5) {
+                            if (i < 10) {
                                 var id          = d[i].id,
                                     icon        = data.icon,
                                     newBadge    = "",
@@ -98,15 +108,10 @@
                                 break;
                             }
                         }
-                        if (d.length > 5) {
-                            notif += `  <div class="cursor-pointer relative flex items-center mt-5" onClick="window.location.href='{{ url('notifikasi') }}';">
-                                            <div class="ml-2 overflow-hidden">
-                                                <div class="flex items-center">
-                                                    <a href="javascript:;" class="font-medium truncate mr-5"><i data-feather="inbox" class="mr-2"></i> Lihat
-                                                        Semua..</a>
-                                                </div>
-                                            </div>
-                                        </div>`;
+                        if (d.length > 10) {
+                            $('#all-notif').show();
+                        } else {
+                            $('#all-notif').hide();
                         }
                     } else {
                         notif = `<div class="relative flex items-center mt-5">
