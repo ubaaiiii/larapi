@@ -101,7 +101,7 @@ class DataController extends Controller
     {
         // return $request->all();
         $okupasi = Okupasi::select('id', 'kode_okupasi', 'nama_okupasi', 'rate');
-            // ->where('instype', $request->instype);
+        // ->where('instype', $request->instype);
         if (!empty($request->search)) {
             $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
                 ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
@@ -148,14 +148,14 @@ class DataController extends Controller
                 if (is_array($join[1])) {
                     $table->leftJoin($join[0], function ($jn) use ($join) {
                         $pecah = explode(" ", $join[1][0]);
-                        if (in_array($pecah[1],["=",">",">=","<","<=","<>"])) {
+                        if (in_array($pecah[1], ["=", ">", ">=", "<", "<=", "<>"])) {
                             $jn->on($pecah[0], $pecah[1], $pecah[2]);
                         } else {
                             $jn->on(DB::raw($join[1][0]), DB::raw(''), DB::raw(''));
                         }
                         for ($i = 1; $i < count($join[1]); $i++) {
                             $pecah = explode(" ", $join[1][$i]);
-                            if (in_array($pecah[1],["=",">",">=","<","<=","<>"])) {
+                            if (in_array($pecah[1], ["=", ">", ">=", "<", "<=", "<>"])) {
                                 $jn->where($pecah[0], $pecah[1], $pecah[2]);
                             } else {
                                 $jn->whereRaw($join[1][$i]);
@@ -173,7 +173,7 @@ class DataController extends Controller
         $awal = $table->get()->count();
 
         if (!empty($request->search)) {
-            $table->where(function ($query) use ($columns, $request){
+            $table->where(function ($query) use ($columns, $request) {
                 for ($i = 0; $i < count($columns); $i++) {
                     if ($i == 0) {
                         $query->where($columns[$i], 'like', '%' . $request->search . '%');
@@ -242,7 +242,7 @@ class DataController extends Controller
             case 'broker':
                 $statPengajuan  = "1";
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
-                    $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '".Auth::user()->id."' ";
+                    $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '" . Auth::user()->id . "' ";
                 }
                 break;
             case 'insurance':
@@ -255,9 +255,9 @@ class DataController extends Controller
             case 'adm':
                 $statPengajuan  = "0,1";
                 break;
-            
+
             default:
-                
+
                 break;
         }
         $query = "  SELECT
@@ -281,6 +281,7 @@ class DataController extends Controller
 
     public function dataTransaksi(Request $request)
     {
+        // return $request->server('SERVER_NAME');
         // sorting column datatables
         $columns = [
             'kode_okupasi',
@@ -339,12 +340,12 @@ class DataController extends Controller
                     $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 }
                 break;
-                
+
             case 'broker':
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
                     $table->join('cabang as cbg_broker', function ($q) {
                         $q->on('cbg_broker.id', '=', 'transaksi.id_cabang')
-                        ->where('cbg_broker.id_broker', '=', Auth::user()->id);
+                            ->where('cbg_broker.id_broker', '=', Auth::user()->id);
                     });
                 }
                 break;
@@ -369,8 +370,8 @@ class DataController extends Controller
         if (!empty($request->data)) {
             switch ($request->data) {
                 case 'pengajuan':
-                    if (in_array($user,['maker','checker','adm'])) {
-                        $table->whereIN('id_status', ["0","1"]);
+                    if (in_array($user, ['maker', 'checker', 'adm'])) {
+                        $table->whereIN('id_status', ["0", "1"]);
                     } else {
                         $table->whereIN('id_status', ["1"]);
                     }
@@ -397,24 +398,24 @@ class DataController extends Controller
                         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
                             ->where('pmby.paid_type', '=', "PD01")
                             ->whereNull('pmby.deleted_at');
-                        });
+                    });
                     $table->leftJoin('transaksi_pembayaran as pmby2', function ($q) use ($user) {
                         $q->on('transaksi.transid', '=', 'pmby2.id_transaksi')
                             ->where('pmby2.paid_type', '=', "PD02")
                             ->whereNull('pmby2.deleted_at');
-                        });
+                    });
                     $table->whereNotNull('pmby.id_transaksi')
-                          ->whereNull('pmby2.id_transaksi');
+                        ->whereNull('pmby2.id_transaksi');
                     break;
-                        
+
                 case 'dibayar broker':
                     $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
                         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                        ->where('pmby.paid_type', '=', "PD02")
-                        ->whereNull('pmby.deleted_at');
+                            ->where('pmby.paid_type', '=', "PD02")
+                            ->whereNull('pmby.deleted_at');
                     });
                     $table->whereNotNull('pmby.id_transaksi')
-                          ->whereRaw('transaksi.id_status < 9');
+                        ->whereRaw('transaksi.id_status < 9');
                     break;
 
                 case 'polis siap':
@@ -440,7 +441,7 @@ class DataController extends Controller
             ['cabang', 'id_cabang = cabang.id'],
             ['documents as cn', ['transid = cn.id_transaksi', 'cn.jenis_file = COVERNOTE']],
             ['documents as polis', ['transid = polis.id_transaksi', 'polis.jenis_file = POLIS']],
-            ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1','id_parent_transaksi is null']],
+            ['transaksi_pricing as tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1', 'id_parent_transaksi is null']],
             ['transaksi_pricing as premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
         ];
 
@@ -479,7 +480,7 @@ class DataController extends Controller
             "sql"             => $query[3]
         ], 200);
     }
-    
+
     public function dataPembayaran(Request $request)
     {
         // sorting column datatables
@@ -514,7 +515,7 @@ class DataController extends Controller
             'grossnet.value as grossnet',
         ];
 
-        $table = DB::table("transaksi_pembayaran as pby_bank")->whereNull('pby_bank.deleted_at')->where('pby_bank.paid_type','PD01');
+        $table = DB::table("transaksi_pembayaran as pby_bank")->whereNull('pby_bank.deleted_at')->where('pby_bank.paid_type', 'PD01');
 
         if (isset($request->filter_sudah_dibayar) && isset($request->filter_belum_dibayar)) {
             $table->whereRaw('1');
@@ -529,12 +530,12 @@ class DataController extends Controller
         $joins = [
             ['transaksi as tsk', 'pby_bank.id_transaksi = tsk.transid'],
             ['asuransi as asn', 'id_asuransi = asn.id'],
-            ['transaksi_pembayaran as pby_broker', ['pby_broker.id_transaksi = pby_bank.id_transaksi', 'pby_broker.paid_type = PD02','pby_broker.deleted_at is null']],
-            ['transaksi_pricing as tagihan', ['tagihan.id_transaksi = tsk.transid','tagihan.id_kodetrans = 18']],
-            ['transaksi_pricing as komisi', ['komisi.id_transaksi = tsk.transid','komisi.id_kodetrans = 13']],
-            ['transaksi_pricing as ppn', ['ppn.id_transaksi = tsk.transid','ppn.id_kodetrans = 14']],
-            ['transaksi_pricing as pph', ['pph.id_transaksi = tsk.transid','pph.id_kodetrans = 15']],
-            ['transaksi_pricing as grossnet', ['grossnet.id_transaksi = tsk.transid','grossnet.id_kodetrans = 19']],
+            ['transaksi_pembayaran as pby_broker', ['pby_broker.id_transaksi = pby_bank.id_transaksi', 'pby_broker.paid_type = PD02', 'pby_broker.deleted_at is null']],
+            ['transaksi_pricing as tagihan', ['tagihan.id_transaksi = tsk.transid', 'tagihan.id_kodetrans = 18']],
+            ['transaksi_pricing as komisi', ['komisi.id_transaksi = tsk.transid', 'komisi.id_kodetrans = 13']],
+            ['transaksi_pricing as ppn', ['ppn.id_transaksi = tsk.transid', 'ppn.id_kodetrans = 14']],
+            ['transaksi_pricing as pph', ['pph.id_transaksi = tsk.transid', 'pph.id_kodetrans = 15']],
+            ['transaksi_pricing as grossnet', ['grossnet.id_transaksi = tsk.transid', 'grossnet.id_kodetrans = 19']],
         ];
 
         $query = $this->generateQuery($request, $table, $columns, $select, $joins);
@@ -576,69 +577,69 @@ class DataController extends Controller
 
         switch ($request->jenis) {
             case '1':
-                
+
                 break;
 
             default:
                 $select = [
-                    'transaksi.created_at   AS "Tanggal Dibuat"',
-                    'transid                AS "Nomor Transaksi"',
-                    'cif                    AS "CIF"',
-                    'nopinjaman             AS "Nomor Pinjaman"',
-                    'nama_cabang            AS "Cabang KB Bukopin"',
+                    'id_transaksi           AS "Nomor Transaksi"',
                     'nama_insured           AS "Nama Tertanggung"',
-                    'plafond_kredit         AS "Plafond"',
-                    'outstanding_kredit     AS "Outstanding"',
-                    'alamat_insured         AS "Alamat Tertanggung"',
-                    'nama_okupasi           AS "Okupasi"',
-                    'location               AS "Lokasi Okupasi"',
+                    'nama_cabang            AS "Cabang"',
                     'nama_asuransi          AS "Asuransi"',
-                    'instype_name           AS "Tipe Asuransi"',
-                    'tsi.value              AS "Nilai Pertanggungan"',
-                    'premi.value            AS "Premium"',
-                    'polis_start            AS "Polis Mulai"',
-                    'polis_end              AS "Polis Selesai"',
+                    'tgl_lapor              AS "Tanggal Lapor"',
+                    'tgl_kejadian           AS "Tanggal Kejadian"',
+                    'pic                    AS "PIC"',
+                    'kontak_pic             AS "Kontak PIC"',
+                    'nama_surveyor          AS "Surveyor"',
+                    'nilai_tuntutan         AS "Nilai Tuntutan"',
+                    'nilai_ganti_surveyor   AS "Nilai Surveyor"',
+                    'nilai_yang_disetujui   AS "Nilai Yg Disetujui"',
                     'sts.msdesc             AS "Status"',
-                    'catatan                AS "Catatan"',
+                    'catatan                AS "Catatan"'
                 ];
                 if (!empty($request->dtable)) {
                     // $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end]);
 
                     $column = [
-                        'transaksi.created_at',
-                        'transid',
-                        'cif',
-                        'nopinjaman',
+                        'id_transaksi',
                         'nama_insured',
-                        'alamat_insured',
                         'nama_cabang',
                         'nama_asuransi',
-                        'plafond_kredit',
-                        'cover_note',
-                        'policy_no',
-                        'instype_name',
-                        'polis_start',
-                        'polis_end',
-                        'nama_okupasi',
-                        'location',
-                        'tsi.value',
-                        'premi.value',
+                        'tgl_lapor',
+                        'tgl_kejadian',
+                        'pic',
+                        'kontak_pic',
+                        'nama_surveyor',
+                        'nilai_tuntutan',
+                        'nilai_ganti_surveyor',
+                        'nilai_yang_disetujui',
                         'sts.msdesc',
-                        'catatan',
+                        'catatan"'
                     ];
                     $joins = [
+                        ['transaksi', 'transid = id_transaksi'],
                         ['insured', 'id_insured = insured.id'],
-                        ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', 'id_instype = instype.id'],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
-                        ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
-                        ['transaksi_pricing AS premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
                     ];
                 }
                 // return redirect()->route('logout');
                 break;
+        }
+
+        if (!empty($request->dashKlaim)) {
+            $select = [
+                'tgl_lapor              AS "Tanggal Lapor"',
+                'id_transaksi           AS "Nomor Transaksi"',
+                'tgl_kejadian           AS "Tanggal Kejadian"',
+                'pic                    AS "PIC"',
+                'kontak_pic             AS "Kontak PIC"',
+                'nama_surveyor          AS "Surveyor"',
+                'nilai_tuntutan         AS ""',
+                'nilai_ganti_surveyor',
+                'nilai_yang_disetujui'
+            ];
         }
 
         if (!empty($request->dtable)) {
@@ -874,9 +875,9 @@ class DataController extends Controller
         $role = Auth::user()->getRoleNames()[0];
         $table = DB::table("documents");
         $table->where('id_transaksi', $request->transid);
-        $table->where(function($q) use ($role) {
+        $table->where(function ($q) use ($role) {
             $q->whereNull('visible_by')
-              ->orWhere('visible_by', 'like', '%' . $role . '%');
+                ->orWhere('visible_by', 'like', '%' . $role . '%');
         });
         $table->whereNull('documents.deleted_at');
 
@@ -891,7 +892,7 @@ class DataController extends Controller
 
         $data = array();
         foreach ($query[0] as $row) {
-            if (in_array($role,['maker','checker','approver'])) {
+            if (in_array($role, ['maker', 'checker', 'approver'])) {
                 if ($transaksi->id_status <= 8 && $row->jenis_file == 'POLIS') {
                     continue;
                 }
@@ -993,12 +994,13 @@ class DataController extends Controller
         ], 200);
     }
 
-    public function dataNotifikasi(Request $request) {
+    public function dataNotifikasi(Request $request)
+    {
         $notif = DB::table('notifications')
-            ->where('notifiable_id',$request->id)
+            ->where('notifiable_id', $request->id)
             ->where('type', 'App\Notifications\PushNotification');
         if (!empty($request->search)) {
-            $notif->where('data','like', '%'. $request->search. '%');
+            $notif->where('data', 'like', '%' . $request->search . '%');
         }
         if (!empty($request->skip)) {
             $notif->skip($request->skip);
@@ -1025,7 +1027,8 @@ class DataController extends Controller
         return response()->json($rowdata);
     }
 
-    public function getBiayaKlausula(Request $request) {
+    public function getBiayaKlausula(Request $request)
+    {
         if ($request->premi !== 0 || $request->tsi !== 0 || $request->periode_tahun !== 0) {
             $config = DB::table('asuransi_config')
                 ->where('id_insurance', $request->id_insurance)
@@ -1033,7 +1036,7 @@ class DataController extends Controller
                 ->whereRaw($request->premi . " BETWEEN `min_premi` AND `max_premi`")
                 ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`")
                 ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
-            
+
             $data = $config->first();
         } else {
             $data = [
@@ -1046,7 +1049,8 @@ class DataController extends Controller
         return response()->json($data);
     }
 
-    public function cariTransaksi(Request $request) {
+    public function cariTransaksi(Request $request)
+    {
         $dataPricing = Pricing::where('id_transaksi', $request->transid)->orderBy('id_kodetrans')->get();
         foreach ($dataPricing as $row) {
             // echo $row->id_kodetrans;
@@ -1054,8 +1058,8 @@ class DataController extends Controller
         }
         $data = [
             'transaksi'   => Transaksi::find($request->transid),
-            'pembayaran1' => Pembayaran::select('paid_at')->where('id_transaksi',$request->transid)->where('paid_type','PD01')->first(),
-            'pembayaran2' => Pembayaran::select('paid_at')->where('id_transaksi',$request->transid)->where('paid_type','PD02')->first(),
+            'pembayaran1' => Pembayaran::select('paid_at')->where('id_transaksi', $request->transid)->where('paid_type', 'PD01')->first(),
+            'pembayaran2' => Pembayaran::select('paid_at')->where('id_transaksi', $request->transid)->where('paid_type', 'PD02')->first(),
             'pricing'     => $pricing,
         ];
         $data['insured']  = Insured::find($data['transaksi']->id_insured);
