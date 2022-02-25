@@ -92,31 +92,31 @@ class ProcessController extends Controller
                 $ada_error = false;
 
                 if ($request->username !== $user->username) {
-                    $cekUsername = User::where('username',$request->username)->get();
+                    $cekUsername = User::where('username', $request->username)->get();
                     if ($cekUsername->count() > 0) {
                         $ada_error = true;
                         $errors[] = [
                             'username'  => [
                                 'Username ' . $request->username . ' telah digunakan, harap menggunakan username lain',
-                                ]
-                            ];
+                            ]
+                        ];
                     }
                 }
-                
+
                 if ($request->email !== $user->email) {
-                    $cekemail = User::where('email',$request->email)->get();
+                    $cekemail = User::where('email', $request->email)->get();
                     if ($cekemail->count() > 0) {
                         $ada_error = true;
                         $errors[] = [
                             'email'  => [
                                 'email ' . $request->email . ' telah digunakan, harap menggunakan email lain',
-                                ]
+                            ]
                         ];
                     }
                 }
-                
+
                 $dataUpdate = [];
-                
+
                 if ($request->update_pw === "on") {
                     if ($user->unpass !== $request->old_password) {
                         $ada_error = true;
@@ -137,8 +137,8 @@ class ProcessController extends Controller
                         'email'         => $request->email,
                         'notelp'        => $request->notelp,
                     ];
-                    
-                    if (in_array($role,['admin','broker'])) {
+
+                    if (in_array($role, ['admin', 'broker'])) {
                         array_merge($dataUpdate, [
                             'id_cabang'     => $request->id_cabang,
                             'id_parent'     => $request->id_parent,
@@ -150,13 +150,13 @@ class ProcessController extends Controller
                 if ($ada_error) {
                     return response()->json(['errors' => $errors], 422);
                 }
-                
+
                 if (!empty($request->level)) {
                     $user->syncRoles($request->level);
                 }
                 $user = $user->update($dataUpdate);
-                
-                
+
+
                 return response()->json([
                     'message'   => 'User ' . $request->name . ' Berhasil Diubah',
                     'data'      => $user,
@@ -298,7 +298,7 @@ class ProcessController extends Controller
                         'paid'      => 'required',
                         'tgl_bayar' => 'required',
                     ]);
-    
+
                     $insert = [
                         'id_transaksi'  => $request->transid,
                         'paid_amount'   => $request->paid,
@@ -315,19 +315,19 @@ class ProcessController extends Controller
                             'data'      => $cekPembayaran,
                         ], 400);
                     }
-    
+
                     Pembayaran::create($insert);
                     $transaksi->update(['id_status' => 7]);
 
-                    $this->aktifitas($transaksi->transid, '6', 'Pembayaran Premi Diterima Oleh BDS Pada Tanggal: '. Functions::tgl_indo($request->tgl_bayar));
+                    $this->aktifitas($transaksi->transid, '6', 'Pembayaran Premi Diterima Oleh BDS Pada Tanggal: ' . Functions::tgl_indo($request->tgl_bayar));
                     $this->aktifitas($transaksi->transid, '7', 'Menunggu E-Polis untuk diupload oleh Asuransi.');
-    
+
                     return response()->json([
                         'message'   => 'Berhasil input pembayaran atas Nomor Transaksi ' . $transaksi->transid,
                         'data'      => $transaksi,
                     ], 200);
                     break;
-    
+
                 case 'asuransi':
                     $transaksi = $transaksi->first();
                     $request->validate([
@@ -335,7 +335,7 @@ class ProcessController extends Controller
                         'paid'      => 'required',
                         'tgl_bayar' => 'required',
                     ]);
-    
+
                     $insert = [
                         'id_transaksi'  => $request->transid,
                         'paid_amount'   => $request->paid,
@@ -352,13 +352,13 @@ class ProcessController extends Controller
                             'data'      => $cekPembayaran,
                         ], 400);
                     }
-    
+
                     Pembayaran::create($insert);
-                    $this->aktifitas($transaksi->transid, '9', 'Premi Dibayarkan Oleh BDS ke Asuransi Pada Tanggal: '. Functions::tgl_indo($request->tgl_bayar));
+                    $this->aktifitas($transaksi->transid, '9', 'Premi Dibayarkan Oleh BDS ke Asuransi Pada Tanggal: ' . Functions::tgl_indo($request->tgl_bayar));
 
                     $cetak = new CetakController;
                     $cetak->cetakNotaPembayaran($request->transid);
-    
+
                     return response()->json([
                         'message'   => 'Berhasil input pembayaran atas Nomor Transaksi ' . $transaksi->transid,
                         'data'      => $transaksi,
@@ -376,17 +376,15 @@ class ProcessController extends Controller
 
                     if (!empty($cekPembayaran2)) {
                         $cekPembayaran2->forceDelete();
-                        $nota_pembayaran = Document::where('id_transaksi', $request->transid)->where('jenis_file','NOTAPEMBAYARAN');
-                        $path = str_replace("public/","",$nota_pembayaran->first()->lokasi_file);
+                        $nota_pembayaran = Document::where('id_transaksi', $request->transid)->where('jenis_file', 'NOTAPEMBAYARAN');
+                        $path = str_replace("public/", "", $nota_pembayaran->first()->lokasi_file);
                         if (file_exists(public_path($path))) {
                             unlink(public_path($path));
                         }
                         $nota_pembayaran->forceDelete();
-
                     } elseif (!empty($cekPembayaran1)) {
                         $cekPembayaran1->forceDelete();
                         $transaksi->update(['id_status' => 5]);
-                        
                     } else {
                         return response()->json([
                             'message'   => 'Gagal batalkan pembayaran karena tidak ada datanya'
@@ -413,14 +411,14 @@ class ProcessController extends Controller
                     if (!empty($cekPembayaran1) or !empty($cekPembayaran2)) {
                         $catatan .= "Perubahan Tanggal Pembayaran:";
                         if (!empty($cekPembayaran1)) {
-                            $tgl_sebelumnya = explode(" ",$cekPembayaran1->paid_at)[0];
+                            $tgl_sebelumnya = explode(" ", $cekPembayaran1->paid_at)[0];
                             if ($tgl_sebelumnya !== $request->tgl_terima) {
                                 $catatan .= "<br>- Tgl Terima Dari Bank:
-                                <br> ". Functions::tgl_indo($tgl_sebelumnya) . " Menjadi " . Functions::tgl_indo($request->tgl_terima);
-                                $cekPembayaran1->update(['paid_at'=>$request->tgl_terima]);
+                                <br> " . Functions::tgl_indo($tgl_sebelumnya) . " Menjadi " . Functions::tgl_indo($request->tgl_terima);
+                                $cekPembayaran1->update(['paid_at' => $request->tgl_terima]);
                             }
                         }
-                        
+
                         if (!empty($cekPembayaran2)) {
                             $tgl_sebelumnya = explode(" ", $cekPembayaran2->paid_at)[0];
                             if ($tgl_sebelumnya !== $request->tgl_bayar) {
@@ -441,7 +439,7 @@ class ProcessController extends Controller
                         'message'   => 'Berhasil merubah tanggal pembayaran atas Nomor Transaksi ' . $transaksi->transid,
                         'data'      => $transaksi,
                     ], 200);
-    
+
                 default:
                     return response()->json([
                         'message'   => 'Gagal, Kesalahan Method'
@@ -503,6 +501,55 @@ class ProcessController extends Controller
                     'visible_by'    => '{"broker","insurance","finance"}',
                     'ukuran_file'   => $invoiceSize / 1000000,
                     'lokasi_file'   => $pathInvoice,
+                    'created_by'    => Auth::user()->id,
+                ]);
+
+                $transaksi->update($update);
+                $this->aktifitas($request->transid, '8', 'Asuransi mengunggah E-Polis');
+                return response()->json([
+                    'message'   => 'E-Polis dan Invoice berhasil diunggah',
+                ], 200);
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
+    }
+
+    public function endorsement(Request $request)
+    {
+        switch ($request->method) {
+            case 'store':
+                $request->validate([
+                    'cover_note' => 'required',
+                    'nopolis'    => 'required',
+                    'transid'    => 'required',
+                    'endorsement' => 'required|mimes:pdf|max:20480',
+                ]);
+                $transaksi  = Transaksi::find($request->transid);
+                $asuransi   = Asuransi::find($transaksi->id_asuransi);
+                $update = [
+                    'id_status' => 8
+                ];
+
+                $endorsement        = $request->file('polis');
+                $endorsementExt     = $endorsement->extension();
+                $endorsementSize    = $endorsement->getSize();
+                $fileEndorsement    = "Endorsement_" . $asuransi->akronim . "-" . $request->transid;
+                $path               = 'public/files/' . $request->transid;
+                if (!is_dir($path)) {
+                    mkdir($path, 0777, TRUE);
+                }
+
+                $path   = $endorsement->move($path, $fileEndorsement . "." . $endorsementExt);
+                Document::create([
+                    'id_transaksi'  => $request->transid,
+                    'nama_file'     => $fileEndorsement,
+                    'tipe_file'     => $endorsementExt,
+                    'jenis_file'    => "ENDORSEMENT",
+                    'ukuran_file'   => $endorsementSize / 1000000,
+                    'lokasi_file'   => $path,
                     'created_by'    => Auth::user()->id,
                 ]);
 
@@ -691,7 +738,7 @@ class ProcessController extends Controller
                                 'cif'               => $request->cif,
                                 'id_insured'        => $insured->id,
                                 'plafond_kredit'    => round($request->plafond_kredit, 2),
-                                'outstanding_kredit'=> round($request->outstanding_kredit, 2),
+                                'outstanding_kredit' => round($request->outstanding_kredit, 2),
                                 'policy_parent'     => $request->nopolis_lama,
                                 'polis_start'       => $request->polis_start,
                                 'polis_end'         => $request->polis_end,
@@ -871,20 +918,20 @@ class ProcessController extends Controller
                             $update = [
                                 'id_okupasi'    => NULL,
                             ];
-                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans',[1,3,4,5,6,7,8,9])->update(['value'=>0]);
+                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans', [1, 3, 4, 5, 6, 7, 8, 9])->update(['value' => 0]);
                         }
                         break;
 
                     case 'checker':
                         // PENDING
                         $status = 0;
-                        
+
                         // DISETUJUI ASURANSI
                         if ($transaksi->id_status == 4) {
                             $update = [
                                 'id_okupasi'    => NULL,
                             ];
-                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans',[1,3,4,5,6,7,8,9])->update(['value'=>0]);
+                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans', [1, 3, 4, 5, 6, 7, 8, 9])->update(['value' => 0]);
                         }
                         break;
 
@@ -897,8 +944,8 @@ class ProcessController extends Controller
                         // DISETUJUI -> TERTUNDA
                         if ($transaksi->id_status == "2") {
                             $status = 1;
-                        
-                        // PENGECEKAN POLIS -> MENUNGGU E-POLIS
+
+                            // PENGECEKAN POLIS -> MENUNGGU E-POLIS
                         } else if ($transaksi->id_status == "8") {
                             $status = 7;
                         }
@@ -1172,10 +1219,11 @@ class ProcessController extends Controller
 
         return $cabang;
     }
-	
-	public function cekGagalBayar() {
-        
-        $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`billing_at`) > 30')->where('id_status','<','7');
+
+    public function cekGagalBayar()
+    {
+
+        $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`billing_at`) > 30')->where('id_status', '<', '7');
         foreach ($transaksi->get() as $row) {
             $this->aktifitas($row->transid, 18, "Pembayaran tidak diterima BDS selama 30 hari. Covernote Dibatalkan.", "1");
             // echo $row->transid;
