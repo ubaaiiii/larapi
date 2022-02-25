@@ -519,55 +519,6 @@ class ProcessController extends Controller
         }
     }
 
-    public function endorsement(Request $request)
-    {
-        switch ($request->method) {
-            case 'store':
-                $request->validate([
-                    'cover_note' => 'required',
-                    'nopolis'    => 'required',
-                    'transid'    => 'required',
-                    'endorsement'=> 'required|mimes:pdf|max:20480',
-                ]);
-                $transaksi  = Transaksi::find($request->transid);
-                $asuransi   = Asuransi::find($transaksi->id_asuransi);
-                $update = [
-                    'id_status' => 8
-                ];
-
-                $endorsement        = $request->file('polis');
-                $endorsementExt     = $endorsement->extension();
-                $endorsementSize    = $endorsement->getSize();
-                $fileEndorsement    = "Endorsement_" . $asuransi->akronim . "-" . $request->transid;
-                $path               = 'public/files/' . $request->transid;
-                if (!is_dir($path)) {
-                    mkdir($path, 0777, TRUE);
-                }
-
-                $path   = $endorsement->move($path, $fileEndorsement . "." . $endorsementExt);
-                Document::create([
-                    'id_transaksi'  => $request->transid,
-                    'nama_file'     => $fileEndorsement,
-                    'tipe_file'     => $endorsementExt,
-                    'jenis_file'    => "ENDORSEMENT",
-                    'ukuran_file'   => $endorsementSize / 1000000,
-                    'lokasi_file'   => $path,
-                    'created_by'    => Auth::user()->id,
-                ]);
-
-                $transaksi->update($update);
-                $this->aktifitas($request->transid, '8', 'Asuransi mengunggah E-Polis');
-                return response()->json([
-                    'message'   => 'E-Polis dan Invoice berhasil diunggah',
-                ], 200);
-                break;
-
-            default:
-                abort(404);
-                break;
-        }
-    }
-
     public function pengajuan(Request $request)
     {
         return $request->all();

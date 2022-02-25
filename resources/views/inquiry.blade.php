@@ -121,11 +121,6 @@
                                     <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Upload E-Polis
                                 </a>
-                                <a class="ps-endorsement flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
-                                    style="cursor:pointer">
-                                    <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
-                                    Upload Endorsement
-                                </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                     style="cursor:pointer">
@@ -280,57 +275,6 @@
                             <label for="invoice" class="form-label">Upload Invoice</label>
                             <input id="invoice" type="file" name="invoice" class="form-control" accept="application/pdf"
                                 required>
-                        </div>
-                    </div>
-                    <!-- END: Modal Body -->
-                    <!-- BEGIN: Modal Footer -->
-                    <div class="modal-footer text-right">
-                        <button type="button" data-dismiss="modal"
-                            class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
-                        <button type="submit" class="btn btn-primary w-20">Send</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-endorsement" class="modal" data-backdrop="static" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <!-- BEGIN: Modal Header -->
-                <form id="frm-endorsement">
-                    @csrf
-                    <div class="modal-header">
-                        <h2 class="font-medium text-base mr-auto">
-                            Upload Endorsement (Tanpa Perubahan Premi)
-                        </h2>
-                    </div>
-                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="transid" class="form-label">Nomor Transaksi</label>
-                            <input id="transid" type="text" class="form-control" readonly>
-                            <input type="hidden" name="transid" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="nama_insured" class="form-label">Nama Tertanggung</label>
-                            <input id="nama_insured" name="nama_insured" type="text" class="form-control" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="cover_note" class="form-label">Cover Note</label>
-                            <input id="cover_note" name="cover_note" type="text" class="form-control" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="nopolis" class="form-label">Nomor Polis</label>
-                            <input id="nopolis" name="nopolis" type="text" class="form-control" readonly>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="endorsement" class="form-label">Upload Endorsement</label>
-                            <input id="endorsement" type="file" name="endorsement" class="form-control" accept="application/pdf"
-                                required>
-                        </div>
-                        <div class="col-span-12 sm:col-span-6">
-                            <label for="catatan" class="form-label">Catatan</label>
-                            <textarea id="catatan" name="catatan" class="form-control"></textarea>
                         </div>
                     </div>
                     <!-- END: Modal Body -->
@@ -581,6 +525,14 @@
                 });
             });
 
+            $('.ps-polis').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({
+                    selected: true
+                }).data()[2];
+
+            });
+
             cash('#modal-bayar').on('hidden.bs.modal', function() {
                 console.log('tutup');
             });
@@ -610,35 +562,7 @@
                         console.log('d', d);
                     },
                 });
-            });
-
-            $('.ps-endorsement').click(function(e) {
-                e.preventDefault();
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[2];
-                $.ajax({
-                    url: "{{ url('api/caritransaksi') }}",
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                    },
-                    type: "GET",
-                    data: {
-                        transid
-                    },
-                    success: function(d) {
-                        $('#frm-endorsement #transid').val(d.transaksi.transid);
-                        $('#frm-endorsement [name="transid"]').val(d.transaksi.transid);
-                        $('#frm-endorsement #nama_insured').val(d.insured.nama_insured);
-                        $('#frm-endorsement #cover_note').val(d.transaksi.cover_note);
-                        $('#frm-endorsement #nopolis').val(d.transaksi.policy_no);
-                        cash('#modal-endorsement').modal('show');
-                    },
-                    error: function(d) {
-                        console.log('d', d);
-                    },
-                });
-            });
+            })
 
             $('#frm-bayar').submit(function(e) {
                 e.preventDefault();
@@ -692,7 +616,7 @@
                 e.preventDefault();
                 var data = new FormData(this);
                 data.append("method", "store");
-                // console.log('data', data);
+                console.log('data', data);
                 $.ajax({
                     url: "{{ url('api/polis') }}",
                     headers: {
@@ -724,45 +648,7 @@
                         );
                     },
                 });
-            });
-
-            $('#frm-endorsement').submit(function(e) {
-                e.preventDefault();
-                var data = new FormData(this);
-                data.append("method", "store");
-                // console.log('data', data);
-                $.ajax({
-                    url: "{{ url('api/endorsement') }}",
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    },
-                    data: data,
-                    type: "POST",
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function(d) {
-                        reloadTable();
-                        $('#frm-polis').trigger('reset');
-                        console.log(d);
-                        Swal.fire(
-                            'Berhasil!',
-                            d.message,
-                            'success'
-                        ).then(function() {
-                            cash('#modal-polis').modal('hide');
-                        });
-                    },
-                    error: function(d) {
-                        console.log(d);
-                        Swal.fire(
-                            'Gagal!',
-                            d.message,
-                            'error'
-                        );
-                    },
-                });
-            });
+            })
 
             $('#ps-hapus').click(function(e) {
                 e.preventDefault();
