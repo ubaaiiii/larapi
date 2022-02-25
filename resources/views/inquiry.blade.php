@@ -25,16 +25,16 @@
                 </select>
             </div>
             <div class="dropdown ml-3 mt-3 sm:mt-0 sm:ml-auto md:ml-3 mr-3">
-                <button id="btn-proses" class="dropdown-toggle btn btn-primary" aria-expanded="false" disabled><i
-                        data-feather="settings" class="w-4 h-4 dark:text-gray-300 mr-2"></i>
-                    Proses</button>
+                <button id="btn-proses" class="dropdown-toggle btn btn-primary" aria-expanded="false" disabled>
+                    <i class="fa fa-cog w-4 h-4 dark:text-gray-300 mr-2"></i>Proses
+                </button>
                 <div class="proses dropdown-menu w-56">
                     <div class="dropdown-menu__content box dark:bg-dark-1">
                         <div class="p-2">
                             <a id="ps-lihat"
                                 class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                 style="cursor:pointer">
-                                <i data-feather="search" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                <i class="fa fa-search w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                 Lihat 
                             </a>
                             @role('maker|checker|adm')
@@ -46,79 +46,84 @@
                                 </a> --}}
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                     style="cursor:pointer">
-                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ajukan
                                 </a>
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
                                     style="cursor:pointer">
-                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
                                 <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-10"
                                     style="cursor:pointer">
-                                    <i data-feather="refresh-cw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-sync-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Perpanjang
+                                </a>
+                                <a class="ps-klaim flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-10"
+                                    style="cursor:pointer">
+                                    <i class="fa fa-exclamation-circle w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Klaim
                                 </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
                                     style="cursor:pointer">
-                                    <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Batal Mengajukan
                                 </a>
                                 <a id="ps-hapus"
                                     class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
                                     style="cursor:pointer">
-                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-trash-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Hapus
                                 </a>
                             @endrole
                             @role('approver|adm')
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
                                     style="cursor:pointer">
-                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
                                     style="cursor:pointer">
-                                    <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
                                 </a>
                             @endrole
                             @role('broker|adm')
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
                                     style="cursor:pointer">
-                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Verifikasi
                                 </a>
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-8"
                                     style="cursor:pointer">
-                                    <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-edit w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Cek Polis
                                 </a>
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
                                     style="cursor:pointer">
-                                    <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
                                 </a>
                             @endrole
                             @role('finance|adm')
                                 <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
                                     style="cursor:pointer">
-                                    <i data-feather="edit-3" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-edit w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Input Pembayaran
                                 </a>
                                 @endrole
                             @role('insurance|adm')
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                     style="cursor:pointer">
-                                    <i data-feather="check-square" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
                                 <a class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
                                     style="cursor:pointer">
-                                    <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-upload w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Upload E-Polis
                                 </a>
                                 <a class="ps-endorsement flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
@@ -129,7 +134,7 @@
                                 <a id="ps-rollback"
                                     class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
                                     style="cursor:pointer">
-                                    <i data-feather="rotate-ccw" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
                                 </a>
                             @endrole
@@ -139,7 +144,7 @@
                                 <a id="ps-invoice"
                                     class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                     style="cursor:pointer">
-                                    <i data-feather="file-text" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    <i class="fa fa-file-download w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Invoice
                                 </a>
                             </div>
@@ -515,10 +520,18 @@
 
             $('#ps-lihat').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[2];
-                window.open("{{ url('pengajuan') }}/" + transid);
+                if ($('.selected').length > 0) {
+                    var transid = tablenya.row({
+                        selected: true
+                    }).data()[2];
+                    window.open("{{ url('pengajuan') }}/" + transid);
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             $('#frm').submit(function() {
@@ -527,20 +540,36 @@
 
             $('.ps-approve').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[2];
-                $('#frm-method').val('approve');
-                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
+                if ($('.selected').length > 0) {
+                    var transid = tablenya.row({
+                        selected: true
+                    }).data()[2];
+                    $('#frm-method').val('approve');
+                    $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             $('.ps-renewal').click(function(e) {
                 e.preventDefault();
+                if ($('.selected').length > 0) {
                 var transid = tablenya.row({
                     selected: true
                 }).data()[2];
                 $('#frm-method').val('renewal');
-                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
+                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit(); 
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             // $('#ps-ubah').click(function(e) {
@@ -554,31 +583,39 @@
 
             $('.ps-bayar').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[2];
-                $.ajax({
-                    url: "{{ url('api/caritransaksi') }}",
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                    },
-                    type: "GET",
-                    data: {
-                        transid
-                    },
-                    success: function(d) {
-                        $('#frm-bayar #transid').val(d.transaksi.transid);
-                        $('#frm-bayar [name="transid"]').val(d.transaksi.transid);
-                        $('#frm-bayar #nama_insured').val(d.insured.nama_insured);
-                        $('#frm-bayar #cover_note').val(d.transaksi.cover_note);
-                        $('#frm-bayar #tagihan').val(d.pricing[18].value);
-                        $('.masked').trigger('keyup');
-                        cash('#modal-bayar').modal('show');
-                    },
-                    error: function(d) {
-                        console.log('d', d);
-                    },
-                });
+                if ($('.selected').length > 0) {
+                    var transid = tablenya.row({
+                        selected: true
+                    }).data()[2];
+                    $.ajax({
+                        url: "{{ url('api/caritransaksi') }}",
+                        headers: {
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        },
+                        type: "GET",
+                        data: {
+                            transid
+                        },
+                        success: function(d) {
+                            $('#frm-bayar #transid').val(d.transaksi.transid);
+                            $('#frm-bayar [name="transid"]').val(d.transaksi.transid);
+                            $('#frm-bayar #nama_insured').val(d.insured.nama_insured);
+                            $('#frm-bayar #cover_note').val(d.transaksi.cover_note);
+                            $('#frm-bayar #tagihan').val(d.pricing[18].value);
+                            $('.masked').trigger('keyup');
+                            cash('#modal-bayar').modal('show');
+                        },
+                        error: function(d) {
+                            console.log('d', d);
+                        },
+                    });
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             cash('#modal-bayar').on('hidden.bs.modal', function() {
@@ -587,29 +624,37 @@
 
             $('.ps-polis').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[2];
-                $.ajax({
-                    url: "{{ url('api/caritransaksi') }}",
-                    headers: {
-                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
-                    },
-                    type: "GET",
-                    data: {
-                        transid
-                    },
-                    success: function(d) {
-                        $('#frm-polis #transid').val(d.transaksi.transid);
-                        $('#frm-polis [name="transid"]').val(d.transaksi.transid);
-                        $('#frm-polis #nama_insured').val(d.insured.nama_insured);
-                        $('#frm-polis #cover_note').val(d.transaksi.cover_note);
-                        cash('#modal-polis').modal('show');
-                    },
-                    error: function(d) {
-                        console.log('d', d);
-                    },
-                });
+                if ($('.selected').length > 0) {
+                    var transid = tablenya.row({
+                        selected: true
+                    }).data()[2];
+                    $.ajax({
+                        url: "{{ url('api/caritransaksi') }}",
+                        headers: {
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        },
+                        type: "GET",
+                        data: {
+                            transid
+                        },
+                        success: function(d) {
+                            $('#frm-polis #transid').val(d.transaksi.transid);
+                            $('#frm-polis [name="transid"]').val(d.transaksi.transid);
+                            $('#frm-polis #nama_insured').val(d.insured.nama_insured);
+                            $('#frm-polis #cover_note').val(d.transaksi.cover_note);
+                            cash('#modal-polis').modal('show');
+                        },
+                        error: function(d) {
+                            console.log('d', d);
+                        },
+                    });
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             $('.ps-endorsement').click(function(e) {
@@ -642,88 +687,104 @@
 
             $('#frm-bayar').submit(function(e) {
                 e.preventDefault();
-                var data = $(this).serializeArray(),
-                    paid = data[6].value,
-                    tagihan = data[5].value;
-                data.push({
-                    name: "method",
-                    value: "bank"
-                });
-                console.log(data);
-                if (paid == tagihan) {
-                    $.ajax({
-                        url: "{{ url('api/pembayaran') }}",
-                        data: data,
-                        type: "POST",
-                        dataType: "JSON",
-                        success: function(d) {
-                            console.log(d);
-                            Swal.fire(
-                                'Berhasil!',
-                                d.message,
-                                'success'
-                            );
-                            $(':input', '#frm-bayar')
-                                .not(':button, :submit, :reset, :hidden')
-                                .val('');
-                            $('#tgl_bayar').val("{{ date('Y-m-d') }}");
-                            cash('#modal-bayar').modal('hide');
-                            reloadTable();
-                        },
-                        error: function(d) {
-                            console.log(d.responseJSON);
-                            Swal.fire(
-                                'Gagal!',
-                                d.responseJSON.message,
-                                'error'
-                            );
-                        },
+                if ($('.selected').length > 0) {
+                    var data = $(this).serializeArray(),
+                        paid = data[6].value,
+                        tagihan = data[5].value;
+                    data.push({
+                        name: "method",
+                        value: "bank"
                     });
+                    console.log(data);
+                    if (paid == tagihan) {
+                        $.ajax({
+                            url: "{{ url('api/pembayaran') }}",
+                            data: data,
+                            type: "POST",
+                            dataType: "JSON",
+                            success: function(d) {
+                                console.log(d);
+                                Swal.fire(
+                                    'Berhasil!',
+                                    d.message,
+                                    'success'
+                                );
+                                $(':input', '#frm-bayar')
+                                    .not(':button, :submit, :reset, :hidden')
+                                    .val('');
+                                $('#tgl_bayar').val("{{ date('Y-m-d') }}");
+                                cash('#modal-bayar').modal('hide');
+                                reloadTable();
+                            },
+                            error: function(d) {
+                                console.log(d.responseJSON);
+                                Swal.fire(
+                                    'Gagal!',
+                                    d.responseJSON.message,
+                                    'error'
+                                );
+                            },
+                        });
+                    } else {
+                        Swal.fire(
+                            'Gagal!',
+                            'Nominal yang dibayar tidak sesuai dengan tagihan premi',
+                            'error'
+                        );
+                    }
                 } else {
                     Swal.fire(
-                        'Gagal!',
-                        'Nominal yang dibayar tidak sesuai dengan tagihan premi',
-                        'error'
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
                     );
                 }
             });
 
             $('#frm-polis').submit(function(e) {
                 e.preventDefault();
-                var data = new FormData(this);
-                data.append("method", "store");
-                // console.log('data', data);
-                $.ajax({
-                    url: "{{ url('api/polis') }}",
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    },
-                    data: data,
-                    type: "POST",
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function(d) {
-                        reloadTable();
-                        $('#frm-polis').trigger('reset');
-                        console.log(d);
-                        Swal.fire(
-                            'Berhasil!',
-                            d.message,
-                            'success'
-                        ).then(function() {
-                            cash('#modal-polis').modal('hide');
-                        });
-                    },
-                    error: function(d) {
-                        console.log(d);
-                        Swal.fire(
-                            'Gagal!',
-                            d.message,
-                            'error'
-                        );
-                    },
-                });
+                if ($('.selected').length > 0) {
+                    var data = new FormData(this);
+                    data.append("method", "store");
+                    // console.log('data', data);
+                    $.ajax({
+                        url: "{{ url('api/polis') }}",
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        },
+                        data: data,
+                        type: "POST",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function(d) {
+                            reloadTable();
+                            $('#frm-polis').trigger('reset');
+                            console.log(d);
+                            Swal.fire(
+                                'Berhasil!',
+                                d.message,
+                                'success'
+                            ).then(function() {
+                                cash('#modal-polis').modal('hide');
+                            });
+                        },
+                        error: function(d) {
+                            console.log(d);
+                            Swal.fire(
+                                'Gagal!',
+                                d.message,
+                                'error'
+                            );
+                        },
+                    });
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             $('#frm-endorsement').submit(function(e) {
@@ -766,140 +827,165 @@
 
             $('#ps-hapus').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({
-                        selected: true
-                    }).data()[2],
-                    _token = "{{ csrf_token() }}",
-                    method = "delete";
-                Swal.fire({
-                    title: 'Yakin ingin hapus?',
-                    html: "Data <b>" + transid + "</b> tidak akan dapat dikembalikan.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    // confirmButtonColor: '#1C3FAA',
-                    // cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Tidak!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Masukan Alasan Menghapus Data',
-                            input: 'textarea',
-                            showCancelButton: true,
-                            confirmButtonText: 'Konfirmasi',
-                            cancelButtonText: 'Batal'
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                var catatan = "";
-                                if (result.value) {
-                                    catatan = result.value;
-                                }
-                                $.ajax({
-                                    url: "{{ url('api/pengajuan') }}",
-                                    data: {
-                                        transid,
-                                        _token,
-                                        method,
-                                        catatan
-                                    },
-                                    type: "POST",
-                                    success: function(d) {
-                                        console.log('response :', d);
-                                        d = d.responseJSON;
-                                        Swal.fire(
-                                            'Berhasil!',
-                                            d.message,
-                                            'success'
-                                        ).then(function() {
-                                            reloadTable();
-                                        });
-                                    },
-                                    error: function(d) {
-                                        console.log('response :', d);
-                                        d = d.responseJSON;
-                                        Swal.fire(
-                                            'Gagal!',
-                                            d.message,
-                                            'error'
-                                        );
+                if ($('.selected').length > 0) {
+                    var transid = tablenya.row({
+                            selected: true
+                        }).data()[2],
+                        _token = "{{ csrf_token() }}",
+                        method = "delete";
+                    Swal.fire({
+                        title: 'Yakin ingin hapus?',
+                        html: "Data <b>" + transid + "</b> tidak akan dapat dikembalikan.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        // confirmButtonColor: '#1C3FAA',
+                        // cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Tidak!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Masukan Alasan Menghapus Data',
+                                input: 'textarea',
+                                showCancelButton: true,
+                                confirmButtonText: 'Konfirmasi',
+                                cancelButtonText: 'Batal'
+                            }).then(function(result) {
+                                if (result.isConfirmed) {
+                                    var catatan = "";
+                                    if (result.value) {
+                                        catatan = result.value;
                                     }
-                                });
-                            }
-                        });
-                    }
-                });
+                                    $.ajax({
+                                        url: "{{ url('api/pengajuan') }}",
+                                        data: {
+                                            transid,
+                                            _token,
+                                            method,
+                                            catatan
+                                        },
+                                        type: "POST",
+                                        success: function(d) {
+                                            console.log('response :', d);
+                                            d = d.responseJSON;
+                                            Swal.fire(
+                                                'Berhasil!',
+                                                d.message,
+                                                'success'
+                                            ).then(function() {
+                                                reloadTable();
+                                            });
+                                        },
+                                        error: function(d) {
+                                            console.log('response :', d);
+                                            d = d.responseJSON;
+                                            Swal.fire(
+                                                'Gagal!',
+                                                d.message,
+                                                'error'
+                                            );
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             $('#ps-rollback').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({
-                        selected: true
-                    }).data()[2],
-                    _token = "{{ csrf_token() }}",
-                    method = "rollback";
-                Swal.fire({
-                    title: 'Apakah Anda Yakin?',
-                    html: "Data <b>" + transid + "</b> akan dikembalikan ke status sebelumnya.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Kembalikan!',
-                    cancelButtonText: 'Tidak!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Catatan Pengembalian',
-                            input: 'textarea',
-                            showCancelButton: true,
-                            confirmButtonText: 'Konfirmasi',
-                            cancelButtonText: 'Batal'
-                        }).then(function(result) {
-                            if (result.isConfirmed) {
-                                var catatan = "";
-                                if (result.value) {
-                                    catatan = result.value;
-                                }
-                                $.ajax({
-                                    url: "{{ url('api/pengajuan') }}",
-                                    data: {
-                                        transid,
-                                        _token,
-                                        method,
-                                        catatan
-                                    },
-                                    type: "POST",
-                                    success: function(d) {
-                                        console.log('response :', d);
-                                        Swal.fire(
-                                            'Berhasil!',
-                                            d.message,
-                                            'success'
-                                        ).then(function() {
-                                            reloadTable();
-                                        });
-                                    },
-                                    error: function(d) {
-                                        console.log('response :', d);
-                                        Swal.fire(
-                                            'Gagal!',
-                                            d.message,
-                                            'error'
-                                        );
+                if ($('.selected').length > 0) {
+                    var transid = tablenya.row({
+                            selected: true
+                        }).data()[2],
+                        _token = "{{ csrf_token() }}",
+                        method = "rollback";
+                    Swal.fire({
+                        title: 'Apakah Anda Yakin?',
+                        html: "Data <b>" + transid + "</b> akan dikembalikan ke status sebelumnya.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Kembalikan!',
+                        cancelButtonText: 'Tidak!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Catatan Pengembalian',
+                                input: 'textarea',
+                                showCancelButton: true,
+                                confirmButtonText: 'Konfirmasi',
+                                cancelButtonText: 'Batal'
+                            }).then(function(result) {
+                                if (result.isConfirmed) {
+                                    var catatan = "";
+                                    if (result.value) {
+                                        catatan = result.value;
                                     }
-                                });
-                            }
-                        });
-                    }
-                });
+                                    $.ajax({
+                                        url: "{{ url('api/pengajuan') }}",
+                                        data: {
+                                            transid,
+                                            _token,
+                                            method,
+                                            catatan
+                                        },
+                                        type: "POST",
+                                        success: function(d) {
+                                            console.log('response :', d);
+                                            Swal.fire(
+                                                'Berhasil!',
+                                                d.message,
+                                                'success'
+                                            ).then(function() {
+                                                reloadTable();
+                                            });
+                                        },
+                                        error: function(d) {
+                                            console.log('response :', d);
+                                            Swal.fire(
+                                                'Gagal!',
+                                                d.message,
+                                                'error'
+                                            );
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
             $('#ps-invoice').click(function(e) {
                 e.preventDefault();
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[2];
-                window.open("{{ url('cetak_invoice') }}/" + transid);
+                if ($('.selected').length > 0) {
+                    var transid = tablenya.row({
+                        selected: true
+                    }).data()[2];
+                    window.open("{{ url('cetak_invoice') }}/" + transid);
+                } else {
+                    Swal.fire(
+                        'Perhatian',
+                        'Harap memilih data sebelum klik proses!',
+                        'info'
+                    );
+                }
             });
 
+            // menyembunyikan dropdown setelah diklik
             $('a').click(function() {
                 $('#text-inquiry').click();
             })

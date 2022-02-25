@@ -202,51 +202,58 @@ class LaporanController extends Controller
                 break;
 
             case '4':
-                // Laporan Pembatalan
+                // Laporan Pembatalan Pengajuan
                 $select = [
-                    'nopinjaman         AS "Nomor Pinjaman"',
-                    'nama_insured       AS "Tertanggung"',
-                    'alamat_insured     AS "Alamat Tertanggung"',
-                    'nama_cabang        AS "Cabang KB Bukopin"',
-                    'plafond_kredit     AS "Plafond"',
-                    'cover_note         AS "Covernote"',
-                    'policy_no          AS "Nomor Polis"',
-                    'instype_name       AS "Tipe Asuransi"',
-                    'polis_start        AS "Polis Mulai"',
-                    'polis_end          AS "Polis Selesai"',
-                    'nama_okupasi       AS "Okupasi"',
-                    'location           AS "Lokasi Okupasi"',
-                    'tsi.value          AS "Nilai Pertanggungan"',
-                    'premi.value        AS "Premium"',
-                    'sts.msdesc         AS "Status"',
+                    'transaksi.created_at   AS "Tanggal Produksi"',
+                    'transid                AS "Nomor Transaksi"',
+                    'cif                    AS "CIF"',
+                    'nopinjaman             AS "Nomor Pinjaman"',
+                    'nama_cabang            AS "Cabang KB Bukopin"',
+                    'cover_note             AS "Covernote"',
+                    'nama_insured           AS "Nama Tertanggung"',
+                    'nama_asuransi          AS "Asuransi"',
+                    'nama_okupasi           AS "Okupasi"',
+                    'location               AS "Lokasi Okupasi"',
+                    'instype_name           AS "Tipe Asuransi"',
+                    'tsi.value              AS "Nilai Pertanggungan"',
+                    'tag_premi.value        AS "TAG Premi"',
+                    'polis_start            AS "Polis Mulai"',
+                    'polis_end              AS "Polis Selesai"',
+                    'sts.msdesc             AS "Status"',
+                    'catatan                AS "Catatan"',
                 ];
                 if (!empty($request->dtable)) {
+                    $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end])
+                        ->whereIn('transaksi.id_status', ['12','13','18']);
+
                     $column = [
+                        'transaksi.created_at',
                         'transid',
                         'cif',
                         'nopinjaman',
-                        'nama_insured',
-                        'alamat_insured',
                         'nama_cabang',
-                        'plafond_kredit',
                         'cover_note',
-                        'policy_no',
-                        'instype_name',
-                        'polis_start',
-                        'polis_end',
+                        'nama_insured',
+                        'nama_asuransi',
                         'nama_okupasi',
                         'location',
+                        'instype_name',
                         'tsi.value',
-                        'premi.value',
+                        'tag_premi.value',
+                        'polis_start',
+                        'polis_end',
                         'sts.msdesc',
+                        'catatan',
                     ];
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
+                        ['okupasi', 'id_okupasi = okupasi.id'],
+                        ['asuransi', 'id_asuransi = asuransi.id'],
                         ['instype', 'id_instype = instype.id'],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
-                        ['transaksi_pricing AS premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+                        ['transaksi_pricing AS tag_premi', ['transid = tag_premi.id_transaksi', 'tag_premi.id_kodetrans = 18']],
                     ];
                 }
                 break;
@@ -299,52 +306,44 @@ class LaporanController extends Controller
             case '6':
                 // Laporan Klaim Reject
                 $select = [
-                    'act.created_at         AS "Tanggal Penolakan"',
+                    'transaksi.created_at   AS "Tanggal Produksi"',
                     'transid                AS "Nomor Transaksi"',
                     'cif                    AS "CIF"',
                     'nopinjaman             AS "Nomor Pinjaman"',
-                    'nama_insured           AS "Tertanggung"',
-                    'alamat_insured         AS "Alamat Tertanggung"',
                     'nama_cabang            AS "Cabang KB Bukopin"',
-                    'nama_asuransi          AS "Asuransi"',
-                    'plafond_kredit         AS "Plafond"',
                     'cover_note             AS "Covernote"',
-                    'policy_no              AS "Nomor Polis"',
-                    'instype_name           AS "Tipe Asuransi"',
-                    'polis_start            AS "Polis Mulai"',
-                    'polis_end              AS "Polis Selesai"',
+                    'nama_insured           AS "Nama Tertanggung"',
+                    'nama_asuransi          AS "Asuransi"',
                     'nama_okupasi           AS "Okupasi"',
                     'location               AS "Lokasi Okupasi"',
+                    'instype_name           AS "Tipe Asuransi"',
                     'tsi.value              AS "Nilai Pertanggungan"',
-                    'premi.value            AS "Premium"',
-                    'sts.msdesc             AS "Status"',
-                    'act.deskripsi          AS "Catatan"',
+                    'tag_premi.value        AS "TAG Premi"',
+                    'polis_start            AS "Polis Mulai"',
+                    'polis_end              AS "Polis Selesai"',
+                    'catatan                AS "Catatan"',
                 ];
                 if (!empty($request->dtable)) {
-                    $table->whereBetween('act.created_at', [$request->periode_start, $request->periode_end])
-                        ->where('transaksi.id_status', '=', '6');
+                    $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end])
+                        ->where('transaksi.id_status', '=', '24');
 
                     $column = [
-                        'act.created_at',
+                        'transaksi.created_at',
                         'transid',
                         'cif',
                         'nopinjaman',
-                        'nama_insured',
-                        'alamat_insured',
                         'nama_cabang',
-                        'nama_asuransi',
-                        'plafond_kredit',
                         'cover_note',
-                        'policy_no',
-                        'instype_name',
-                        'polis_start',
-                        'polis_end',
+                        'nama_insured',
+                        'nama_asuransi',
                         'nama_okupasi',
                         'location',
+                        'instype_name',
                         'tsi.value',
-                        'premi.value',
-                        'sts.msdesc',
-                        'act.deskripsi'
+                        'tag_premi.value',
+                        'polis_start',
+                        'polis_end',
+                        'catatan',
                     ];
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
@@ -353,9 +352,8 @@ class LaporanController extends Controller
                         ['instype', 'id_instype = instype.id'],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
-                        ['activities AS act', ['transid = act.id_transaksi', 'act.id_status = 6']],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
-                        ['transaksi_pricing AS premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
+                        ['transaksi_pricing AS tag_premi', ['transid = tag_premi.id_transaksi', 'tag_premi.id_kodetrans = 18']],
                     ];
                 }
                 break;

@@ -101,7 +101,7 @@ class DataController extends Controller
     {
         // return $request->all();
         $okupasi = Okupasi::select('id', 'kode_okupasi', 'nama_okupasi', 'rate');
-        // ->where('instype', $request->instype);
+            // ->where('instype', $request->instype);
         if (!empty($request->search)) {
             $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
                 ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
@@ -255,9 +255,9 @@ class DataController extends Controller
             case 'adm':
                 $statPengajuan  = "0,1";
                 break;
-
+            
             default:
-
+                
                 break;
         }
         $query = "  SELECT
@@ -281,7 +281,6 @@ class DataController extends Controller
 
     public function dataTransaksi(Request $request)
     {
-        // return $request->server('SERVER_NAME');
         // sorting column datatables
         $columns = [
             'kode_okupasi',
@@ -340,12 +339,12 @@ class DataController extends Controller
                     $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 }
                 break;
-
+                
             case 'broker':
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
                     $table->join('cabang as cbg_broker', function ($q) {
                         $q->on('cbg_broker.id', '=', 'transaksi.id_cabang')
-                            ->where('cbg_broker.id_broker', '=', Auth::user()->id);
+                        ->where('cbg_broker.id_broker', '=', Auth::user()->id);
                     });
                 }
                 break;
@@ -398,24 +397,24 @@ class DataController extends Controller
                         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
                             ->where('pmby.paid_type', '=', "PD01")
                             ->whereNull('pmby.deleted_at');
-                    });
+                        });
                     $table->leftJoin('transaksi_pembayaran as pmby2', function ($q) use ($user) {
                         $q->on('transaksi.transid', '=', 'pmby2.id_transaksi')
                             ->where('pmby2.paid_type', '=', "PD02")
                             ->whereNull('pmby2.deleted_at');
-                    });
+                        });
                     $table->whereNotNull('pmby.id_transaksi')
-                        ->whereNull('pmby2.id_transaksi');
+                          ->whereNull('pmby2.id_transaksi');
                     break;
-
+                        
                 case 'dibayar broker':
                     $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
                         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                            ->where('pmby.paid_type', '=', "PD02")
-                            ->whereNull('pmby.deleted_at');
+                        ->where('pmby.paid_type', '=', "PD02")
+                        ->whereNull('pmby.deleted_at');
                     });
                     $table->whereNotNull('pmby.id_transaksi')
-                        ->whereRaw('transaksi.id_status < 9');
+                          ->whereRaw('transaksi.id_status < 9');
                     break;
 
                 case 'polis siap':
@@ -480,7 +479,7 @@ class DataController extends Controller
             "sql"             => $query[3]
         ], 200);
     }
-
+    
     public function dataPembayaran(Request $request)
     {
         // sorting column datatables
@@ -877,7 +876,7 @@ class DataController extends Controller
         $table->where('id_transaksi', $request->transid);
         $table->where(function ($q) use ($role) {
             $q->whereNull('visible_by')
-                ->orWhere('visible_by', 'like', '%' . $role . '%');
+              ->orWhere('visible_by', 'like', '%' . $role . '%');
         });
         $table->whereNull('documents.deleted_at');
 
@@ -1036,7 +1035,7 @@ class DataController extends Controller
                 ->whereRaw($request->premi . " BETWEEN `min_premi` AND `max_premi`")
                 ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`")
                 ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
-
+            
             $data = $config->first();
         } else {
             $data = [

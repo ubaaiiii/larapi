@@ -110,13 +110,13 @@ class ProcessController extends Controller
                         $errors[] = [
                             'email'  => [
                                 'email ' . $request->email . ' telah digunakan, harap menggunakan email lain',
-                            ]
+                                ]
                         ];
                     }
                 }
-
+                
                 $dataUpdate = [];
-
+                
                 if ($request->update_pw === "on") {
                     if ($user->unpass !== $request->old_password) {
                         $ada_error = true;
@@ -137,7 +137,7 @@ class ProcessController extends Controller
                         'email'         => $request->email,
                         'notelp'        => $request->notelp,
                     ];
-
+                    
                     if (in_array($role, ['admin', 'broker'])) {
                         array_merge($dataUpdate, [
                             'id_cabang'     => $request->id_cabang,
@@ -150,13 +150,13 @@ class ProcessController extends Controller
                 if ($ada_error) {
                     return response()->json(['errors' => $errors], 422);
                 }
-
+                
                 if (!empty($request->level)) {
                     $user->syncRoles($request->level);
                 }
                 $user = $user->update($dataUpdate);
-
-
+                
+                
                 return response()->json([
                     'message'   => 'User ' . $request->name . ' Berhasil Diubah',
                     'data'      => $user,
@@ -298,7 +298,7 @@ class ProcessController extends Controller
                         'paid'      => 'required',
                         'tgl_bayar' => 'required',
                     ]);
-
+    
                     $insert = [
                         'id_transaksi'  => $request->transid,
                         'paid_amount'   => $request->paid,
@@ -315,19 +315,19 @@ class ProcessController extends Controller
                             'data'      => $cekPembayaran,
                         ], 400);
                     }
-
+    
                     Pembayaran::create($insert);
                     $transaksi->update(['id_status' => 7]);
 
                     $this->aktifitas($transaksi->transid, '6', 'Pembayaran Premi Diterima Oleh BDS Pada Tanggal: ' . Functions::tgl_indo($request->tgl_bayar));
                     $this->aktifitas($transaksi->transid, '7', 'Menunggu E-Polis untuk diupload oleh Asuransi.');
-
+    
                     return response()->json([
                         'message'   => 'Berhasil input pembayaran atas Nomor Transaksi ' . $transaksi->transid,
                         'data'      => $transaksi,
                     ], 200);
                     break;
-
+    
                 case 'asuransi':
                     $transaksi = $transaksi->first();
                     $request->validate([
@@ -335,7 +335,7 @@ class ProcessController extends Controller
                         'paid'      => 'required',
                         'tgl_bayar' => 'required',
                     ]);
-
+    
                     $insert = [
                         'id_transaksi'  => $request->transid,
                         'paid_amount'   => $request->paid,
@@ -352,13 +352,13 @@ class ProcessController extends Controller
                             'data'      => $cekPembayaran,
                         ], 400);
                     }
-
+    
                     Pembayaran::create($insert);
                     $this->aktifitas($transaksi->transid, '9', 'Premi Dibayarkan Oleh BDS ke Asuransi Pada Tanggal: ' . Functions::tgl_indo($request->tgl_bayar));
 
                     $cetak = new CetakController;
                     $cetak->cetakNotaPembayaran($request->transid);
-
+    
                     return response()->json([
                         'message'   => 'Berhasil input pembayaran atas Nomor Transaksi ' . $transaksi->transid,
                         'data'      => $transaksi,
@@ -418,7 +418,7 @@ class ProcessController extends Controller
                                 $cekPembayaran1->update(['paid_at' => $request->tgl_terima]);
                             }
                         }
-
+                        
                         if (!empty($cekPembayaran2)) {
                             $tgl_sebelumnya = explode(" ", $cekPembayaran2->paid_at)[0];
                             if ($tgl_sebelumnya !== $request->tgl_bayar) {
@@ -439,7 +439,7 @@ class ProcessController extends Controller
                         'message'   => 'Berhasil merubah tanggal pembayaran atas Nomor Transaksi ' . $transaksi->transid,
                         'data'      => $transaksi,
                     ], 200);
-
+    
                 default:
                     return response()->json([
                         'message'   => 'Gagal, Kesalahan Method'
@@ -738,7 +738,7 @@ class ProcessController extends Controller
                                 'cif'               => $request->cif,
                                 'id_insured'        => $insured->id,
                                 'plafond_kredit'    => round($request->plafond_kredit, 2),
-                                'outstanding_kredit' => round($request->outstanding_kredit, 2),
+                                'outstanding_kredit'=> round($request->outstanding_kredit, 2),
                                 'policy_parent'     => $request->nopolis_lama,
                                 'polis_start'       => $request->polis_start,
                                 'polis_end'         => $request->polis_end,
@@ -880,6 +880,11 @@ class ProcessController extends Controller
                 }
 
                 $update['id_status'] = $status;
+                if ($transaksi->catatan == $request->catatan) {
+                    $request->merge([
+                        'catatan' => "",
+                    ]);
+                }
                 $update['catatan'] = $request->catatan;
 
                 $data = Transaksi::where('transid', $request->transid)->update($update);
@@ -944,8 +949,8 @@ class ProcessController extends Controller
                         // DISETUJUI -> TERTUNDA
                         if ($transaksi->id_status == "2") {
                             $status = 1;
-
-                            // PENGECEKAN POLIS -> MENUNGGU E-POLIS
+                        
+                        // PENGECEKAN POLIS -> MENUNGGU E-POLIS
                         } else if ($transaksi->id_status == "8") {
                             $status = 7;
                         }
@@ -962,6 +967,11 @@ class ProcessController extends Controller
                 }
 
                 $catatan = "Dikembalikan.";
+                if ($transaksi->catatan == $request->catatan) {
+                    $request->merge([
+                        'catatan' => "",
+                    ]);
+                }
                 if (!empty($request->catatan)) {
                     $catatan .= " Catatan: " . $request->catatan;
                 }
@@ -1219,8 +1229,8 @@ class ProcessController extends Controller
 
         return $cabang;
     }
-
-    public function cekGagalBayar()
+	
+	public function cekGagalBayar()
     {
 
         $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`billing_at`) > 30')->where('id_status', '<', '7');

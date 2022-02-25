@@ -185,7 +185,7 @@ class PageController extends Controller
         // return $request->all();
         $controller     = new DataController;
         $data = [
-            'data'      => $request,
+            'request'   => $request,
             'columns'   => $controller->dataKlaim($request),
             // 'dataLaporan'   => $dataController->dataLaporan($request),
         ];

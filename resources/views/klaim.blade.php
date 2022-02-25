@@ -3,8 +3,8 @@
 @section('breadcrumb', 'Klaim')
 @section('menu', 'Klaim')
 @section('content')
-{{-- @dd($data) --}}
-@if (empty($data))
+{{-- @dd($request) --}}
+@if (empty($request))
 
 @else
     <div class="intro-y flex items-center mt-4">
@@ -84,7 +84,7 @@
 @section('script')
     <script>
         $(document).ready(function() {
-            @if (empty($data))
+            @if (empty($request))
                 $('select').select2();
                 
                 function judul() {
@@ -122,7 +122,7 @@
                 $('[name="judul"]').val($('#jenis option:selected').text().trim() + " - " + $('#cabang option:selected').text().trim() + " (" + $('#range-periode').val() + ")");
 
             @else
-                $(document).attr("title", "{{ $data->judul }}");
+                $(document).attr("title", "{{ $request->judul }}");
                 var oldExportAction = function (self, e, dt, button, config) {
                     if (button[0].className.indexOf('buttons-excel') >= 0) {
                         if ($.fn.dataTable.ext.buttons.excelHtml5.available(dt, config)) {
@@ -193,12 +193,12 @@
                         data: function(d) {
                             d.search        = $("#DataTables_Table_0_filter label input").val();
                             d._token        = '{{ csrf_token() }}';
-                            d.periode_start = "{{ $data->periode_start }}";
-                            d.periode_end   = "{{ $data->periode_end }}";
-                            d.instype       = "{{ $data->instype }}";
-                            d.cabang        = "{{ $data->cabang }}";
-                            d.asuransi      = "{{ $data->asuransi }}";
-                            d.jenis         = "{{ $data->jenis }}";
+                            d.periode_start = "{{ $request->periode_start }}";
+                            d.periode_end   = "{{ $request->periode_end }}";
+                            d.instype       = "{{ $request->instype }}";
+                            d.cabang        = "{{ $request->cabang }}";
+                            d.asuransi      = "{{ $request->asuransi }}";
+                            d.jenis         = "{{ $request->jenis }}";
                             d.dtable        = true;
                             // console.log('datanya: ', d);
                         },
