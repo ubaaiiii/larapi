@@ -281,6 +281,7 @@ class DataController extends Controller
 
     public function dataTransaksi(Request $request)
     {
+        // return $request->server('SERVER_NAME');
         // sorting column datatables
         $columns = [
             'kode_okupasi',
@@ -581,64 +582,64 @@ class DataController extends Controller
 
             default:
                 $select = [
-                    'transaksi.created_at   AS "Tanggal Dibuat"',
-                    'transid                AS "Nomor Transaksi"',
-                    'cif                    AS "CIF"',
-                    'nopinjaman             AS "Nomor Pinjaman"',
-                    'nama_cabang            AS "Cabang KB Bukopin"',
+                    'id_transaksi           AS "Nomor Transaksi"',
                     'nama_insured           AS "Nama Tertanggung"',
-                    'plafond_kredit         AS "Plafond"',
-                    'outstanding_kredit     AS "Outstanding"',
-                    'alamat_insured         AS "Alamat Tertanggung"',
-                    'nama_okupasi           AS "Okupasi"',
-                    'location               AS "Lokasi Okupasi"',
+                    'nama_cabang            AS "Cabang"',
                     'nama_asuransi          AS "Asuransi"',
-                    'instype_name           AS "Tipe Asuransi"',
-                    'tsi.value              AS "Nilai Pertanggungan"',
-                    'premi.value            AS "Premium"',
-                    'polis_start            AS "Polis Mulai"',
-                    'polis_end              AS "Polis Selesai"',
+                    'tgl_lapor              AS "Tanggal Lapor"',
+                    'tgl_kejadian           AS "Tanggal Kejadian"',
+                    'pic                    AS "PIC"',
+                    'kontak_pic             AS "Kontak PIC"',
+                    'nama_surveyor          AS "Surveyor"',
+                    'nilai_tuntutan         AS "Nilai Tuntutan"',
+                    'nilai_ganti_surveyor   AS "Nilai Surveyor"',
+                    'nilai_yang_disetujui   AS "Nilai Yg Disetujui"',
                     'sts.msdesc             AS "Status"',
-                    'catatan                AS "Catatan"',
+                    'catatan                AS "Catatan"'
                 ];
                 if (!empty($request->dtable)) {
                     // $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end]);
 
                     $column = [
-                        'transaksi.created_at',
-                        'transid',
-                        'cif',
-                        'nopinjaman',
+                        'id_transaksi',
                         'nama_insured',
-                        'alamat_insured',
                         'nama_cabang',
                         'nama_asuransi',
-                        'plafond_kredit',
-                        'cover_note',
-                        'policy_no',
-                        'instype_name',
-                        'polis_start',
-                        'polis_end',
-                        'nama_okupasi',
-                        'location',
-                        'tsi.value',
-                        'premi.value',
+                        'tgl_lapor',
+                        'tgl_kejadian',
+                        'pic',
+                        'kontak_pic',
+                        'nama_surveyor',
+                        'nilai_tuntutan',
+                        'nilai_ganti_surveyor',
+                        'nilai_yang_disetujui',
                         'sts.msdesc',
-                        'catatan',
+                        'catatan"'
                     ];
                     $joins = [
+                        ['transaksi', 'transid = id_transaksi'],
                         ['insured', 'id_insured = insured.id'],
-                        ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', 'id_instype = instype.id'],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
-                        ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
-                        ['transaksi_pricing AS premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
                     ];
                 }
                 // return redirect()->route('logout');
                 break;
+        }
+
+        if (!empty($request->dashKlaim)) {
+            $select = [
+                'tgl_lapor              AS "Tanggal Lapor"',
+                'id_transaksi           AS "Nomor Transaksi"',
+                'tgl_kejadian           AS "Tanggal Kejadian"',
+                'pic                    AS "PIC"',
+                'kontak_pic             AS "Kontak PIC"',
+                'nama_surveyor          AS "Surveyor"',
+                'nilai_tuntutan         AS ""',
+                'nilai_ganti_surveyor',
+                'nilai_yang_disetujui'
+            ];
         }
 
         if (!empty($request->dtable)) {
