@@ -1303,7 +1303,6 @@
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
                     nama_insured = $('#insured option:selected').text(),
                     nama_cabang = $('#cabang option:selected').text();
-                console.log('Masuk Sini');
                 $(this)
                     .attr('disabled',true)
                     .html(loading);
