@@ -1028,13 +1028,13 @@ class DataController extends Controller
 
     public function getBiayaKlausula(Request $request)
     {
-        if ($request->premi !== 0 || $request->tsi !== 0 || $request->periode_tahun !== 0) {
+        if (is_numeric($request->premi) && is_numeric($request->tsi) && is_numeric($request->periode_tahun)) {
             $config = DB::table('asuransi_config')
                 ->where('id_insurance', $request->id_insurance)
                 ->where('id_instype', $request->id_instype)
                 ->whereRaw($request->premi . " BETWEEN `min_premi` AND `max_premi`")
-                ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`")
-                ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
+                ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`");
+                // ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
             
             $data = $config->first();
         } else {
