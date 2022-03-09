@@ -121,6 +121,11 @@
         <td>{{ $data['transaksi']->no_jaminan }}</td>
       </tr>
       <tr valign="top">
+        <td>Kode Pos / Kelurahan</td>
+        <td>:</td>
+        <td>{{ $data['kodepos']->kodepos }} / {{ $data['kodepos']->kelurahan }}</td>
+      </tr>
+      <tr valign="top">
         <td>Kode / Okupasi</td>
         <td>:</td>
         <td></td>
