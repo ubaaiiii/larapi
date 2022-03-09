@@ -153,7 +153,7 @@
                             @if (!empty($data) && $data->id_status >= 2)
                             <div class="form-inline mt-5">
                                 <label for="asuransi" class="ml-3 form-label sm:w-20">Asuransi</label>
-                                <select id="asuransi" name="asuransi" required style="width:100%" onchange="hitung()">
+                                <select id="asuransi" name="asuransi" required style="width:100%" onchange="hitung(); asuransiConfig();">
                                     {{-- @foreach ($asuransi as $val)
                                         <option value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
                                             {{ $val->nama_asuransi }}
@@ -619,7 +619,7 @@
         }
 
         function hitung() {
-            $.when( asuransiConfig() ).done(function() {
+            // $.when( asuransiConfig() ).done(function() {
                 var OKUPASI = $('#okupasi').val(),
                     _RATE   = totalRate(),
                     PRORATA = $('#PRORATA').val();
@@ -654,7 +654,7 @@
                 console.log("Polis: ", POLIS);
                 console.log("Biaya Lain: ", LAIN);
                 $('.masked').trigger('keyup');
-            });
+            // });
         }
 
         function asuransiConfig() {
@@ -677,6 +677,7 @@
                             $('.ql-editor').html(data.klausula_template);
                         @endif
                         $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
+                        hitung();
                     },
                     "error": function(response) {
                         console.log('error biaya:',response);
@@ -1026,6 +1027,7 @@
                 var data = e.params.data;
                 RATE = parseFloat(data.rate);
                 hitung();
+                asuransiConfig();
             });
 
             $('#kodepos').on('select2:select', function(e) {
