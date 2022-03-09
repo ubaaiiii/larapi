@@ -464,6 +464,64 @@
                 window.open("{{ url('pengajuan') }}/"+transid);
             });
 
+            $('.ps-bayar').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[2];
+                $.ajax({
+                    url:"{{ url('api/caritransaksi') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    type: "GET",
+                    data: {transid},
+                    success: function(d) {
+                        $('#frm-bayar #transid').val(d.transaksi.transid);
+                        $('#frm-bayar [name="transid"]').val(d.transaksi.transid);
+                        $('#frm-bayar #nama_asuransi').val(d.asuransi.nama_asuransi);
+                        $('#frm-bayar #rekening_asuransi').val(d.asuransi.rekening_asuransi);
+                        $('#frm-bayar #tagihan').val(d.pricing[19].value);
+                        $('.masked').trigger('keyup');
+                        cash('#modal-bayar').modal('show');
+                    },
+                    error: function(d) {
+                        console.log('d',d);
+                    },
+                });
+            });
+
+            $('.ps-ubah').click(function(e) {
+                e.preventDefault();
+                var transid = tablenya.row({ selected: true }).data()[2];
+                $.ajax({
+                    url:"{{ url('api/caritransaksi') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    type: "GET",
+                    data: {transid},
+                    success: function(d) {
+                        $('#frm-ubah #transid').val(d.transaksi.transid);
+                        $('#frm-ubah [name="transid"]').val(d.transaksi.transid);
+                        $('#frm-ubah #nama_asuransi').val(d.asuransi.nama_asuransi);
+                        $('#frm-ubah #diterima').val(d.pricing[18].value);
+                        $('#frm-ubah #dibayar').val(d.pricing[19].value);
+                        $('#frm-ubah #tgl_terima').val(d.pembayaran1.paid_at.split(" ")[0]);
+                        if (d.pembayaran2 !== null) {
+                            $('#frm-ubah #tgl_bayar').val(d.pembayaran2.paid_at.split(" ")[0]);
+                            $('#div_bayar').removeAttr('style');
+                        } else {
+							$('#frm-ubah #tgl_bayar').removeAttr('required');
+                            $('#div_bayar').css('display','none');
+                        }
+                        $('.masked').trigger('keyup');
+                        cash('#modal-ubah').modal('show');
+                    },
+                    error: function(d) {
+                        console.log('d',d);
+                    },
+                });
+            });
+
             $('.ps-batal').click(function(e) {
                 e.preventDefault();
                 var transid = tablenya.row({ selected: true }).data()[2],

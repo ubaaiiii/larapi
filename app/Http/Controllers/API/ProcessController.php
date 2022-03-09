@@ -568,7 +568,6 @@ class ProcessController extends Controller
 
     public function pengajuan(Request $request)
     {
-        return $request->all();
         $role = Auth::user()->getRoleNames()[0];
         switch ($request->method) {
             case 'store':
