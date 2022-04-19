@@ -202,7 +202,59 @@ function prorata(tglAwal, tglAkhir) {
     return _prorata;
 }
 
+function initCurrency() {
+    $(".currency").inputmask("decimal", {
+        alias: "numeric",
+        groupSeparator: ",",
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ".",
+        digitsOptional: false,
+        placeholder: "0",
+    });
+}
+
+function initDecimal() {
+    $(".decimal").inputmask("decimal", {
+        alias: "numeric",
+        groupSeparator: ",",
+        autoGroup: true,
+        digits: 4,
+        radixPoint: ".",
+        digitsOptional: false,
+        allowMinus: false,
+        placeholder: "0",
+    });
+}
+
+function initTSI() {
+    $(".tsi").keyup(function() {
+        var sum = 0;
+        $(".tsi").each(function() {
+            if ($(this).val() == "") {
+                sum += 0;
+            } else {
+                sum += parseFloat($(this).inputmask("unmaskedvalue"));
+            }
+        });
+        $(".total-si").val(sum).trigger('keyup');
+    });
+
+    $(".masked").keyup(function() {
+        // console.log("[name='" + $(this).attr("id") + "']");
+        $("[name='" + $(this).attr("id") + "']").val(
+            $(this).inputmask("unmaskedvalue")
+        );
+    });
+}
+
 $(document).ready(function() {
+
+    $('#npwp_insured').inputmask("99.999.999.9-999.999");
+    $('#nik_insured').inputmask("9999999999999999");
+    $('.range-periode').inputmask("99/99/9999 - 99/99/9999");
+    $('#masa').inputmask("decimal");
+    $('#nohp_insured').inputmask("decimal");
 
     $(".dark-mode-switcher").removeAttr("style");
 
@@ -222,43 +274,10 @@ $(document).ready(function() {
         $(".select2-search__field").css("text-transform", "uppercase");
     });
 
-    $(".currency").inputmask("decimal", {
-        alias: "numeric",
-        groupSeparator: ",",
-        autoGroup: true,
-        digits: 2,
-        radixPoint: ".",
-        digitsOptional: false,
-        placeholder: "0",
-    });
+    initCurrency();
 
-    $(".decimal").inputmask("decimal", {
-        alias: "numeric",
-        groupSeparator: ",",
-        autoGroup: true,
-        digits: 0,
-        radixPoint: ".",
-        digitsOptional: false,
-        allowMinus: false,
-        placeholder: "0",
-    });
+    initDecimal();
 
-    $(".tsi").keyup(function() {
-        var sum = 0;
-        $(".tsi").each(function() {
-            if ($(this).val() == "") {
-                sum += 0;
-            } else {
-                sum += parseFloat($(this).inputmask("unmaskedvalue"));
-            }
-        });
-        $(".total-si").val(sum).trigger('keyup');
-    });
-
-    $(".masked").keyup(function() {
-        $("[name='" + $(this).attr("id") + "']").val(
-            $(this).inputmask("unmaskedvalue")
-        );
-    });
+    initTSI();
     $(".date-range").inputmask("99/99/9999 - 99/99/9999");
 });

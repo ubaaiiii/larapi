@@ -7,13 +7,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Asuransi;
 use App\Models\Document;
+use App\Models\Installment;
 use App\Models\Instype;
 use App\Models\Insured;
 use App\Models\KodePos;
 use App\Models\Okupasi;
 use App\Models\Pembayaran;
+use App\Models\Perluasan;
 use App\Models\Pricing;
 use App\Models\Transaksi;
+use App\Models\TransaksiObjek;
+use App\Models\TransaksiPenanggung;
+use App\Models\TransaksiPerluasan;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,6 +26,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+
+use function PHPUnit\Framework\isNull;
 
 class DataController extends Controller
 {
@@ -35,7 +42,7 @@ class DataController extends Controller
     public function selectKodepos(Request $request)
     {
         // DB::enableQueryLog();
-        $provinsi = KodePos::select('id', 'kecamatan', 'kelurahan', 'kodepos', 'rate_TSFWD', 'rate_RSMDCC', 'rate_OTHERS')->distinct();
+        $provinsi = KodePos::select('*')->distinct();
         if (!empty($request->search)) {
             $provinsi->cariKecamatan($request->search)->orWhere->cariKelurahan($request->search)->orWhere->cariKodePos($request->search);
         }
@@ -45,18 +52,20 @@ class DataController extends Controller
         $key = 0;
         foreach ($provinsi as $row) {
             $list[$key]['id'] = $row['id'];
-            $list[$key]['text'] = $row['kecamatan'] . " / " . $row['kelurahan'] . " / " . $row['kodepos'];
+            $list[$key]['text'] = $row['kodepos'] . " / " . $row['kelurahan'] . " / " . $row['kecamatan'];
+            $list[$key]['wilayah'] = $row['wilayah'];
             $list[$key]['rate_TSFWD'] = $row['rate_TSFWD'];
             $list[$key]['rate_RSMDCC'] = $row['rate_RSMDCC'];
             $list[$key]['rate_OTHERS'] = $row['rate_OTHERS'];
             $key++;
         }
+        // $list['sql'] = DB::getQueryLog();
         return response()->json($list);
     }
 
-    public function selectInstype(Request $request)
+    public function selectInstype(Request $request, $bisnis = "sme")
     {
-        $instype = Instype::select('id', 'instype_name', 'brokerage_percent', 'klausula_template', 'max_tsi', 'max_periode_tahun');
+        $instype = Instype::select('id', 'instype_name')->where('bisnis', 'like', '%' . $bisnis . '%');
         if (!empty($request->search)) {
             $instype->where('id', 'like', '%' . $request->search . '%')
                 ->orWhere('instype_name', 'like', '%' . $request->search . '%');
@@ -67,10 +76,6 @@ class DataController extends Controller
         foreach ($instype as $row) {
             $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['instype_name'];
-            $list[$key]['brokerage_percent'] = $row['brokerage_percent'];
-            $list[$key]['klausula_template'] = $row['klausula_template'];
-            $list[$key]['max_tsi'] = $row['max_tsi'];
-            $list[$key]['max_periode_tahun'] = $row['max_periode_tahun'];
             $key++;
         }
         return response()->json($list);
@@ -97,15 +102,28 @@ class DataController extends Controller
         return response()->json($list);
     }
 
-    public function selectOkupasi(Request $request)
+    public function selectOkupasi(Request $request, $format = null)
     {
         // return $request->all();
+        // DB::enableQueryLog();
         $okupasi = Okupasi::select('id', 'kode_okupasi', 'nama_okupasi', 'rate');
-            // ->where('instype', $request->instype);
+        // ->where('instype', $request->instype);
         if (!empty($request->search)) {
-            $okupasi->where('nama_okupasi', 'like', '%' . $request->search . '%')
-                ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
-                ->orWhere('rate', 'like', '%' . $request->search . '%');
+            $okupasi->where(function ($query) use ($request) {
+                return $query->where('nama_okupasi', 'like', '%' . $request->search . '%')
+                    ->orWhere('kode_okupasi', 'like', '%' . $request->search . '%')
+                    ->orWhere('rate', 'like', '%' . $request->search . '%');
+            });
+        }
+        if ($format == "wholesales") {
+            $okupasi->where('bisnis', '=', 'WHOLESALES')
+                ->where('id_instype', 'like', '%' . $request->id_instype . '%')
+                ->where('wilayah','like', '%' . $request-> wilayah . '%');
+            if (!empty($request->id_kelas)) {
+                $okupasi->where('id_kelas_pertanggungan', 'like', '%' . $request->id_kelas. '%');
+            }
+        } elseif (isNull($format) || $format == "sme") {
+            $okupasi->where('bisnis', '=', 'SME');
         }
         $okupasi = $okupasi->orderBy('kode_okupasi')->get();
 
@@ -113,10 +131,15 @@ class DataController extends Controller
         $key = 0;
         foreach ($okupasi as $row) {
             $list[$key]['id'] = $row['id'];
-            $list[$key]['text'] = $row['kode_okupasi'] . " - (" . $row['rate'] . " ‰) " . $row['nama_okupasi'];
+            if ($format == "wholesales") {
+                $list[$key]['text'] = $row['kode_okupasi'] . " - " . $row['nama_okupasi'];
+            } else {
+                $list[$key]['text'] = $row['kode_okupasi'] . " - (" . $row['rate'] . " ‰) " . $row['nama_okupasi'];
+            }
             $list[$key]['rate'] = $row['rate'];
             $key++;
         }
+        // $list['sql'] = DB::getQueryLog();
         return response()->json($list);
     }
 
@@ -134,6 +157,27 @@ class DataController extends Controller
         foreach ($asuransi as $row) {
             $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['nama_asuransi'];
+            $key++;
+        }
+        return response()->json($list);
+    }
+
+    public function selectKelas(Request $request)
+    {
+        // return $request->all();
+        $kelas = DB::table("kelas_pertanggungan")
+            ->where('id_instype', 'like', '%' . $request->tipe . '%');
+        if (!empty($request->search)) {
+            $kelas->where('nama_kelas', 'like', '%' . $request->tipe . '%');
+        }
+        $kelas = $kelas->orderBy('id')->get();
+
+        $list = [];
+        $key = 0;
+        foreach ($kelas as $row) {
+            $list[$key]['id'] = $row->id;
+            $list[$key]['text'] = $row->nama_kelas;
+            $list[$key]['field'] = $row->nama_field;
             $key++;
         }
         return response()->json($list);
@@ -242,7 +286,7 @@ class DataController extends Controller
             case 'broker':
                 $statPengajuan  = "1";
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
-                    $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker = '" . Auth::user()->id . "' ";
+                    $customJoin     = " INNER JOIN cabang as cbg_broker ON cbg_broker.id = transaksi.id_cabang AND cbg_broker.id_broker like \"%'" . Auth::user()->id . "'%\" ";
                 }
                 break;
             case 'insurance':
@@ -255,9 +299,9 @@ class DataController extends Controller
             case 'adm':
                 $statPengajuan  = "0,1";
                 break;
-            
+
             default:
-                
+
                 break;
         }
         $query = "  SELECT
@@ -339,12 +383,12 @@ class DataController extends Controller
                     $table->where('transaksi.id_cabang', Auth::user()->id_cabang);
                 }
                 break;
-                
+
             case 'broker':
                 if (Auth::user()->id_cabang !== 1) {    // All Cabang
                     $table->join('cabang as cbg_broker', function ($q) {
                         $q->on('cbg_broker.id', '=', 'transaksi.id_cabang')
-                        ->where('cbg_broker.id_broker', '=', Auth::user()->id);
+                            ->where('cbg_broker.id_broker', 'like', "%'" . Auth::user()->id . "'%");
                     });
                 }
                 break;
@@ -397,24 +441,24 @@ class DataController extends Controller
                         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
                             ->where('pmby.paid_type', '=', "PD01")
                             ->whereNull('pmby.deleted_at');
-                        });
+                    });
                     $table->leftJoin('transaksi_pembayaran as pmby2', function ($q) use ($user) {
                         $q->on('transaksi.transid', '=', 'pmby2.id_transaksi')
                             ->where('pmby2.paid_type', '=', "PD02")
                             ->whereNull('pmby2.deleted_at');
-                        });
+                    });
                     $table->whereNotNull('pmby.id_transaksi')
-                          ->whereNull('pmby2.id_transaksi');
+                        ->whereNull('pmby2.id_transaksi');
                     break;
-                        
+
                 case 'dibayar broker':
                     $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
                         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                        ->where('pmby.paid_type', '=', "PD02")
-                        ->whereNull('pmby.deleted_at');
+                            ->where('pmby.paid_type', '=', "PD02")
+                            ->whereNull('pmby.deleted_at');
                     });
                     $table->whereNotNull('pmby.id_transaksi')
-                          ->whereRaw('transaksi.id_status < 9');
+                        ->whereRaw('transaksi.id_status < 9');
                     break;
 
                 case 'polis siap':
@@ -467,6 +511,7 @@ class DataController extends Controller
 
             // hidden
             $nestedData[] = $row->id_status;
+            $nestedData[] = $row->bisnis;
 
             $data[] = $nestedData;
         }
@@ -479,7 +524,7 @@ class DataController extends Controller
             "sql"             => $query[3]
         ], 200);
     }
-    
+
     public function dataPembayaran(Request $request)
     {
         // sorting column datatables
@@ -788,7 +833,7 @@ class DataController extends Controller
             ->leftJoin('insured', 'id_insured', '=', 'insured.id')
             ->leftJoin('kodepos', 'id_kodepos', '=', 'kodepos.id')
             ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
-            ->leftJoin('instype', 'id_instype', '=', 'instype.id')
+            ->leftJoin('instype', 'transaksi.id_instype', '=', 'instype.id')
             ->leftJoin('asuransi', 'id_asuransi', '=', 'asuransi.id')
             ->where('transid', '=', $transid)
             ->select($select)
@@ -799,12 +844,110 @@ class DataController extends Controller
 
     public function dataPricing($transid)
     {
-        $data = Pricing::where('id_transaksi', '=', $transid)->get();
+        $data = Pricing::where('id_transaksi', '=', $transid)->whereNull('id_objek')->get();
         $new = array();
         foreach ($data as $val) {
             $new[$val->id_kodetrans] = $val;
         }
         return $new;
+    }
+
+    public function dataPerluasan($transid)
+    {
+        $data = TransaksiPerluasan::where('id_transaksi', '=', $transid)->get();
+        $new = array();
+        foreach ($data as $val) {
+            $new[$val->id_perluasan] = $val;
+        }
+        return $new;
+    }
+
+    public function dataInstallment($transid)
+    {
+        $data = Installment::where('id_transaksi', '=', $transid)->orderBy('tgl_tagihan')->get();
+        return $data;
+    }
+
+    public function dataPenanggung($transid)
+    {
+        $data = TransaksiPenanggung::join('asuransi', 'id_asuransi', '=', 'asuransi.id')
+            ->where('id_transaksi', '=', $transid)
+            ->orderBy('share_pertanggungan', 'DESC')->get();
+        return $data;
+    }
+
+    public function cekPerluasan(Request $request)
+    {
+        DB::enableQueryLog();
+        $perluasan = Perluasan::where('id_instype',$request->instype);
+        $select = [
+            'perluasan.id',
+            'perluasan.kode',
+            'perluasan.keterangan',
+            'perluasan.required',
+        ];
+
+        if (!empty($request->transid)) {
+            array_push($select,
+                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate), perluasan.rate) as rate'),
+                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, "checked", NULL) as checked'));
+            $perluasan->leftJoin('transaksi_perluasan', function($q) use ($request) {
+                $q->on('perluasan.id', '=', 'id_perluasan')
+                ->where('id_transaksi', '=', $request->transid);
+            })->select($select);
+        } else {
+            array_push($select,'perluasan.rate', DB::raw('null as checked'));
+            $perluasan->select($select);
+        }
+        // $perluasan->get();
+        // return DB::getQueryLog();
+        return $perluasan->get();
+    }
+
+    public function dataObjekPricing($transid)
+    {
+        $objek = TransaksiObjek::where('id_transaksi', $transid)->get();
+        $data_objek_pricing = [];
+        foreach ($objek as $i => $v) {
+            $pricing = Pricing::where('id_transaksi', $transid)->where('id_objek', $v->id)->get();
+            $data_objek_pricing[$v->id] = $pricing;
+        }
+        return $data_objek_pricing;
+    }
+
+    public function dataObjek($transid)
+    {
+        // DB::enableQueryLog();
+        $data = TransaksiObjek::join('masters as jaminan', function ($jn) {
+            $jn->on('transaksi_objek.id_jaminan', '=', 'jaminan.msid')
+                ->where('jaminan.mstype', '=', 'jaminan');
+        })
+            ->leftJoin('kelas_pertanggungan as kelas', 'transaksi_objek.id_kelas', '=', 'kelas.id')
+            ->join('kodepos', 'transaksi_objek.id_kodepos', '=', 'kodepos.id')
+            ->leftJoin('okupasi', 'transaksi_objek.id_okupasi', '=', 'okupasi.id');
+
+        $data->where('transaksi_objek.id_transaksi', $transid);
+
+        $data->select([
+            'transaksi_objek.id as id_objek',
+            'transaksi_objek.objek',
+            'transaksi_objek.alamat_objek',
+            'transaksi_objek.id_kodepos',
+            DB::raw('CONCAT(kodepos.kodepos, " / ", kelurahan, " / ", kecamatan) as nama_kodepos'),
+            'kodepos.wilayah',
+            'transaksi_objek.id_jaminan',
+            'jaminan.msdesc as nama_jaminan',
+            'transaksi_objek.no_jaminan',
+            'transaksi_objek.agunan_kjpp',
+            'transaksi_objek.id_kelas',
+            'kelas.nama_kelas',
+            'transaksi_objek.id_okupasi',
+            DB::raw('CONCAT(okupasi.id, " - ", okupasi.nama_okupasi) as nama_okupasi'),
+            'transaksi_objek.rate',
+        ]);
+
+        return $data->get();
+        // return DB::getQueryLog();
     }
 
     public function dataAktifitas(Request $request)
@@ -838,7 +981,7 @@ class DataController extends Controller
         $i = 1;
         foreach ($query[0] as $row) {
             $nestedData = array();
-            $nestedData[] = $row->created_at;
+            $nestedData[] = Carbon::parse($row->created_at)->format('Y-m-d h:m:s');
             $nestedData[] = $row->statusnya;
             $nestedData[] = $row->name;
             $nestedData[] = $row->deskripsi;
@@ -876,7 +1019,7 @@ class DataController extends Controller
         $table->where('id_transaksi', $request->transid);
         $table->where(function ($q) use ($role) {
             $q->whereNull('visible_by')
-              ->orWhere('visible_by', 'like', '%' . $role . '%');
+                ->orWhere('visible_by', 'like', '%' . $role . '%');
         });
         $table->whereNull('documents.deleted_at');
 
@@ -1034,8 +1177,8 @@ class DataController extends Controller
                 ->where('id_instype', $request->id_instype)
                 ->whereRaw($request->premi . " BETWEEN `min_premi` AND `max_premi`")
                 ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`");
-                // ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
-            
+            // ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
+
             $data = $config->first();
         } else {
             $data = [

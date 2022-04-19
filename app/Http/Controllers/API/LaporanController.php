@@ -717,6 +717,7 @@ class LaporanController extends Controller
                     'pemb.paid_at           AS "Tanggal Dibayar"',
                     'catatan                AS "Keterangan"',
                 ];
+                
                 if (!empty($request->dtable)) {
                     $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end])
                         ->whereRaw('pemb.id IS NOT NULL');

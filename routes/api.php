@@ -29,9 +29,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/selectkodepos', 'API\DataController@selectKodepos');
     Route::get('/selectinsured', 'API\DataController@selectInsured');
     Route::get('/selectokupasi', 'API\DataController@selectOkupasi');
+    Route::get('/selectokupasi/{any}', 'API\DataController@selectOkupasi');
     Route::get('/selectinstype', 'API\DataController@selectInstype');
+    Route::get('/selectinstype/{any}', 'API\DataController@selectInstype');
     Route::get('/selectasuransi', 'API\DataController@selectAsuransi');
+    Route::get('/selectkelas', 'API\DataController@selectKelas');
     Route::get('/datadashboard', 'API\DataController@dataDashboard');
+    Route::get('/cekperluasan', 'API\DataController@cekPerluasan');
 
     // data table
     Route::post('/datatransaksi', 'API\DataController@dataTransaksi');
@@ -56,7 +60,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/user', 'API\ProcessController@user');
     Route::post('/dokumen', 'API\ProcessController@dokumen');
     Route::post('/dokumen/{any}', 'API\ProcessController@dokumen');
-    Route::post('/pengajuan', 'API\ProcessController@pengajuan');
+    Route::post('/sme', 'API\ProcessController@sme');
+    Route::post('/wholesales', 'API\ProcessController@wholesales');
     Route::post('/pembayaran', 'API\ProcessController@pembayaran');
     Route::post('/polis', 'API\ProcessController@polis');
     Route::post('/endorsement', 'API\ProcessController@endorsement');

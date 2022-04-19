@@ -204,7 +204,7 @@
                 </tr>
                 <tr>
                   <td>
-                    PPN
+                    PPN ({{ number_format($data['pricing'][14]->value / $data['pricing'][13]->value * 100,0) }}%)
                   </td>
                   <td align="right">
                     - {{ number_format($data['pricing'][14]->value,2) }}

@@ -14,7 +14,12 @@ use App\Models\Laporan;
 use App\Models\Master;
 use App\Models\Okupasi;
 use App\Models\Page;
+use App\Models\Perluasan;
+use App\Models\Pricing;
 use App\Models\Sequential;
+use App\Models\Transaksi;
+use App\Models\TransaksiObjek;
+use App\Models\TransaksiPerluasan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +45,7 @@ class PageController extends Controller
         return view('profile', $data);
     }
 
-    function pengajuan($transid = null, Request $request)
+    function pengajuan_sme($transid = null, Request $request)
     {
         $data = [
             'cabang'    => Cabang::withoutTrashed()->orderBy('nama_cabang','asc')->get(),
@@ -49,7 +54,7 @@ class PageController extends Controller
             'instype'   => Instype::all(),
             'jaminan'   => Master::withoutTrashed()->where('mstype', 'jaminan')->get(),
             'act'       => 'add',
-            'price'     => KodeTrans::withoutTrashed()->where('tsi', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'price'     => KodeTrans::withoutTrashed()->where('tsi', true)->where('id_bisnis', 'like', '%SME%')->orderBy('kodetrans_index', 'ASC')->get(),
             'formula'   => KodeTrans::withoutTrashed()->whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
             'value'     => KodeTrans::withoutTrashed()->whereNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
             'hitung'    => KodeTrans::where('hitung', true)->orderBy('kodetrans_index', 'ASC')->get(),
@@ -86,7 +91,63 @@ class PageController extends Controller
         } else {
             Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);
         }
-        return view('pengajuan', $data);
+        return view('pengajuan-sme', $data);
+    }
+
+    function pengajuan_wholesales($transid = null, Request $request)
+    {
+        $data = [
+            'cabang'    => Cabang::withoutTrashed()->orderBy('nama_cabang','asc')->get(),
+            'asuransi'  => Asuransi::all(),
+            'okupasi'   => Okupasi::all(),
+            'instype'   => Instype::all(),
+            'jaminan'   => Master::withoutTrashed()->where('mstype', 'jaminan')->get(),
+            'act'       => 'add',
+            'price'     => KodeTrans::withoutTrashed()->where('tsi', true)->where('id_bisnis', 'like', '%WHOLESALES%')->orderBy('kodetrans_index', 'ASC')->get(),
+            'formula'   => KodeTrans::withoutTrashed()->whereNotNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'value'     => KodeTrans::withoutTrashed()->whereNull('kodetrans_formula')->orderBy('kodetrans_index', 'ASC')->get(),
+            'hitung'    => KodeTrans::where('hitung', true)->orderBy('kodetrans_index', 'ASC')->get(),
+            'transid'   => Sequential::where('seqdesc', 'transid')->first(),
+            'perluasan' => Perluasan::all(),
+            'method'    => $request->method,
+        ];
+        // echo $data['transid']->seqno;
+        // die;
+        // echo $data['formula']->kodetrans_input[0];
+        $transaksi = Transaksi::find($transid);
+        if (!empty($transaksi)) {
+            $level = Auth::user()->getRoleNames()[0];
+            $dataController     = new DataController;
+            $transaksi = $dataController->dataPengajuan($transid);
+
+            if (in_array($level,['maker','checker'])) {
+                if (Auth::user()->id_cabang !== 1) { // Not All Cabang
+                    if ($transaksi->created_by !== Auth::user()->id) {
+                        abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                    }
+                }
+            }
+            if (in_array($level,['approval'])) {
+                if (Auth::user()->id_cabang !== 1) { // Not All Cabang
+                    if ($transaksi->id_cabang !== Auth::user()->id_cabang) {
+                        abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                    }
+                }
+            }
+            $data['act']                = 'edit';
+            $data['data']               = $transaksi;
+            $data['pricing']            = $dataController->dataPricing($transid);
+            $data['data_objek']         = $dataController->dataObjek($transid);
+            $data['data_objek_pricing'] = $dataController->dataObjekPricing($transid);
+            $data['data_perluasan']     = $dataController->dataPerluasan($transid);
+            $data['data_installment']   = $dataController->dataInstallment($transid);
+            $data['data_penanggung']    = $dataController->dataPenanggung($transid);
+            $data['status']             = Master::where('msid', $transaksi->id_status)->where('mstype','status')->first();
+            // return json_encode($data['data_installment']);
+        } else {
+            Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);
+        }
+        return view('pengajuan-wholesales', $data);
     }
 
     function perpanjangan($transid = null, Request $request)
@@ -119,7 +180,7 @@ class PageController extends Controller
         } else {
             Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);
         }
-        return view('pengajuan', $data);
+        return view('pengajuan-sme', $data);
     }
 
     function notifikasi($transid = null, Request $request)

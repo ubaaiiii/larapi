@@ -19,8 +19,10 @@
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/datatables/datatables.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/fontawesome/all.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/quill/quill.bubble.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url('public/vendor/quill/quill.snow.css') }}" />
     <!-- END: CSS Assets-->
     <script src="{{ url('public/vendor/jquery/jquery-3.6.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
     @yield('header')
     <style>
         .has-error .select2-selection {
@@ -48,6 +50,7 @@
     <script type="text/javascript" src="{{ url('public/vendor/select2/select2.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/select2/id.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/quill/quill.js') }}"></script>
+    <script type="text/javascript" src="{{ url('public/vendor/quill/image-resize.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/sweetalert2/sweetalert2.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/js/jquery.inputmask.min.js') }}"></script>
     <script type="text/javascript" src="{{ url('public/vendor/daterangepicker/moment.min.js') }}"></script>
@@ -61,6 +64,8 @@
     <script>
         $(document).ready(function() {
             $(".side-menu:contains('@yield('menu')')").addClass("side-menu--active");
+            $(".side-menu:contains('@yield('menu')')").closest("ul").addClass("side-menu__sub-open");
+            $(".side-menu:contains('@yield('menu')')").closest("ul").prev().addClass("side-menu--active");
 
             $(".dark-mode-switcher__toggle").click(function() {
                 $("html").toggleClass("light dark");

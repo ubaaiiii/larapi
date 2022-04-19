@@ -7,6 +7,7 @@ use App\Models\Activity;
 use App\Models\Asuransi;
 use App\Models\Cabang;
 use App\Models\Document;
+use App\Models\Installment;
 use App\Models\Instype;
 use App\Models\Insured;
 use App\Models\KodePos;
@@ -16,6 +17,8 @@ use App\Models\Pembayaran;
 use App\Models\Pricing;
 use App\Models\Sequential;
 use App\Models\Transaksi;
+use App\Models\TransaksiObjek;
+use App\Models\TransaksiPerluasan;
 use App\Models\User;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade as PDF;
@@ -389,6 +392,136 @@ class CetakController extends Controller
                 return Redirect::to(url('public/'.$path.$filename));
             } elseif ($transaksi->id_status < 3) {
                 abort(403, "Belum Diverifikasi oleh Broker");
+            } else {
+                abort(404);
+            }
+        } else {
+            abort(404);
+        }
+    }
+
+    //Wholesales
+    public function cetakKlausula($transid, $jenis, $id_asuransi)
+    {
+        // DB::enableQueryLog();
+        $transaksi = Transaksi::find($transid);
+        if (!empty($transaksi)) {
+            if ($transaksi->id_status >= 3) {
+                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)
+                    ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')
+                    ->whereNull('id_objek')
+                    ->orderBy('id_kodetrans', 'ASC')
+                    ->get();
+                foreach ($dataPricing as $row) {
+                    // echo $row->id_kodetrans;
+                    $pricing[$row->id_kodetrans] = $row;
+                }
+
+                if ($jenis == "placing") {
+                    $jenis_text = "PLACING SLIP";
+                    $jenis_kode = "PS";
+                    $jenis_link = "cek_placing";
+                    $jenis_file = "PLACING";
+                } else if ($jenis == "ftc") {
+                    $jenis_text = "FINAL TERM CONDITION";
+                    $jenis_kode = "FTC";
+                    $jenis_link = "cek_ftc";
+                    $jenis_file = "FTC";
+                } else {
+                    abort(404);
+                }
+
+                $data = [
+                    'transaksi'   => $transaksi,
+                    'instype'     => Instype::find($transaksi->id_instype),
+                    'tgl_aktif'   => Activity::where('id_transaksi', $transaksi->transid)->where('id_status', '4')->orderBy('created_at', 'DESC')->first(),
+                    'sequential'  => Sequential::where('seqdesc', 'transid')->first(),
+                    'tertanggung' => Insured::find($transaksi->id_insured),
+                    'cabang'      => Cabang::find($transaksi->id_cabang),
+                    'jenis'       => $jenis_text,
+                    'pricing'     => $pricing,
+                    'installment' => Installment::where('id_transaksi', '=', $transaksi->transid)->get(),
+                    'objek'       => TransaksiObjek::join('kodepos', 'id_kodepos', '=', 'kodepos.id')
+                        ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
+                        ->leftJoin('kelas_pertanggungan', 'id_kelas', '=', 'kelas_pertanggungan.id')
+                        ->where('id_transaksi', $transaksi->transid)->get(),
+                    'objek_pricing' => TransaksiObjek::join('kodepos', 'id_kodepos', '=', 'kodepos.id')
+                        ->leftJoin('transaksi_pricing', function ($q) {
+                            $q->on('id_objek', '=', 'transaksi_objek.id')
+                                ->whereNotNull('id_objek');
+                        })
+                        ->leftJoin('transaksi_kode', 'id_kodetrans', '=', 'kodetrans_id')
+                        ->where('transaksi_objek.id_transaksi', $transaksi->transid)->get(),
+                    'perluasan'   => TransaksiPerluasan::join('perluasan', 'id_perluasan', '=' , 'perluasan.id')
+                        ->where('id_transaksi', $transaksi->transid)->get(),
+                    'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
+                        ->where('tsi', 1)
+                        ->where('transaksi_pricing.value', '<>', 0)
+                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
+                ];
+                // dd($data['objek']);
+                $data['nomor_surat'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "/" . $jenis_kode . "/" . $data['instype']->id . "/UW-01/BDS/" . Functions::angka_romawi(date('m')) . "/" . date('Y');
+                $parameter = [
+                    'id' => $transaksi->transid,
+                ];
+                $parameter = Crypt::encrypt($parameter);
+                $url = url($jenis_link) . "/" . $parameter;
+                // return $data['tsi'];
+
+                $qrcode = base64_encode(QrCode::format('svg')->size(100)->errorCorrection('H')->generate($url));
+                // share data to view
+                // view()->share('employee', $data);
+                $pdf = PDF::loadView('prints/wholesales_klausula', compact(
+                    'data',
+                    'qrcode'
+                ));
+                // Download PDF without viewing
+                // return $pdf->download('pdf_file.pdf');
+
+                // Streaming PDF, not saved on local
+                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                exit(0);
+
+                // Saving PDF to local and redirect to the file
+                $output = $pdf->setpaper('a4', 'portrait')->output();
+                $path   = "files/$transid/";
+
+                if ($jenis == "placing") {
+                    $filename = "PS-" . substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "- " . $data['instype']->id . " - " . $data['tertanggung']->nama_insured . ".pdf";
+                } else if ($jenis == "ftc") {
+                    $filename = "FTC-" . substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "- " . $data['instype']->id . " - " . $data['tertanggung']->nama_insured . ".pdf";
+                } else {
+                    abort(404);
+                }
+
+                if (!is_dir(public_path($path))) {
+                    mkdir(public_path($path), 0777, TRUE);
+                }
+
+                $eksis = false;
+                if (file_exists(public_path($path . $filename))) {
+                    $eksis = true;
+                }
+
+                file_put_contents(public_path($path) . $filename, $output);
+                // return redirect($path . $filename);
+                $insert = [
+                    'id_transaksi'  => $transaksi->transid,
+                    'nama_file'     => $filename,
+                    'tipe_file'     => "pdf",
+                    'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
+                    'lokasi_file'   => "public/" . $path . $filename,
+                    'jenis_file'    => $jenis_file,
+                    'created_by'    => Auth::user()->id,
+                ];
+
+                if (!$eksis) {
+                    Document::create($insert);
+                }
+
+                return redirect(url("public/" . $path) . "/" . $filename);
+            } elseif ($transaksi->id_status < 3) {
+                abort(403, "Belum disetujui oleh asuransi");
             } else {
                 abort(404);
             }

@@ -335,7 +335,7 @@
       <tr>
         <td></td>
         <td></td>
-        <td>PPN (10%)</td>
+        <td>PPN ({{ number_format($data['pricing'][14]->value / $data['pricing'][13]->value * 100,0) }}%)</td>
         <td align="right">= IDR</td>
         <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][14]->value,2) }}</td>
         <td>-</td>

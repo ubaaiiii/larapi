@@ -75,6 +75,7 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('cetak_nota_pembayaran/{any}', [CetakController::class, 'cetakNotaPembayaran'])->name('notapembayaran')->middleware('role:adm|broker|finance');
   Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:maker|checker|adm|broker|finance');
   Route::get('cetak_placing/{any}', [CetakController::class, 'cetakPlacing'])->name('placing')->middleware('role:insurance|adm|broker');
+  Route::get('cetak_klausula/{transid}/{jenis}/{id_asuransi}', [CetakController::class, 'cetakKlausula'])->name('klausulaWholesales')->middleware('role:insurance|adm|broker');
 
   // inquiry
   Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
@@ -91,10 +92,15 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('klaim', [PageController::class, 'klaim'])->name('klaim')->middleware('role:adm|broker|maker|checker|approver|insurance');
   Route::get('klaim/{any}', [PageController::class, 'klaim'])->name('klaim')->middleware('role:adm|broker|maker|checker|approver|insurance');
 
-  // pengajuan
-  Route::get('pengajuan', [PageController::class, 'pengajuan'])->name('pengajuan')->middleware('role:maker|adm');
-  Route::get('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
-  Route::post('pengajuan/{any}', [PageController::class, 'pengajuan'])->name('pengajuan');
+  // sme
+  Route::get('sme', [PageController::class, 'pengajuan_sme'])->name('sme')->middleware('role:maker|adm');
+  Route::get('sme/{any}', [PageController::class, 'pengajuan_sme'])->name('sme');
+  Route::post('sme/{any}', [PageController::class, 'pengajuan_sme'])->name('sme');
+
+  // wholesales
+  Route::get('wholesales', [PageController::class, 'pengajuan_wholesales'])->name('wholesales')->middleware('role:maker|adm');
+  Route::get('wholesales/{any}', [PageController::class, 'pengajuan_wholesales'])->name('wholesales');
+  Route::post('wholesales/{any}', [PageController::class, 'pengajuan_wholesales'])->name('wholesales');
 
   // perpanjangan
   Route::get('perpanjangan', [PageController::class, 'perpanjangan'])->name('perpanjangan')->middleware('role:maker|adm');

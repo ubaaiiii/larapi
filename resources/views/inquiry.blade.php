@@ -39,100 +39,102 @@
                             </a>
                             @role('maker|checker|adm')
                                 {{-- <a id="ps-ubah"
-                                    class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                    class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-0"
                                     style="cursor:pointer">
                                     <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ubah
                                 </a> --}}
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-0"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ajukan
                                 </a>
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-4"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
-                                <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-10"
+                                <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-10"
                                     style="cursor:pointer">
                                     <i class="fa fa-sync-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Perpanjang
                                 </a>
-                                <a class="ps-klaim flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-10"
+                                <a class="ps-klaim flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-10"
                                     style="cursor:pointer">
                                     <i class="fa fa-exclamation-circle w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Klaim
                                 </a>
+                                class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-4"
                                 <a id="ps-rollback"
-                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-4"
                                     style="cursor:pointer">
                                     <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Batal Mengajukan
                                 </a>
                                 <a id="ps-hapus"
-                                    class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-0"
+                                    class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-0"
                                     style="cursor:pointer">
                                     <i class="fa fa-trash-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Hapus
                                 </a>
                             @endrole
                             @role('approver|adm')
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-1"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
-                                <a id="ps-rollback"
-                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-1"
+                                <a class="ps-rollback flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-1"
                                     style="cursor:pointer">
                                     <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
                                 </a>
                             @endrole
                             @role('broker|adm')
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-2"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Verifikasi
                                 </a>
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-8"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-wholesales st-3"
+                                    style="cursor:pointer">
+                                    <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
+                                    Pilih Asuransi
+                                </a>
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-8"
                                     style="cursor:pointer">
                                     <i class="fa fa-edit w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Cek Polis
                                 </a>
-                                <a id="ps-rollback"
-                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-2"
+                                <a class="ps-rollback flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-2"
                                     style="cursor:pointer">
                                     <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
                                 </a>
                             @endrole
                             @role('finance|adm')
-                                <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-5"
+                                <a class="ps-bayar flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-5"
                                     style="cursor:pointer">
                                     <i class="fa fa-edit w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Input Pembayaran
                                 </a>
                                 @endrole
                             @role('insurance|adm')
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-3"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
-                                <a class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
+                                <a class="ps-polis flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-7"
                                     style="cursor:pointer">
                                     <i class="fa fa-upload w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Upload E-Polis
                                 </a>
-                                <a class="ps-endorsement flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-7"
+                                <a class="ps-endorsement flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-7"
                                     style="cursor:pointer">
                                     <i data-feather="upload" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Upload Endorsement
                                 </a>
-                                <a id="ps-rollback"
-                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-3"
+                                <a class="ps-rollback flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-3"
                                     style="cursor:pointer">
                                     <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
@@ -140,7 +142,7 @@
                             @endrole
                         </div>
                         @role('checker|maker|broker|finance|adm')
-                            <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-5 st-6 st-7 st-8 st-9 st-10 text-theme-9">
+                            <div class="p-2 border-t border-gray-200 dark:border-dark-5 ps-st st-sme st-5 st-6 st-7 st-8 st-9 st-10 text-theme-9">
                                 <a id="ps-invoice"
                                     class="flex items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"
                                     style="cursor:pointer">
@@ -156,7 +158,7 @@
                 <div class="w-56 relative text-gray-700 dark:text-gray-300">
                     <input type="text" id="filterSearch" class="form-control w-56 box pr-10 placeholder-theme-13"
                         placeholder="Search..." value="{{ empty($_GET['q']) ? $qsearch : $_GET['q'] }}">
-                    <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-feather="search"></i>
+                    <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-feather="search" onclick="reloadTable();" style="cursor:pointer;"></i>
                 </div>
             </div>
         </div>
@@ -439,6 +441,10 @@
                         "visible": false,
                         "className": "border-b",
                     },
+                    {
+                        "visible": false,
+                        "className": "border-b",
+                    },
                 ],
                 "ajax": {
                     url: "{{ url('api/datatransaksi') }}",
@@ -514,24 +520,25 @@
                     }
                 }, 64);
                 var statusnya = tablenya.row(this).data()[15];
+                var bisnisnya = tablenya.row(this).data()[16];
+                console.log('bisnisnya', bisnisnya);
                 $('.ps-st').css('display', 'none');
-                $('.st-' + statusnya).css('display', 'block');
+                $('.st-' + statusnya + '.st-' + bisnisnya).css('display', 'block');
             });
 
             $('#ps-lihat').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
-                    var transid = tablenya.row({
-                        selected: true
-                    }).data()[2];
-                    window.open("{{ url('pengajuan') }}/" + transid);
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // if ($('.selected').length > 0) {
+                    var transid = tablenya.row({selected: true}).data()[2];
+                    var bisnis = tablenya.row({selected: true}).data()[16];
+                    window.open("{{ url('') }}/" + bisnis + "/" + transid);
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             $('#frm').submit(function() {
@@ -540,50 +547,46 @@
 
             $('.ps-approve').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
-                    var transid = tablenya.row({
-                        selected: true
-                    }).data()[2];
+                // if ($('.selected').length > 0) {
+                    var transid = tablenya.row({selected: true}).data()[2];
+                    var bisnis = tablenya.row({selected: true}).data()[16];
                     $('#frm-method').val('approve');
-                    $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                    $('#frm').attr('action', "{{ url('') }}/" + bisnis + "/" + transid).submit();
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             $('.ps-renewal').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
-                var transid = tablenya.row({
-                    selected: true
-                }).data()[2];
-                $('#frm-method').val('renewal');
-                $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit(); 
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // if ($('.selected').length > 0) {
+                    var transid = tablenya.row({selected: true}).data()[2];
+                    var bisnis = tablenya.row({selected: true}).data()[16];
+                    $('#frm-method').val('renewal');
+                    $('#frm').attr('action', "{{ url('') }}/" + bisnis + "/" + transid).submit(); 
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             // $('#ps-ubah').click(function(e) {
             //     e.preventDefault();
-            //     var transid = tablenya.row({
-            //         selected: true
-            //     }).data()[2];
+            //     var transid = tablenya.row({selected: true}).data()[2];
             //     $('#frm-method').val('update');
-            //     $('#frm').attr('action', "{{ url('pengajuan') }}/" + transid).submit();
+            //     $('#frm').attr('action', "{{ url('') }}/" + bisnis + "/" + transid).submit();
             // });
 
             $('.ps-bayar').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
+                // if ($('.selected').length > 0) {
                     var transid = tablenya.row({
                         selected: true
                     }).data()[2];
@@ -609,13 +612,13 @@
                             console.log('d', d);
                         },
                     });
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             cash('#modal-bayar').on('hidden.bs.modal', function() {
@@ -624,7 +627,7 @@
 
             $('.ps-polis').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
+                // if ($('.selected').length > 0) {
                     var transid = tablenya.row({
                         selected: true
                     }).data()[2];
@@ -648,13 +651,13 @@
                             console.log('d', d);
                         },
                     });
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             $('.ps-endorsement').click(function(e) {
@@ -687,7 +690,7 @@
 
             $('#frm-bayar').submit(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
+                // if ($('.selected').length > 0) {
                     var data = $(this).serializeArray(),
                         paid = data[6].value,
                         tagihan = data[5].value;
@@ -703,7 +706,7 @@
                             type: "POST",
                             dataType: "JSON",
                             success: function(d) {
-                                console.log(d);
+                                console.log("success",d);
                                 Swal.fire(
                                     'Berhasil!',
                                     d.message,
@@ -717,7 +720,7 @@
                                 reloadTable();
                             },
                             error: function(d) {
-                                console.log(d.responseJSON);
+                                console.log("error",d);
                                 Swal.fire(
                                     'Gagal!',
                                     d.responseJSON.message,
@@ -732,18 +735,18 @@
                             'error'
                         );
                     }
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             $('#frm-polis').submit(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
+                // if ($('.selected').length > 0) {
                     var data = new FormData(this);
                     data.append("method", "store");
                     // console.log('data', data);
@@ -758,9 +761,9 @@
                         contentType: false,
                         processData: false,
                         success: function(d) {
+                            console.log("polis success",d);
                             reloadTable();
                             $('#frm-polis').trigger('reset');
-                            console.log(d);
                             Swal.fire(
                                 'Berhasil!',
                                 d.message,
@@ -770,7 +773,7 @@
                             });
                         },
                         error: function(d) {
-                            console.log(d);
+                            console.log("polis failed",d);
                             Swal.fire(
                                 'Gagal!',
                                 d.message,
@@ -778,13 +781,13 @@
                             );
                         },
                     });
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             $('#frm-endorsement').submit(function(e) {
@@ -827,10 +830,9 @@
 
             $('#ps-hapus').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
-                    var transid = tablenya.row({
-                            selected: true
-                        }).data()[2],
+                // if ($('.selected').length > 0) {
+                    var transid = tablenya.row({selected: true}).data()[2],
+                        bisnis = tablenya.row({selected: true}).data()[16],
                         _token = "{{ csrf_token() }}",
                         method = "delete";
                     Swal.fire({
@@ -857,7 +859,7 @@
                                         catatan = result.value;
                                     }
                                     $.ajax({
-                                        url: "{{ url('api/pengajuan') }}",
+                                        url: "{{ url('') }}/" + bisnis + "/" + transid,
                                         data: {
                                             transid,
                                             _token,
@@ -890,21 +892,20 @@
                             });
                         }
                     });
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
-            $('#ps-rollback').click(function(e) {
+            $('.ps-rollback').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
-                    var transid = tablenya.row({
-                            selected: true
-                        }).data()[2],
+                // if ($('.selected').length > 0) {
+                    var transid = tablenya.row({selected: true}).data()[2],
+                        bisnis = tablenya.row({selected: true}).data()[16],
                         _token = "{{ csrf_token() }}",
                         method = "rollback";
                     Swal.fire({
@@ -929,7 +930,7 @@
                                         catatan = result.value;
                                     }
                                     $.ajax({
-                                        url: "{{ url('api/pengajuan') }}",
+                                        url: "{{ url('') }}/" + bisnis + "/" + transid,
                                         data: {
                                             transid,
                                             _token,
@@ -960,29 +961,29 @@
                             });
                         }
                     });
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             $('#ps-invoice').click(function(e) {
                 e.preventDefault();
-                if ($('.selected').length > 0) {
+                // if ($('.selected').length > 0) {
                     var transid = tablenya.row({
                         selected: true
                     }).data()[2];
                     window.open("{{ url('cetak_invoice') }}/" + transid);
-                } else {
-                    Swal.fire(
-                        'Perhatian',
-                        'Harap memilih data sebelum klik proses!',
-                        'info'
-                    );
-                }
+                // } else {
+                //     Swal.fire(
+                //         'Perhatian',
+                //         'Harap memilih data sebelum klik proses!',
+                //         'info'
+                //     );
+                // }
             });
 
             // menyembunyikan dropdown setelah diklik
