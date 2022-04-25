@@ -10,6 +10,7 @@
 @endif
 
 @section('content')
+{{-- @dd($data_objek_perluasan) --}}
 <style>
     .swal2-container {
         z-index: 999999;
@@ -208,12 +209,6 @@
                                         </script>
                                     @endif
                                 </div>
-                                <div class="form-inline mt-5" id="div-perluasan">
-                                    <label for="type_insurance" class="ml-3 form-label sm:w-20">Perluasan @if (!empty($data->transid) && $data->id_status > 1)(‰)@endif</label>
-                                    <div class="grid grid-cols-12" id="list-perluasan">
-                                        <input type="hidden" id="total_perluasan">
-                                    </div>
-                                </div>
                                 @if (!empty($data->transid) && $data->id_status > 2)
                                 <div class="form-inline mt-5">
                                     <label for="cover_note" class="form-label sm:w-20">Cover Note</label>
@@ -371,7 +366,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th class="border-b-2 dark:border-dark-5 whitespace-nowrap">No.</th>
-                                                                <th width="14%" class="text-center border-b-2 dark:border-dark-5 whitespace-nowrap">TGL. TAGIHAN <i class="fa fa-info-circle text-theme-1 tooltip" title="Installment akan disimpan berurutan sesuai tanggal tagihan" data-theme="light" onmouseover="setTimeout(()=>{$('#tippy-23').css('z-index',100000),100})"></i></th>
+                                                                <th width="14%" class="text-center border-b-2 dark:border-dark-5 whitespace-nowrap">TGL. TAGIHAN <i class="fa fa-info-circle text-theme-1 tooltip" title="Installment akan disimpan berurutan sesuai tanggal tagihan" data-theme="light" onmouseover="setTimeout(()=>{$('#tippy-1').css('z-index',1000000),100})"></i></th>
                                                                 <th width="14%" class="text-center border-b-2 dark:border-dark-5 whitespace-nowrap">BIAYA POLIS</th>
                                                                 <th width="14%" class="text-center border-b-2 dark:border-dark-5 whitespace-nowrap">BIAYA MATERAI</th>
                                                                 <th width="14%" class="text-center border-b-2 dark:border-dark-5 whitespace-nowrap">BIAYA LAIN</th>
@@ -381,51 +376,84 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-installment">
-                                                            @foreach ($data_installment as $row => $installment)
-                                                                <tr id="{{ $installment->id }}">
-                                                                    <td>{{ $row + 1 }}</td>
-                                                                    <td class="whitespace-nowrap">
-                                                                        <input type="hidden" name="id_installment[{{ $installment->id }}]" value="1">
-                                                                        <input type="date" class="form-control tgl-tagihan" name="tgl_tagihan[{{ $installment->id }}]" value="{{ $installment->tgl_tagihan }}">
-                                                                    </td>
-                                                                    @if ($row + 1 == 1)
+                                                            @if(count($data_installment) > 0)
+                                                                @foreach ($data_installment as $row => $installment)
+                                                                    <tr id="{{ $installment->id }}">
+                                                                        <td>{{ $row + 1 }}</td>
                                                                         <td class="whitespace-nowrap">
-                                                                            <input type="text" id="by_polis_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Polis" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Polis" readonly>
-                                                                            <input type="hidden" name="by_polis_installment">
+                                                                            <input type="hidden" name="id_installment[{{ $installment->id }}]" value="1">
+                                                                            <input type="date" class="form-control tgl-tagihan" name="tgl_tagihan[{{ $installment->id }}]" value="{{ $installment->tgl_tagihan }}">
                                                                         </td>
-                                                                        <td class="whitespace-nowrap">
-                                                                            <input type="text" id="by_materai_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Materai" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Materai" readonly>
-                                                                            <input type="hidden" name="by_materai_installment">
-                                                                        </td>
-                                                                        <td class="whitespace-nowrap">
-                                                                            <input type="text" id="by_lain_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Lain" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Lain" readonly>
-                                                                            <input type="hidden" name="by_lain_installment">
-                                                                        </td>
-                                                                    @else
-                                                                        <td class="whitespace-nowrap" colspan="3"></td>
-                                                                    @endif
-                                                                    <td class="whitespace-nowrap">
-                                                                        <input type="text" id="premium_installment[{{ $installment->id }}]" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Premium" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Premium" readonly>
-                                                                        <input type="hidden" name="premium_installment[{{ $installment->id }}]">
-                                                                    </td>
-                                                                    <td class="whitespace-nowrap">
-                                                                        <input type="text" id="total_installment[{{ $installment->id }}]" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Total Gross" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Total Installment" readonly>
-                                                                        <input type="hidden" name="total_installment[{{ $installment->id }}]">
-                                                                    </td>
-                                                                    <td class="whitespace-nowrap">
-                                                                        @if ($row + 1 != 1)
-                                                                            @if(!empty($method))
-                                                                            <div class="flex justify-center items-center">
-                                                                                <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeInstallment({{ $installment->id }})">
-                                                                                    <i class="w-4 h-4 mr-1 fa fa-trash"></i>
-                                                                                    Hapus 
-                                                                                </button>
-                                                                            </div>
-                                                                            @endif
+                                                                        @if ($row + 1 == 1)
+                                                                            <td class="whitespace-nowrap">
+                                                                                <input type="text" id="by_polis_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Polis" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Polis" readonly>
+                                                                                <input type="hidden" name="by_polis_installment">
+                                                                            </td>
+                                                                            <td class="whitespace-nowrap">
+                                                                                <input type="text" id="by_materai_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Materai" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Materai" readonly>
+                                                                                <input type="hidden" name="by_materai_installment">
+                                                                            </td>
+                                                                            <td class="whitespace-nowrap">
+                                                                                <input type="text" id="by_lain_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Lain" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Lain" readonly>
+                                                                                <input type="hidden" name="by_lain_installment">
+                                                                            </td>
+                                                                        @else
+                                                                            <td class="whitespace-nowrap" colspan="3"></td>
                                                                         @endif
+                                                                        <td class="whitespace-nowrap">
+                                                                            <input type="text" id="premium_installment[{{ $installment->id }}]" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Premium" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Premium" readonly>
+                                                                            <input type="hidden" name="premium_installment[{{ $installment->id }}]">
+                                                                        </td>
+                                                                        <td class="whitespace-nowrap">
+                                                                            <input type="text" id="total_installment[{{ $installment->id }}]" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Total Gross" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Total Installment" readonly>
+                                                                            <input type="hidden" name="total_installment[{{ $installment->id }}]">
+                                                                        </td>
+                                                                        <td class="whitespace-nowrap">
+                                                                            @if ($row + 1 != 1)
+                                                                                @if(!empty($method))
+                                                                                <div class="flex justify-center items-center">
+                                                                                    <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeInstallment({{ $installment->id }})">
+                                                                                        <i class="w-4 h-4 mr-1 fa fa-trash"></i>
+                                                                                        Hapus 
+                                                                                    </button>
+                                                                                </div>
+                                                                                @endif
+                                                                            @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            @else
+                                                                <tr id="1">
+                                                                    <td>1</td>
+                                                                    <td class="whitespace-nowrap">
+                                                                        <input type="hidden" name="id_installment[1]" value="1">
+                                                                        <input type="date" class="form-control tgl-tagihan" name="tgl_tagihan[1]" value="{{ date('Y-m-d') }}">
+                                                                    </td>
+                                                                    <td class="whitespace-nowrap">
+                                                                        <input type="text" id="by_polis_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Polis" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Polis" readonly>
+                                                                        <input type="hidden" name="by_polis_installment">
+                                                                    </td>
+                                                                    <td class="whitespace-nowrap">
+                                                                        <input type="text" id="by_materai_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Materai" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Materai" readonly>
+                                                                        <input type="hidden" name="by_materai_installment">
+                                                                    </td>
+                                                                    <td class="whitespace-nowrap">
+                                                                        <input type="text" id="by_lain_installment" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Biaya Lain" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Biaya Lain" readonly>
+                                                                        <input type="hidden" name="by_lain_installment">
+                                                                    </td>
+                                                                    <td class="whitespace-nowrap">
+                                                                        <input type="text" id="premium_installment[1]" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Premium" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Premium" readonly>
+                                                                        <input type="hidden" name="premium_installment[1]">
+                                                                    </td>
+                                                                    <td class="whitespace-nowrap">
+                                                                        <input type="text" id="total_installment[1]" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Total Gross" style="text-align: right; width: 100%" onchange="hitungTOTAL()" inputmode="decimal" @role('maker|checker') readonly @endrole d-element="Total Installment" readonly>
+                                                                        <input type="hidden" name="total_installment[1]">
+                                                                    </td>
+                                                                    <td class="whitespace-nowrap">
+                                                                        
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            @endif
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
@@ -471,6 +499,7 @@
                                 </h2>
                                 @if((!empty($method) && !empty($data->transid)) || empty($data->transid))
                                 <div class="w-full sm:w-auto flex items-center sm:ml-auto mt-3 sm:mt-0">
+                                    <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="generatePlacing()"><i class="fa fa-download mr-2"></i> Placing </button>
                                     <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="addAsuransiRow()"><i class="fa fa-plus mr-2"></i> Tambah </button>
                                 </div>
                                 @endif
@@ -510,10 +539,6 @@
                                                             </td>
                                                             <td class="whitespace-nowrap">
                                                                 <div class="flex justify-center items-center">
-                                                                    <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="generatePlacing({{ $penanggung->id_asuransi }})">
-                                                                        <i class="w-4 h-4 mr-1 fa fa-print"></i>
-                                                                        Placing
-                                                                    </button>
                                                                     <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow({{ $row + 1 }})">
                                                                         <i class="w-4 h-4 mr-1 fa fa-trash"></i>
                                                                         Hapus
@@ -579,6 +604,7 @@
                                                 <th class="text-center whitespace-nowrap">ALAMAT OBJEK / KODEPOS</th>
                                                 <th class="text-center whitespace-nowrap">JENIS JAMINAN / DESKRIPSI</th>
                                                 <th class="text-center whitespace-nowrap">SUM INSURED</th>
+                                                <th class="text-center whitespace-nowrap">PERLUASAN</th>
                                                 <th class="text-center whitespace-nowrap">NILAI PASAR OBJEK / TAKSASI CI / Retaksasi CI</th>
                                                 <th class="whitespace-nowrap"></th>
                                             </tr>
@@ -640,6 +666,22 @@
                                                                 </div>
                                                             @endforeach
                                                         </td>
+                                                        <td>
+                                                            <select class="perluasan" d-id="{{ $row + 1 }}" id="perluasan[{{ $row + 1 }}]" name="perluasan[{{ $row + 1 }}][]" style="width:100%" d-element="Perluasan {{ $row + 1 }}" multiple="multiple"></select>
+                                                            <script>
+                                                                $(document).ready(function(){
+                                                                    var value = [];
+                                                                    @foreach ($data_objek_perluasan[$objek->id_objek] as $objek_perluasan)
+                                                                        var newOption = $("<option selected='selected'></option>").val({{ $objek_perluasan->id_perluasan }}).text("{{ $objek_perluasan->kode }}");
+                                                                        $('#perluasan\\[{{ $row + 1 }}\\]').append(newOption).trigger('change');
+                                                                        value.push({{ $objek_perluasan->id_perluasan }});
+                                                                    @endforeach
+                                                                    setTimeout(() => {
+                                                                        $('#perluasan\\[{{ $row + 1 }}\\]').val(value).change();
+                                                                    }, 1000);
+                                                                });
+                                                            </script>
+                                                        </td>
                                                         <td class="text-center">
                                                             <input type="text" class="form-control form-control-sm allow-decimal currency masked w-100" placeholder="Nilai Pasar OBJEK / Taksasi CI / Retaksasi CI" id="agunan_kjpp[{{ $row + 1 }}]" style="text-align: right;" inputmode="decimal" onchange="hitungTSI()" required d-element="Nilai Pasar {{ $row + 1 }}" value="{{ $objek->agunan_kjpp }}">
                                                             <input type="hidden" name="agunan_kjpp[{{ $row + 1 }}]" value="{{ $objek->agunan_kjpp }}">
@@ -695,67 +737,82 @@
                                             <tbody id="body-okupasi" valign="top">
                                                 @if (!empty($data->transid))
                                                     @foreach ($data_objek as $row => $objek)
-                                                    <tr class="intro-x" id="{{ $row + 1 }}">
-                                                        <td class="w-10 text-center">
-                                                            {{ $row + 1 }}
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <select class="kelas" id="id_kelas[{{ $row + 1 }}]" d-id="{{ $row + 1 }}" name="id_kelas[{{ $row + 1 }}]" style="width:100%" d-element="Jenis Pertanggungan {{ $row + 1 }}"></select>
-                                                            <script>
-                                                                @if (!empty($objek->id_kelas))
-                                                                    $(document).ready(function(){
-                                                                        setTimeout(() => {
-                                                                            var newOption = new Option('{{ $objek->nama_kelas }}', {{ $objek->id_kelas }}, false, false);
-                                                                            $('[name="id_kelas\\[{{ $row + 1 }}\\]"]').append(newOption).trigger('change');
-                                                                        }, 500);
-                                                                    });
-                                                                @endif
-                                                            </script>
-                                                        </td>
-                                                        <td>
-                                                            <select class="okupasi" id="okupasi[{{ $row + 1 }}]" name="okupasi[{{ $row + 1 }}]" required style="width: 100%" d-element="Okupasi 1"></select>
-                                                            <script>
-                                                                @if (!empty($objek->id_okupasi))
-                                                                    $(document).ready(function(){
-                                                                        setTimeout(() => {
-                                                                            var newOption = new Option('{{ $objek->nama_okupasi }}', {{ $objek->id_okupasi }}, false, false);
-                                                                            $('[name="okupasi\\[{{ $row + 1 }}\\]"]').append(newOption).trigger('change');
-                                                                        }, 500);
-                                                                    });
-                                                                @endif
-                                                            </script>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <input id="rate_okupasi[{{ $row + 1 }}]" type="text" placeholder="Rate (‰)" class="rate form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" required inputmode="decimal" onchange="hitungTSI()" d-element="Rate Okupasi {{ $row + 1 }}" value="@if(!empty($objek->rate)){{ $objek->rate }}@endif">
-                                                            <input type="hidden" name="rate_okupasi[{{ $row + 1 }}]" class="rate" value="@if(!empty($objek->rate)){{ $objek->rate }}@endif">
-                                                        </td>
-                                                        <td class="text-right">
-                                                            <input type="text" class="form-control form-control-sm allow-decimal currency masked" placeholder="Total Sum Insured" id="kodetrans_value[1][{{ $row + 1 }}]" style="text-align: right; width: 100%" inputmode="decimal" readonly d-element="TSI {{ $row + 1 }}">
-                                                            <input type="hidden" name="kodetrans_value[1][{{ $row + 1 }}]">
-                                                        </td>
-                                                        <td class="text-right">
-                                                            <input type="text" class="form-control form-control-sm allow-decimal currency masked" placeholder="Premium" id="kodetrans_value[2][{{ $row + 1 }}]" style="text-align: right; width: 100%" inputmode="decimal" readonly d-element="Premium {{ $row + 1 }}">
-                                                            <input type="hidden" name="kodetrans_value[2][{{ $row + 1 }}]">
-                                                        </td>
-                                                    </tr>
+                                                        <tr class="intro-x" id="{{ $row + 1 }}">
+                                                            <td class="w-10 text-center">
+                                                                {{ $row + 1 }}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <select class="kelas" id="id_kelas[{{ $row + 1 }}]" d-id="{{ $row + 1 }}" name="id_kelas[{{ $row + 1 }}]" style="width:100%" d-element="Jenis Pertanggungan {{ $row + 1 }}"></select>
+                                                                <script>
+                                                                    @if (!empty($objek->id_kelas))
+                                                                        $(document).ready(function(){
+                                                                            setTimeout(() => {
+                                                                                var newOption = new Option('{{ $objek->nama_kelas }}', {{ $objek->id_kelas }}, false, false);
+                                                                                $('[name="id_kelas\\[{{ $row + 1 }}\\]"]').append(newOption).trigger('change');
+                                                                            }, 500);
+                                                                        });
+                                                                    @endif
+                                                                </script>
+                                                            </td>
+                                                            <td>
+                                                                <select class="okupasi" id="okupasi[{{ $row + 1 }}]" name="okupasi[{{ $row + 1 }}]" required style="width: 100%" d-element="Okupasi 1"></select>
+                                                                <script>
+                                                                    @if (!empty($objek->id_okupasi))
+                                                                        $(document).ready(function(){
+                                                                            setTimeout(() => {
+                                                                                var newOption = new Option('{{ $objek->nama_okupasi }}', {{ $objek->id_okupasi }}, false, false);
+                                                                                $('[name="okupasi\\[{{ $row + 1 }}\\]"]').append(newOption).trigger('change');
+                                                                            }, 500);
+                                                                        });
+                                                                    @endif
+                                                                </script>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <input id="rate_okupasi[{{ $row + 1 }}]" type="text" placeholder="Rate (‰)" class="rate form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" required inputmode="decimal" onchange="hitungTSI()" d-element="Rate Okupasi {{ $row + 1 }}" value="@if(!empty($objek->rate)){{ $objek->rate }}@endif">
+                                                                <input type="hidden" name="rate_okupasi[{{ $row + 1 }}]" class="rate" value="@if(!empty($objek->rate)){{ $objek->rate }}@endif">
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <input type="text" class="border-theme-9 form-control form-control-sm allow-decimal currency masked" placeholder="Total Sum Insured" id="kodetrans_value[1][{{ $row + 1 }}]" style="text-align: right; width: 100%; font-weight: bold" inputmode="decimal" readonly d-element="TSI {{ $row + 1 }}">
+                                                                <input type="hidden" name="kodetrans_value[1][{{ $row + 1 }}]">
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <input type="text" class="form-control form-control-sm allow-decimal currency masked" placeholder="Premium" id="kodetrans_value[2][{{ $row + 1 }}]" style="text-align: right; width: 100%" inputmode="decimal" readonly d-element="Premium {{ $row + 1 }}">
+                                                                <input type="hidden" name="kodetrans_value[2][{{ $row + 1 }}]">
+                                                            </td>
+                                                        </tr>
+                                                        @if(!empty($data_objek_perluasan[$objek->id_objek]))
+                                                            @foreach ($data_objek_perluasan[$objek->id_objek] as $row_perluasan => $objek_perluasan)
+                                                                <tr>
+                                                                    <td colspan="2"></td>
+                                                                    <td>
+                                                                        ({{ $objek_perluasan->kode }}) {{ $objek_perluasan->keterangan }}
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <input id="rate_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" type="text" placeholder="Rate Perluasan (‰)" class="rate-perluasan rate form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" required inputmode="decimal" onchange="hitungPerluasan()" d-element="Rate Perluasan {{ $row + 1 }}" value="@if(!empty($objek_perluasan->rate)){{ $objek_perluasan->rate }}@endif">
+                                                                        <input type="hidden" name="rate_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" class="rate" value="@if(!empty($objek_perluasan->rate)){{ $objek_perluasan->rate }}@endif">
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <input type="text" class="rate form-control form-control-sm allow-decimal currency masked" placeholder="Nilai Pengkali Perluasan" id="value_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" d-element="Value Perluasan {{ $row + 1 }}" value="{{ $objek_perluasan->value }}">
+                                                                        <input type="hidden" name="value_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" value="{{ $objek_perluasan->value }}">
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <input type="text" class="form-control form-control-sm allow-decimal currency masked" placeholder="Premium" id="premi_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" readonly d-element="Premium {{ $row + 1 }}">
+                                                                        <input type="hidden" name="premi_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" class="premi-perluasan">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        @endif
                                                     @endforeach
                                                 @endif
                                             </tbody>
                                             <tfoot>
-                                                <tr class="intro-x border-t">
-                                                    <td class="w-10 text-center">
-                                                    </td>
-                                                    <td class="w-10 text-center">
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <b>TOTAL</b>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <input id="total_rate" type="text" placeholder="Total Rate (‰)" aria-describedby="Total Rate (‰)" class="form-control form-control-sm" style="text-align: right; width: 100%; font-weight:bold;" required readonly>
-                                                        <input type="hidden" name="total_rate">
+                                                <tr class="intro-x border-t" id="total-premi">
+                                                    <td class="text-right" colspan="4">
+                                                        <b>TOTAL </b>
+                                                        <input type="hidden" id="total-perluasan">
                                                     </td>
                                                     <td class="text-right">
-                                                        <input type="text" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Total Sum Insured" id="kodetrans_value[1]" style="text-align: right; width: 100%; font-weight:bold;" inputmode="decimal" readonly>
+                                                        <input type="text" class="border-theme-9 form-control form-control-sm allow-decimal currency masked w-40" placeholder="Total Sum Insured" id="kodetrans_value[1]" style="text-align: right; width: 100%; font-weight:bold;" inputmode="decimal" readonly>
                                                         <input type="hidden" name="kodetrans_value[1]">
                                                     </td>
                                                     <td class="text-right">
@@ -1095,12 +1152,14 @@
             var PREMI       = 0;
             var GROSS       = 0;
             var PRORATA     = $('#PRORATA').val();
-            var PERLUASAN   = hitungPerluasan();
+            var PERLUASAN   = isNaN(parseFloat($('#total-perluasan').val())) ? 0 : parseFloat($('#total-perluasan').val());
             var POLIS       = isNaN(parseFloat($('[name="kodetrans_value[10]"]').val())) ? 0 : parseFloat($('[name="kodetrans_value[10]"]').val());
             var MATERAI     = isNaN(parseFloat($('[name="kodetrans_value[11]"]').val())) ? 0 : parseFloat($('[name="kodetrans_value[11]"]').val());
             var LAIN        = isNaN(parseFloat($('[name="kodetrans_value[16]"]').val())) ? 0 : parseFloat($('[name="kodetrans_value[16]"]').val());
 
             var jmlObjek = 0;
+
+            TSI += PERLUASAN;
             $('#body-objek tr').each(function(){
                 var idRow = $(this).attr('id');
                 RATE += parseFloat($("[name='rate_okupasi\\["+idRow+"\\]']").val());
@@ -1108,25 +1167,6 @@
                 PREMI += parseFloat($("[name='kodetrans_value\\[2\\]\\["+idRow+"\\]']").val() * PRORATA);
                 jmlObjek++;
             });
-
-            if (isNaN(RATE)) {
-                console.log('RATE', RATE);
-            } else {
-                console.log('PERLUASAN',PERLUASAN);
-                if (PERLUASAN !== 0) {
-                    $('#head-rate').text('RATE (‰) + ' + PERLUASAN + ' ‰ (Perluasan)');
-                } else {
-                    $('#head-rate').text('RATE (‰)');
-                }
-
-                if (jmlObjek > 1) {
-                    $('#total_rate').val(RATE.toFixed(4) + " / " + jmlObjek + " = " + parseFloat(RATE/jmlObjek).toFixed(4)).keyup();
-                    $('[name="total_rate"]').val(parseFloat(RATE/jmlObjek).toFixed(4)).keyup();
-                } else {
-                    $('#total_rate').val(RATE.toFixed(4)).keyup();
-                    $('[name="total_rate"]').val(RATE.toFixed(4)).keyup();
-                }
-            }
 
             var _RATE = RATE;
 
@@ -1184,12 +1224,26 @@
         }
 
         function hitungPerluasan() {
-            var RATE_PERLUASAN = 0;
-            $('.check-perluasan:checked').each(function(){
-                var id = $(this).attr('id');
-                RATE_PERLUASAN += isNaN(parseFloat($("[name='rate_perluasan\\["+id+"\\]']").val())) ? 0 : parseFloat($("[name='rate_perluasan\\["+id+"\\]']").val());
+            var total_perluasan = isNaN(parseFloat($("#total_perluasan").val())) ? 0 : parseFloat($("#total_perluasan").val());
+
+            $('.rate-perluasan').each(function(){
+                var field_perluasan = $(this).attr('id').replace(/\[/g,"\\[").replace(/\]/g,"\\]").replace("rate_","");
+
+                var rate_perluasan  = isNaN(parseFloat($("[name='rate_"+field_perluasan+"']").val())) ? 0 : parseFloat($("[name='rate_"+field_perluasan+"']").val());
+                var value_perluasan = isNaN(parseFloat($("[name='value_"+field_perluasan+"']").val())) ? 0 : parseFloat($("[name='value_"+field_perluasan+"']").val());
+                var premi_perluasan = rate_perluasan * value_perluasan / 1000;
+
+                $('#premi_'+field_perluasan).val(premi_perluasan).keyup();
+                
+                total_perluasan += premi_perluasan;
+                
+                $('#total-perluasan').val(total_perluasan);
+                // console.log('rate_perluasan',rate_perluasan);
+                // console.log('value_perluasan',value_perluasan);
+                // console.log('total_perluasan',total_perluasan);
+                // console.log('#premi_'+field_perluasan);
+                hitungTOTAL();
             });
-            return RATE_PERLUASAN;
         }
 
         function refreshFunction() {
@@ -1341,6 +1395,9 @@
                                     </div>
                                     <input type="hidden" name="sumins_value[`+id+`][1]" value="">
                                 </div>
+                            </td>
+                            <td>
+                                <select class="perluasan" d-id="`+id+`" id="perluasan[`+id+`]" name="perluasan[`+id+`]" style="width:100%" d-element="Perluasan `+id+`" multiple="multiple"></select>
                             </td>
                             <td class="text-center">
                                 <input type="text" class="form-control form-control-sm allow-decimal currency masked w-100" placeholder="Nilai Pasar OBJEK / Taksasi CI / Retaksasi CI" id="agunan_kjpp[`+id+`]" style="text-align: right;" inputmode="decimal" onchange="hitungTSI()" required d-element="Nilai Pasar `+id+`">
@@ -1517,27 +1574,6 @@
                                 <input type="hidden" name="kodetrans_value[2][`+id+`]">
                             </td>
                         </tr>`;
-
-            // var html = `<tr class="intro-x" id="`+id+`">
-            //                 <td class="w-10 text-center" width="5%">
-            //                     `+id+`
-            //                 </td>
-            //                 <td class="" width="35%">
-            //                     <select class="okupasi" name="okupasi[`+id+`]" required style="width: 100%" d-element="Okupasi `+id+`"></select>
-            //                 </td>
-            //                 <td class="text-center" width="20%">
-            //                     <input id="rate_okupasi[`+id+`]" type="text" name="rate[`+id+`]" class="form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" required inputmode="decimal" onchange="hitungTSI()" d-element="Rate Okupasi `+id+`">
-            //                     <input type="hidden" name="rate_okupasi[`+id+`]">
-            //                 </td>
-            //                 <td class="text-right" width="20%">
-            //                     <input type="text" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Total Sum Insured" id="kodetrans_value[1][`+id+`]" style="text-align: right; width: 100%" inputmode="decimal" readonly d-element="TSI `+id+`">
-            //                     <input type="hidden" name="kodetrans_value[1][`+id+`]" value="">
-            //                 </td>
-            //                 <td class="text-right" width="20%">
-            //                     <input type="text" class="form-control form-control-sm allow-decimal currency masked w-40" placeholder="Premium" id="kodetrans_value[2][`+id+`]" style="text-align: right; width: 100%" inputmode="decimal" readonly d-element="Premium `+id+`">
-            //                     <input type="hidden" name="kodetrans_value[2][`+id+`]" value="">
-            //                 </td>
-            //             </tr>`;
             $('#body-okupasi').append(html);
             initCurrency();
             initDecimal();
@@ -1593,62 +1629,48 @@
             }
         }
 
-        function cekPerluasan(tipe = null) {
-            $('#list-perluasan').empty();
-            $.ajax({
-                url: "{{ url('api/cekperluasan') }}",
-                data: {
-                    "instype":tipe,
-                    @if (!empty($data->transid))
-                    "transid": "{{ $data->transid }}",
-                    @endif
-                },
-                type: "GET",
-                success: function(response){
-                    // console.log(response);
-                    if (response.length > 0) {
-                        $('#div-perluasan').show();
-                        $.each(response, function (i, v) { 
-                            if (v.requred == 1) {
-                                var kondisi = 'onclick="return false;" checked ';
-                            }
-                            if (v.rate == null) {
-                                v.rate = 0;
-                            }
-                            var html = `<div class="form-check mr-2 col-span-12 @if (!empty($data->transid) && $data->id_status > 2) lg:col-span-6 @else lg:col-span-3 @endif">
-                                            <input id="`+v.id+`" class="form-check-input check-perluasan" onchange="hitungTSI()" type="checkbox" name="check_perluasan[`+v.id+`]"
-                                                `+kondisi+`
-                                                `+v.checked+`
-                                                @if (empty($method) && !empty($data->transid)) onclick="return false;" @endif
-                                                @if (!empty($method) && $data->id_status > 1) onclick="return false;" @endif>
-                                            @if (!empty($data->transid) && $data->id_status > 1)
-                                                <div class="input-group form-control-sm" style="width: 100%">
-                                                    <div class="input-group-text form-check-label tooltip" data-theme="light" title="`+v.keterangan+`" for="perluasan-`+v.id+`">`+v.kode+`</div>
-                                                    <input id="rate_perluasan[`+v.id+`]" type="text" placeholder="`+v.keterangan+`" class="form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungTOTAL()" value="`+v.rate+`">
-                                                </div>
-                                                <input type="hidden" class="perluasan-value" name="rate_perluasan[`+v.id+`]" value="`+v.rate+`">
-                                            @else
-                                                <label class="form-check-label" for="`+v.id+`">`+v.kode+`</label>
-                                            @endif
-                                        </div>`;
-                            $('#list-perluasan').append(html);
-                        });
-                        initTSI();
-                        initDecimal();
-                    } else {
-                        $('#div-perluasan').hide();
-                    }
-                },
-                error: function(response){
-                    console.log('err cekPerluasan',response);
-                }
-            })
-        }
-
         function cekTipeAsuransi() {
             var tipe = $('#type_insurance').val();
+            // console.log('tipe',tipe);
             var id = "";
-            cekPerluasan(tipe);
+            
+            $('.perluasan').each(function(){
+                var preselected = [];
+                var id = $(this).attr('d-id');
+                // console.log('id',id);
+                $('#perluasan\\['+id+'\\]').val(null).trigger('change');
+                $('#perluasan\\['+id+'\\]').select2({
+                    language: "id",
+                    placeholder: "Pilih Beberapa",
+                    multiple: true,
+                    ajax: {
+                        dataType: "json",
+                        url: "{{ url('api/selectperluasan') }}",
+                        headers: {
+                            'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                        },
+                        data: function(params) {
+                            return {
+                                search: params.term,
+                                "instype": $('#type_insurance').val()
+                            };
+                        },
+                        processResults: function(data, page) {
+                            $.each(data, function (i, v) { 
+                                 if (v.selected == true){
+                                     preselected.push(v.id)
+                                 }
+                            });
+                            return {
+                                results: data,
+                            };
+                        },
+                    },
+                });
+                setTimeout(() => {
+                    $('#perluasan\\['+id+'\\]').val(preselected).change();
+                }, 500);
+            });
             
             $('.kelas').each(function(){
                 id = $(this).attr('d-id');
@@ -1734,7 +1756,7 @@
                 $('#kodetrans_value\\[12\\]').prop('readonly',false);
                 $('#modal-installment .btn-tambah').show();
                 $('#modal-installment .btn-hapus').show();
-                $('.formnya.installment :input').prop('readonly',false);
+                $('.tgl-tagihan').prop('readonly', false);
                 $('#tb-dokumen a.flex').hide();
                 $('[name^="id_objek"]').prop('readonly',false);
                 @elseif (!empty($method) && $data->id_status == 3)
@@ -1754,10 +1776,14 @@
             @if (empty($data->transid))
                 addObjekRow();
             @endif
+            @if (count($data_penanggung) < 1)
+                addAsuransiRow();
+            @endif
             initSelect();
             initTSI();
             initAsuransi();
             cekTipeAsuransi();
+            hitungPerluasan();
 
             $('.kelas').on('select2:select', function(){
                 var id = $(this).attr('d-id');
@@ -2063,14 +2089,9 @@
             });
 
             $('.okupasi').on('select2:select', function(e) {
-                var perluasan = hitungPerluasan();
                 var data = e.params.data;
                 var field_okupasi = $(this).attr('name').replace("[","\\[").replace("]","\\]");
-                var total_rate = parseFloat(perluasan) + parseFloat(data.rate);
-                console.log('total_rate',total_rate);
-                console.log('perluasan',parseFloat(perluasan));
-                console.log('data.rate',parseFloat(data.rate));
-                $('#rate_' + field_okupasi).val(total_rate).keyup().change();
+                $('#rate_' + field_okupasi).val(data.rate).keyup().change();
                 hitungTOTAL();
             });
             

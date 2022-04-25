@@ -64,8 +64,8 @@
                                     <i class="fa fa-exclamation-circle w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Klaim
                                 </a>
-                                class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-4"
                                 <a id="ps-rollback"
+                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-4"
                                     style="cursor:pointer">
                                     <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Batal Mengajukan
@@ -78,7 +78,7 @@
                                 </a>
                             @endrole
                             @role('approver|adm')
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-1"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme @if(Auth::user()->id_cabang == 1) st-wholesales @endif st-1"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
@@ -90,7 +90,7 @@
                                 </a>
                             @endrole
                             @role('broker|adm')
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-2"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-2"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Verifikasi

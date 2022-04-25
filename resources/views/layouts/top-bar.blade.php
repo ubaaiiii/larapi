@@ -10,7 +10,7 @@
         <div class="search">
             <input id="text-search" type="search" class="search__input form-control border-transparent placeholder-theme-13"
                 placeholder="Cari di Inquiry..." name="search">
-            <i id="icon-search" data-feather="search" class="search__icon dark:text-gray-300"></i>
+            <i id="icon-search" data-feather="search" class="search__icon dark:text-gray-300" style="cursor: pointer"></i>
         </div>
     </div>
     <script>

@@ -329,9 +329,15 @@
         <td></td>
         <td>Brokerage {{ number_format($data['pricing'][12]->value,2) }}% (Exclude VAT)</td>
         <td align="right">= IDR</td>
+        @if (date($data['transaksi']->billing_at) > "2022-04-01")
+        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][13]->value,2) }}</td>
+        <td>-</td>
+        @else
         <td align="right" >{{ number_format($data['pricing'][13]->value,2) }}</td>
         <td></td>
+        @endif
       </tr>
+      @if (date($data['transaksi']->billing_at) <= "2022-04-01")
       <tr>
         <td></td>
         <td></td>
@@ -339,7 +345,8 @@
         <td align="right">= IDR</td>
         <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][14]->value,2) }}</td>
         <td>-</td>
-      </tr> 
+      </tr>
+      @endif
       <tr>
         <td></td>
         <td></td>

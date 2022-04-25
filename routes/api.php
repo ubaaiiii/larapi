@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/selectinstype/{any}', 'API\DataController@selectInstype');
     Route::get('/selectasuransi', 'API\DataController@selectAsuransi');
     Route::get('/selectkelas', 'API\DataController@selectKelas');
+    Route::get('/selectperluasan', 'API\DataController@selectPerluasan');
     Route::get('/datadashboard', 'API\DataController@dataDashboard');
     Route::get('/cekperluasan', 'API\DataController@cekPerluasan');
 

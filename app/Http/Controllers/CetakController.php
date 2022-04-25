@@ -444,22 +444,41 @@ class CetakController extends Controller
                     'objek'       => TransaksiObjek::join('kodepos', 'id_kodepos', '=', 'kodepos.id')
                         ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
                         ->leftJoin('kelas_pertanggungan', 'id_kelas', '=', 'kelas_pertanggungan.id')
-                        ->where('id_transaksi', $transaksi->transid)->get(),
+                        ->where('transaksi_objek.id_transaksi', $transaksi->transid)
+                        ->select([
+                            'transaksi_objek.id       AS objek_id',
+                            'transaksi_objek.*',
+                            'kelas_pertanggungan.*',
+                            'okupasi.*',
+                            'kodepos.*',
+                        ])
+                        ->get(),
                     'objek_pricing' => TransaksiObjek::join('kodepos', 'id_kodepos', '=', 'kodepos.id')
-                        ->leftJoin('transaksi_pricing', function ($q) {
+                        ->leftJoin('transaksi_pricing', function ($q) use ($transaksi) {
                             $q->on('id_objek', '=', 'transaksi_objek.id')
-                                ->whereNotNull('id_objek');
+                                ->whereNotNull('id_objek')
+                                ->where('transaksi_pricing.id_transaksi', '=', $transaksi->transid);
                         })
                         ->leftJoin('transaksi_kode', 'id_kodetrans', '=', 'kodetrans_id')
                         ->where('transaksi_objek.id_transaksi', $transaksi->transid)->get(),
                     'perluasan'   => TransaksiPerluasan::join('perluasan', 'id_perluasan', '=' , 'perluasan.id')
-                        ->where('id_transaksi', $transaksi->transid)->get(),
+                        ->where('id_transaksi', $transaksi->transid)
+                        // ->select([
+                        //     'perluasan.id',
+                        //     'perluasan.kode',
+                        //     'perluasan.keterangan',
+                        //     'transaksi_perluasan.id_perluasan',
+                        //     DB::raw('IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate) as rate'),
+                        //     DB::raw('IF (transaksi_perluasan.value IS NOT NULL, transaksi_perluasan.value, 0) as value')
+                        // ])
+                        ->get(),
                     'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
                         ->where('tsi', 1)
                         ->where('transaksi_pricing.value', '<>', 0)
-                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
+                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get(),
+                    'asuransi'    => Asuransi::where('id', '=', $id_asuransi)->get(),
                 ];
-                // dd($data['objek']);
+                // dd($data['objek_pricing']);
                 $data['nomor_surat'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "/" . $jenis_kode . "/" . $data['instype']->id . "/UW-01/BDS/" . Functions::angka_romawi(date('m')) . "/" . date('Y');
                 $parameter = [
                     'id' => $transaksi->transid,

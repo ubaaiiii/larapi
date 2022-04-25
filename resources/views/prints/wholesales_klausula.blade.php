@@ -1,3 +1,4 @@
+
 <html>
 
 <head>
@@ -293,7 +294,7 @@
     <br>
     <table style="font-size: 10pt" cellspacing=0>
       <tr valign="top">
-        <td><strong>Rate<br>(per annum)</strong></td>
+        <td width="10%"><strong>Rate<br>(per annum)</strong></td>
         <td width="2%">:</td>
         <td>
           <i><u>{{ $data['instype']->instype_name }} :</u></i><br>
@@ -304,163 +305,35 @@
             @foreach ($data['objek'] as $objek)
               @php($total_rate += $objek->rate)
               <tr style="padding:0px;" valign="top">
-                <td width="4%" style="padding:0px;">{{ $i }}.</td>
-                <td style="padding:0px;"><i>{{ $objek->nama_okupasi }} ({{ $objek->kode_okupasi }}) ({{ $objek->nama_kelas }})</i></td>
-                <td style="padding:0px;">:</td>
+                <td width="4%" style="padding:0px;">{{ $i++ }}.</td>
+                <td width="78%" style="padding:0px;"><b><i>{{ $objek->nama_okupasi }} ({{ $objek->kode_okupasi }}) ({{ $objek->nama_kelas }})</i></b></td>
+                <td width="2%" style="padding:0px;">:</td>
                 <td style="padding:0px;" align="right">{{ $objek->rate }} ‰</td>
-                <td style="padding:0px;" align="right">@if($i++ == $jml_objek)+@endif</td>
               </tr>
-            @endforeach
-            <tr>
-              <th style="padding:0px;" align="right" colspan="2">@if($jml_objek == 1) TOTAL RATE @endif</th>
-              <th style="padding:0px;">@if($jml_objek == 1) : @endif</th>
-              <th style="padding:0px;border-top: 1px solid black;" align="right">
-                {{ number_format($total_rate,5) }} ‰
-              </th>
-              <th></th>
-            </tr>
-            @if($jml_objek > 1)
-              @php($total_rate = $total_rate / $jml_objek)
+              @if (!empty($data['perluasan']))
               <tr>
-                <td style="padding:0px;" align="right" colspan="4">{{ $jml_objek }}</td>
-                <td align="right">÷</td>
-              </tr>
-              <tr>
-                <th style="padding:0px;" colspan="2" align="right">TOTAL RATE&nbsp;</th>
-                <th style="padding:0px;" align="right">:</th>
-                <th style="padding:0px;border-top: 1px solid black;" align="right">
-                  {{ number_format($total_rate, 5) }} ‰
-                </th>
-                <th></th>
-              </tr>
-            @endif
-            <tr>
-              <td colspan="5"></td>
-            </tr>
-            <tr>
-              <td colspan="5"><i><u>Expansions :</u></i></td>
-            </tr>
-            @if (count($data['perluasan']) > 1)
-              @php($i = 1)
-              @php($jml_perluasan = count($data['perluasan']))
-              @php($total_perluasan = 0)
-              @foreach ($data['perluasan'] as $perluasan)
-                @php($total_perluasan += $perluasan->rate)
-                <tr style="padding:0px;">
-                  <td style="padding:0px;" width="4%">-</td>
-                  <td style="padding:0px;"><i>{{ $perluasan->keterangan }}</i></td>
-                  <td style="padding:0px;">:</td>
-                  <td style="padding:0px;" align="right">{{ $perluasan->rate }} ‰</td>
-                  <td style="padding:0px;" align="right">@if($i++ == $jml_perluasan)+@endif</td>
-                </tr>
-              @endforeach
-              <tr>
-                <th style="padding:0px;" colspan="2" align="right">TOTAL EXPANSIONS</th>
-                <th style="padding:0px;">:</th>
-                <th style="padding:0px;border-top: 1px solid black;" align="right">
-                  <b>{{ number_format($total_perluasan,5) }} ‰</b>
-                </th>
-                <th></th>
-              </tr>
-              <tr>
-                <td colspan="5">&nbsp;</td>
-              </tr>
-              <tr>
-                <th style="padding:0px;" colspan="2" align="right">GRAND TOTAL</th>
-                <th style="padding:0px;">:</th>
-                <th style="padding:0px;border-top: 1px solid black;" align="right">
-                  <b>{{ number_format($total_rate + $total_perluasan,5) }} ‰</b>
-                </th>
-                <th></th>
-              </tr>
-            @endif
-          </table>
-        </td>
-        {{-- <td width="2%">
-          <br>
-          @php($i = 1)
-          <table>
-            @foreach ($data['objek'] as $objek)
-            <tr style="padding:0px;">
-              <td colspan style="padding:0px;">:</td>
-            </tr>
-            @endforeach
-          </table>
-          @if($jml_objek > 1)
-          <br><br><br>
-          @endif
-          @if (count($data['perluasan']) > 0)
-            <br><br>
-            <table>
-              @foreach ($data['perluasan'] as $perluasan)
-              <tr style="padding:0px;">
-                <td width="4%" style="padding:0px;">:</td>
-              </tr>
-              @endforeach
-            </table>
-          @endif
-        </td>
-        <td>
-          <br>
-          <table>
-            @php($i = 1)
-            @foreach ($data['objek'] as $objek)
-              @php($total_rate += $objek->rate)
-              <tr style="padding:0px;">
-                <td style="padding:0px;" align="right">{{ number_format($objek->rate, 5) }} ‰</td>
-                <td style="padding:0px;" align="right">@if($i++ == $jml_objek)+@endif</td>
-              </tr>
-            @endforeach
-            <tr>
-              <td style="border-top: 1px solid black;" align="right">
-                <b>{{ number_format($total_rate,5) }} ‰</b>
-              </td>
-            </tr>
-            @if($jml_objek > 1)
-            <tr>
-              <td style="border-bottom: 1px solid black;" align="right">{{ $jml_objek }}</td>
-              <td align="right">÷</td>
-            </tr>
-            <tr>
-              <td align="right">
-                <b>{{ number_format($total_rate / $jml_objek, 5) }} ‰</b>
-              </td>
-            </tr>
-            @endif
-          </table>
-          @if (count($data['perluasan']) > 0)
-            <br>
-            <table>
-              @php($i = 1)
-              @php($total_perluasan = 0)
-              @foreach ($data['perluasan'] as $perluasan)
-                @php($total_perluasan += $perluasan->rate)
-                <tr style="padding:0px;">
-                  <td style="padding:0px;" align="right">{{ number_format($perluasan->rate, 5) }} ‰</td>
-                  <td style="padding:0px;" align="right">@if($i++ == $jml_perluasan)+@endif</td>
-                </tr>
-              @endforeach
-              <tr>
-                <td style="border-top: 1px solid black;" align="right">
-                  <b>{{ number_format($total_perluasan,5) }} ‰</b>
+                <td></td>
+                <td colspan="3">
+                  <u>Expansions:</u>
                 </td>
               </tr>
-            </table>
-          @endif
-        </td> --}}
-      </tr>
-      {{-- <tr style="position: absolute;">
-        <td colspan="3" align="right"><strong>TOTAL</strong></td>
-        <td>
-          <table>
-            <tr style="padding:0px;">
-              <td colspan style="padding:0px;">:</td>
-            </tr>
+                @foreach ($data['perluasan'] as $row => $perluasan)
+                  @if ($perluasan->id_objek == $objek->objek_id)
+                    <tr style="padding:0px;" valign="top">
+                      <td style="padding:0px;" align="right">-</td>
+                      <td style="padding:0px;"><i>{{ $perluasan->keterangan }}</i></td>
+                      <td style="padding:0px;">:</td>
+                      <td style="padding:0px;" align="right">{{ $perluasan->rate }} ‰</td>
+                    </tr>
+                  @endif
+                @endforeach
+              @endif
+            @endforeach
           </table>
         </td>
-        <td colspan="2"><strong>{ total_rate } ‰</strong></td>
-      </tr> --}}
+      </tr>
     </table>
+    <br>
     <table style="font-size:10pt">
       <tr valign="top">
         <td><strong>Perhitungan Premi</strong></td>
@@ -469,14 +342,36 @@
       </tr>
     </table>
     <table style="font-size:10pt;font-weight:bold;">
-      <tr>
-        <td width="10%">&nbsp;&nbsp;Premi</td>
-        <td width="5%">:</td>
-        <td width="55%">IDR {{ number_format($data['pricing'][1]->value,2) }} &nbsp;&nbsp;&nbsp;x { total_rate } ‰</td>
-        <td width="6%" align="right">= IDR</td>
-        <td width="" align="right">{{ number_format($data['pricing'][2]->value,2) }}</td>
-        <td width="1%"></td>
-      </tr>
+      @foreach ($data['objek'] as $row => $objek)
+        @php($TSI_objek = 0)
+        @foreach ($data['objek_pricing'] as $objek_pricing)
+          @if($objek->objek_id == $objek_pricing->id_objek)
+            @php($TSI_objek += $objek_pricing->value);
+          @endif
+        @endforeach
+        <tr>
+          <td width="10%">@if($row == 0)&nbsp;&nbsp;Premi @endif</td>
+          <td width="5%">@if($row == 0): @endif</td>
+          <td width="55%">TSI ({{ $row + 1 }}) =  IDR {{ number_format($TSI_objek,2) }} &nbsp;&nbsp;&nbsp;x {{ $objek->rate }} ‰</td>
+          <td width="6%" align="right">= IDR</td>
+          <td width="" align="right">{{ number_format($TSI_objek * $objek->rate / 1000,2) }}</td>
+          <td width="1%"></td>
+        </tr>
+        @if (!empty($data['perluasan']))
+          @foreach ($data['perluasan'] as $row => $perluasan)
+            @if ($perluasan->id_objek == $objek->objek_id)
+              <tr>
+                <td width="10%"></td>
+                <td width="5%"></td>
+                <td width="55%">- {{ $perluasan->kode }} =  IDR {{ number_format($perluasan->value,2) }} &nbsp;&nbsp;&nbsp;x {{ $perluasan->rate }} ‰</td>
+                <td width="6%" align="right">= IDR</td>
+                <td width="" align="right">{{ number_format($perluasan->value * $perluasan->rate / 1000,2) }}</td>
+                <td width="1%"></td>
+              </tr>
+            @endif
+          @endforeach
+        @endif
+      @endforeach
       <tr>
         <td></td>
         <td></td>
@@ -514,30 +409,56 @@
         <td></td>
         <td>Brokerage {{ number_format($data['pricing'][12]->value,2) }}% (Exclude VAT)</td>
         <td align="right">= IDR</td>
-        <td align="right" >{{ number_format($data['pricing'][13]->value,2) }}</td>
-        <td></td>
+        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][13]->value,2) }}</td>
+        <td>-</td>
       </tr>
-      <tr>
+      {{-- <tr>
         <td></td>
         <td></td>
         <td>PPN (10%)</td>
         <td align="right">= IDR</td>
         <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][14]->value,2) }}</td>
         <td>-</td>
-      </tr> 
+      </tr>  --}}
       <tr>
         <td></td>
         <td></td>
-        <td>Total Premi</td>
+        <td><u>TOTAL PREMI</u></td>
         <td align="right">= IDR</td>
         <td align="right">{{ number_format($data['pricing'][19]->value,2) }}</td>
         <td></td>
+      </tr>
+      <tr>
+        <td colspan="6"></td>
+      </tr>
+      <tr>
+        <td width="10%">&nbsp;&nbsp;Security</td>
+          <td width="5%">:</td>
+          <td width="55%">{{ $data['asuransi']->nama_asurasi }}</td>
+          <td width="6%" align="right"></td>
+          <td width="" align="right"></td>
+          <td width="1%"></td>
       </tr>
     </table>
     <br>
     <br>
     <table style="font-size: 10pt">
       <tr>
+        <td>
+          <b>Jakarta, {{ date('d F Y') }}</b><br>
+          Signed for and on behalf of,
+          <b>PT. BINA DANA SEJAHTERA</b>
+        </td>
+        <td colspan="4"></td>
+      </tr>
+      <tr>
+        <td>Wahyusenja D. AAAIK CIIB</td>
+        <td></td>
+        <td>Hargo Nugroho CIIB</td>
+        <td></td>
+        <td>Broker</td>
+      </tr>
+      {{-- <tr>
         <td width="70%"></td>
         <td align="center">JAKARTA, _______________</td>
       </tr>
@@ -550,7 +471,7 @@
       <tr>
         <td></td>
         <td align="center">{ nama_asuransi }</td>
-      </tr>
+      </tr> --}}
     </table>
   </main>
 </body>

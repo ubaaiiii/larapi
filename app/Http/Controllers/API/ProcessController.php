@@ -594,6 +594,7 @@ class ProcessController extends Controller
     public function wholesales(Request $request)
     {
         // return $request->all();
+        // return $this->objek($request);
         $role = Auth::user()->getRoleNames()[0];
         switch ($request->method) {
             case "store":
@@ -647,7 +648,7 @@ class ProcessController extends Controller
                 $insured    = $this->tertanggung($request);
                 $cabang     = $this->cabang($request);
                 $objek      = $this->objek($request); // udah termasuk pricing objeknya
-                $perluasan  = $this->perluasan($request);
+                // $perluasan  = $this->perluasan($request);
 
                 $data   = Transaksi::find($request->transid);
 
@@ -745,7 +746,7 @@ class ProcessController extends Controller
 
                             $this->pricing($request);
                             $this->objek($request);
-                            $this->perluasan($request);
+                            // $this->perluasan($request);
                             $this->installment($request);
 
                         } else if ($transaksi->id_status == 8) {
@@ -1642,8 +1643,8 @@ class ProcessController extends Controller
     public function objek($request)
     {
         if (!empty($request->objek)) {
-            TransaksiObjek::where('id_transaksi', $request->transid)->forceDelete();
-            Pricing::where('id_transaksi', $request->transid)->whereNotNull('id_objek')->forceDelete();
+            // TransaksiObjek::where('id_transaksi', $request->transid)->forceDelete();
+            // Pricing::where('id_transaksi', $request->transid)->whereNotNull('id_objek')->forceDelete();
 
             foreach ($request->objek as $i => $v) {
                 if (!is_numeric($request->id_objek[$i])) {
@@ -1678,6 +1679,7 @@ class ProcessController extends Controller
                     $data
                 );
 
+                // objek pricing
                 foreach ($request->sumins_type[$i] as $j => $k) {
                     $value = $request->sumins_value[$i][$j];
                     if ($value == null) {
@@ -1695,7 +1697,27 @@ class ProcessController extends Controller
                     );
                     $data_pricing[] = $pricing;
                 }
-
+                
+                // objek perluasan
+                foreach ($request->perluasan[$i] as $j => $k) {
+                    $value = (isset($request->value_perluasan[$i][$k])) ? $request->value_perluasan[$i][$k] : null;
+                    $rate  = (isset($request->rate_perluasan[$i][$k])) ? $request->rate_perluasan[$i][$k] : null;
+                    
+                    $perluasan = TransaksiPerluasan::updateOrCreate(
+                        [
+                            'id_transaksi'  => $request->transid,
+                            'id_perluasan'  => $k,
+                            'id_objek'      => $objek->id
+                        ],
+                        [
+                            'rate'          => $rate,
+                            'value'         => $value,
+                            'created_by'    => Auth::user()->id,
+                        ],
+                    );
+                    $data_perluasan[] = $perluasan;
+                }
+                
                 $data_objek[] = [$objek,$data_pricing];
             }
 
@@ -1706,15 +1728,16 @@ class ProcessController extends Controller
     public function perluasan($request)
     {
         // DB::enableQueryLog();
-        if (!empty($request->check_perluasan)) {
+        if (!empty($request->perluasan)) {
             $data_perluasan = [];
             $id_perluasan = [];
-            foreach ($request->check_perluasan as $i => $v) {
+            foreach ($request->perluasan as $i => $v) {
                 $rate = (isset($request->rate_perluasan[$i])) ? $request->rate_perluasan[$i] : null;
                 $perluasan = TransaksiPerluasan::updateOrCreate(
                     [
                         'id_transaksi'  => $request->transid,
                         'id_perluasan'  => $i,
+                        'id_objek'
                     ],
                     [
                         'rate'          => $rate,
@@ -1724,6 +1747,7 @@ class ProcessController extends Controller
                 $data_perluasan[] = $perluasan;
                 $id_perluasan[] = $i;
             }
+            return $data_perluasan;
             TransaksiPerluasan::where('id_transaksi', $request->transid)->whereNotIn('id_perluasan', $id_perluasan)->forceDelete();
 
             return $data_perluasan;

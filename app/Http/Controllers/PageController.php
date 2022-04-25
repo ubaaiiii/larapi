@@ -134,16 +134,17 @@ class PageController extends Controller
                     }
                 }
             }
-            $data['act']                = 'edit';
-            $data['data']               = $transaksi;
-            $data['pricing']            = $dataController->dataPricing($transid);
-            $data['data_objek']         = $dataController->dataObjek($transid);
-            $data['data_objek_pricing'] = $dataController->dataObjekPricing($transid);
-            $data['data_perluasan']     = $dataController->dataPerluasan($transid);
-            $data['data_installment']   = $dataController->dataInstallment($transid);
-            $data['data_penanggung']    = $dataController->dataPenanggung($transid);
-            $data['status']             = Master::where('msid', $transaksi->id_status)->where('mstype','status')->first();
-            // return json_encode($data['data_installment']);
+            $data['act']                    = 'edit';
+            $data['data']                   = $transaksi;
+            $data['pricing']                = $dataController->dataPricing($transid);
+            $data['data_objek']             = $dataController->dataObjek($transid);
+            $data['data_objek_pricing']     = $dataController->dataObjekPricing($transid);
+            $data['data_objek_perluasan']   = $dataController->dataObjekPerluasan($transid);
+            // $data['data_perluasan']      = $dataController->dataPerluasan($transid);
+            $data['data_installment']       = $dataController->dataInstallment($transid);
+            $data['data_penanggung']        = $dataController->dataPenanggung($transid);
+            $data['status']                 = Master::where('msid', $transaksi->id_status)->where('mstype','status')->first();
+            // dd($data['data_objek_perluasan']);
         } else {
             Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);
         }

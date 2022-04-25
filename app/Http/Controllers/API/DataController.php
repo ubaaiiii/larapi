@@ -183,6 +183,64 @@ class DataController extends Controller
         return response()->json($list);
     }
 
+    public function selectPerluasan(Request $request)
+    {
+        // DB::enableQueryLog();
+        $perluasan = Perluasan::where('id_instype', $request->instype);
+        $select = [
+            'perluasan.id',
+            'perluasan.kode',
+            'perluasan.keterangan',
+            'perluasan.required',
+        ];
+
+        if (!empty($request->transid)) {
+            array_push(
+                $select,
+                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate), perluasan.rate) as rate'),
+                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, IF (transaksi_perluasan.value IS NOT NULL, transaksi_perluasan.value, 0), 0) as value'),
+                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, "checked", NULL) as checked')
+            );
+            $perluasan->leftJoin('transaksi_perluasan', function ($q) use ($request) {
+                $q->on('perluasan.id', '=', 'id_perluasan')
+                ->where('id_transaksi', '=', $request->transid);
+            })->select($select);
+        } else {
+            array_push($select, 'perluasan.rate', DB::raw('null as checked'));
+            $perluasan->select($select);
+        }
+        if (!empty($request->search)) {
+            $perluasan->where('perluasan.kode', 'like', '%' . $request->search . '%')
+                ->orWhere('perluasan.keterangan', 'like', '%' . $request->search . '%');
+        }
+        // $perluasan->get();
+        // return DB::getQueryLog();
+        $perluasan = $perluasan->get();
+
+        // return $request->all();
+        // $kelas = DB::table("kelas_pertanggungan")
+        //     ->where('id_instype', 'like', '%' . $request->tipe . '%');
+        // if (!empty($request->search)) {
+        //     $kelas->where('nama_kelas', 'like', '%' . $request->tipe . '%');
+        // }
+        // $kelas = $kelas->orderBy('id')->get();
+
+        // return DB::getQueryLog();
+
+        $list = [];
+        foreach ($perluasan as $key => $row) {
+            $list[$key]['id'] = $row->id;
+            $list[$key]['text'] = $row->kode;
+            $list[$key]['field'] = $row->keterangan;
+            if ($row->required) {
+                $list[$key]['selected'] = true;
+            } else {
+                $list[$key]['selected'] = false;
+            }
+        }
+        return response()->json($list);
+    }
+
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
         DB::enableQueryLog();
@@ -890,6 +948,7 @@ class DataController extends Controller
         if (!empty($request->transid)) {
             array_push($select,
                 DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate), perluasan.rate) as rate'),
+                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, IF (transaksi_perluasan.value IS NOT NULL, transaksi_perluasan.value, 0), 0) as value'),
                 DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, "checked", NULL) as checked'));
             $perluasan->leftJoin('transaksi_perluasan', function($q) use ($request) {
                 $q->on('perluasan.id', '=', 'id_perluasan')
@@ -915,6 +974,28 @@ class DataController extends Controller
         return $data_objek_pricing;
     }
 
+    public function dataObjekPerluasan($transid)
+    {
+        $objek = TransaksiObjek::where('id_transaksi', $transid)->get();
+        $data_objek_perluasan = [];
+        $select = [
+            'perluasan.id',
+            'perluasan.kode',
+            'perluasan.keterangan',
+            'transaksi_perluasan.id_perluasan',
+            DB::raw('IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate) as rate'),
+            DB::raw('IF (transaksi_perluasan.value IS NOT NULL, transaksi_perluasan.value, 0) as value')
+        ];
+        foreach ($objek as $v) {
+            $perluasan = TransaksiPerluasan::where('id_transaksi', $transid)
+                ->join('perluasan', 'id_perluasan', '=', 'perluasan.id')
+                ->where('id_objek', $v->id)
+                ->select($select)->get();
+            $data_objek_perluasan[$v->id] = $perluasan;
+        }
+        return $data_objek_perluasan;
+    }
+
     public function dataObjek($transid)
     {
         // DB::enableQueryLog();
@@ -923,7 +1004,7 @@ class DataController extends Controller
                 ->where('jaminan.mstype', '=', 'jaminan');
         })
             ->leftJoin('kelas_pertanggungan as kelas', 'transaksi_objek.id_kelas', '=', 'kelas.id')
-            ->join('kodepos', 'transaksi_objek.id_kodepos', '=', 'kodepos.id')
+            ->leftJoin('kodepos', 'transaksi_objek.id_kodepos', '=', 'kodepos.id')
             ->leftJoin('okupasi', 'transaksi_objek.id_okupasi', '=', 'okupasi.id');
 
         $data->where('transaksi_objek.id_transaksi', $transid);
