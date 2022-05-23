@@ -44,46 +44,46 @@
                                     <i data-feather="edit" class="w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ubah
                                 </a> --}}
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-0"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-0"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Ajukan
                                 </a>
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-4"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-4"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
-                                <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-10"
+                                <a class="ps-renewal flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-10"
                                     style="cursor:pointer">
                                     <i class="fa fa-sync-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Perpanjang
                                 </a>
-                                <a class="ps-klaim flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-10"
+                                <a class="ps-klaim flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-10"
                                     style="cursor:pointer">
                                     <i class="fa fa-exclamation-circle w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Klaim
                                 </a>
                                 <a id="ps-rollback"
-                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-4"
+                                    class="flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-4"
                                     style="cursor:pointer">
                                     <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Batal Mengajukan
                                 </a>
                                 <a id="ps-hapus"
-                                    class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-0"
+                                    class="flex text-theme-6 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-0"
                                     style="cursor:pointer">
                                     <i class="fa fa-trash-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Hapus
                                 </a>
                             @endrole
                             @role('approver|adm')
-                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme @if(Auth::user()->id_cabang == 1) st-wholesales @endif st-1"
+                                <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-1"
                                     style="cursor:pointer">
                                     <i class="fa fa-check w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Setujui
                                 </a>
-                                <a class="ps-rollback flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-1"
+                                <a class="ps-rollback flex text-theme-11 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-wholesales st-wholesales st-1"
                                     style="cursor:pointer">
                                     <i class="fa fa-undo-alt w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Kembalikan
@@ -117,7 +117,7 @@
                                     <i class="fa fa-edit w-4 h-4 text-gray-700 dark:text-gray-300 mr-2"></i>
                                     Input Pembayaran
                                 </a>
-                                @endrole
+                            @endrole
                             @role('insurance|adm')
                                 <a class="ps-approve flex text-theme-9 items-center block p-2 bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md ps-st st-sme st-3"
                                     style="cursor:pointer">

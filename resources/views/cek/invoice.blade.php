@@ -26,9 +26,21 @@
       -webkit-mask-size: 944px 604px;
       mix-blend-mode: multiply;
     }
-    .is-draft {
+    .is-lunas {
       color: #1CAC4D;
       border: 1rem double #1CAC4D;
+      transform: rotate(-5deg);
+      font-size: 4rem;
+      font-family: "Open sans", Helvetica, Arial, sans-serif;
+      border-radius: 0;
+      padding: 1rem;
+      /* position:fixed;
+      margin-left: -200px;
+      margin-top: -10px; */
+    } 
+    .is-batal {
+      color: #FF0000;
+      border: 1rem double #FF0000;
       transform: rotate(-5deg);
       font-size: 4rem;
       font-family: "Open sans", Helvetica, Arial, sans-serif;
@@ -91,13 +103,20 @@
               @endphp
               <div class="alert alert-success-soft show flex items-center mb-2" role="alert"> <i data-feather="check-circle" class="w-6 h-6 mr-2"></i> Pembayaran telah diterima pada tanggal : {{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }} </div>
             @else
-              <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap menyertakan catatan pembayaran seperti berikut saat akan transfer :<br>PEMB_PREMI {{ $id." A/N ".$data->nama_insured." NO. COVER NOTE: ".$data->cover_note }} </div>
-              @php
-                $date = date_create($data->billing_at);
-                date_add($date,date_interval_create_from_date_string("14 days"));
-              @endphp
-              <div class="alert alert-warning-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap membayar sebelum tanggal jatuh tempo : <br>{{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }} ( 14 hari dari tanggal invoice ) </div>
-              {{-- <div class="alert alert-danger-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-octagon" class="w-6 h-6 mr-2"></i> Transaksi &nbsp;<b>DIBATALKAN</b>&nbsp; karena melebihi tanggal jatuh tempo ( {{ FunctionsHelp::tgl_indo($data->billing_at) }} ) belum ada pembayaran. </div> --}}
+              @if ($data->id_status == 18)
+			  	@php
+                  $date = date_create($data->billing_at);
+                  date_add($date,date_interval_create_from_date_string("30 days"));
+                @endphp
+                <div class="alert alert-danger-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-octagon" class="w-6 h-6 mr-2"></i> Transaksi DIBATALKAN karena melebihi tanggal jatuh tempo ( {{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }} ) belum ada pembayaran. </div>
+              @else
+                <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap menyertakan catatan pembayaran seperti berikut saat akan transfer :<br>PEMB_PREMI {{ $id." A/N ".$data->nama_insured." NO. COVER NOTE: ".$data->cover_note }} </div>
+                @php
+                  $date = date_create($data->billing_at);
+                  date_add($date,date_interval_create_from_date_string("14 days"));
+                @endphp
+                <div class="alert alert-warning-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Harap membayar sebelum tanggal jatuh tempo : <br>{{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }} ( 14 hari dari tanggal invoice ) </div>
+              @endif
             @endif
             <div class="mt-2">Transaksi ID <span class="font-medium">#<a href="{{ url('pengajuan',$id) }}">{{ $id }} <i data-feather="external-link" class="w-4 h-4 mb-1"></i></a></span> </div>
             <div class="mt-1">Tanggal Invoice: {{ FunctionsHelp::tgl_indo($data->billing_at) }}</div>
@@ -175,7 +194,10 @@
             <div class="text-xl text-theme-1 dark:text-theme-10 font-medium mt-2">{{ number_format($pricing[18]->value,2) }}</div>
             {{-- <div class="mt-1 tetx-xs">Sudah termasuk pajak</div> --}}
             @if (!empty($pembayaran))
-            <span class="stamp is-draft">LUNAS</span>
+            <span class="stamp is-lunas">LUNAS</span>
+            @endif
+            @if (!empty($data) && $data->id_status == 18)
+            <span class="stamp is-batal">KADALUARSA</span>
             @endif
           </div>
         </div>

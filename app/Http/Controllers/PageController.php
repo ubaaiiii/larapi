@@ -69,6 +69,10 @@ class PageController extends Controller
             $dataController     = new DataController;
             $transaksi = $dataController->dataPengajuan($transid);
 
+            if (empty($transaksi)) {
+                abort(404, "ID Transaksi Tidak Ditemukan");
+            }
+
             if (in_array($level,['maker','checker'])) {
                 if (Auth::user()->id_cabang !== 1) { // Not All Cabang
                     if ($transaksi->created_by !== Auth::user()->id) {
@@ -116,6 +120,9 @@ class PageController extends Controller
         // echo $data['formula']->kodetrans_input[0];
         $transaksi = Transaksi::find($transid);
         if (!empty($transaksi)) {
+            if (empty($transaksi)) {
+                abort(404, "ID Transaksi Tidak Ditemukan");
+            }
             $level = Auth::user()->getRoleNames()[0];
             $dataController     = new DataController;
             $transaksi = $dataController->dataPengajuan($transid);
@@ -123,14 +130,14 @@ class PageController extends Controller
             if (in_array($level,['maker','checker'])) {
                 if (Auth::user()->id_cabang !== 1) { // Not All Cabang
                     if ($transaksi->created_by !== Auth::user()->id) {
-                        abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                        abort(401, "Tidak Berkepentingan, <br>Bukan Otorisasi Anda");
                     }
                 }
             }
             if (in_array($level,['approval'])) {
                 if (Auth::user()->id_cabang !== 1) { // Not All Cabang
                     if ($transaksi->id_cabang !== Auth::user()->id_cabang) {
-                        abort(401, "Tidak Berkepentingan, Bukan Otorisasi Anda");
+                        abort(401, "Tidak Berkepentingan, <br>Bukan Otorisasi Anda");
                     }
                 }
             }

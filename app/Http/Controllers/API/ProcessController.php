@@ -591,6 +591,11 @@ class ProcessController extends Controller
         }
     }
 
+    public function klausula(Request $request)
+    {
+        
+    }
+
     public function wholesales(Request $request)
     {
         // return $request->all();
@@ -603,7 +608,7 @@ class ProcessController extends Controller
                     'alamat'            => 'array|required',
                     'alamat_cabang'     => 'string|required',
                     'alamat_insured'    => 'string|required',
-                    'check_perluasan'   => 'array|required',
+                    // 'check_perluasan'   => 'array|required',
                     'cif'               => 'string',
                     'insured'           => 'required',
                     'id_jaminan'        => 'array|required',
@@ -693,17 +698,19 @@ class ProcessController extends Controller
                     $method = "update";
                     $changes = $save->getChanges();
                     // $original = $save->getRawOriginal();
-                    $text = 'Perubahan data pengajuan, sebelumnya:';
+                    $text = 'Perubahan data pengajuan:';
                     foreach ($changes as $key => $value) {
                         if ($key !== "updated_at" && $key !== "catatan" && $key !== "created_by" && $key !== "id_status") {
-                            if ($data->$key !== $value)
-                            $text .= "<br>- " . $key . " : " . $data->$key;
+                            if ($data->$key != $value)
+                            $text .= "<br>- " . $key . " : " . $data->$key ." menjadi " . $value;
                         }
                     }
                     if (!empty($request->catatan)) {
                         $text .= "<br>Catatan: " . $request->catatan;
                     }
-                    $this->aktifitas($request->transid, '19', $text);
+                    // if ($text !== "Perubahan data pengajuan:") {
+                        $this->aktifitas($request->transid, '19', $text);
+                    // }
                 } else if ($save->wasRecentlyCreated) {
                     $method = "create";
                     $this->aktifitas($request->transid, $id_status, $request->catatan);
@@ -736,7 +743,7 @@ class ProcessController extends Controller
                             $request->validate([
                                 'okupasi'               => 'required|array',
                                 'okupasi.*'             => 'required',
-                                'rate_perluasan'        => 'required|array',
+                                'rate_perluasan'        => 'array',
                                 'id_kelas'              => 'required|array',
                                 'id_kelas.*'            => 'required',
                                 'klausula'              => ['required', Rule::notIn(['<p><br></p>'])],
@@ -1699,23 +1706,25 @@ class ProcessController extends Controller
                 }
                 
                 // objek perluasan
-                foreach ($request->perluasan[$i] as $j => $k) {
-                    $value = (isset($request->value_perluasan[$i][$k])) ? $request->value_perluasan[$i][$k] : null;
-                    $rate  = (isset($request->rate_perluasan[$i][$k])) ? $request->rate_perluasan[$i][$k] : null;
-                    
-                    $perluasan = TransaksiPerluasan::updateOrCreate(
-                        [
-                            'id_transaksi'  => $request->transid,
-                            'id_perluasan'  => $k,
-                            'id_objek'      => $objek->id
-                        ],
-                        [
-                            'rate'          => $rate,
-                            'value'         => $value,
-                            'created_by'    => Auth::user()->id,
-                        ],
-                    );
-                    $data_perluasan[] = $perluasan;
+                if (!empty($request->perluasan)) {
+                    foreach ($request->perluasan[$i] as $j => $k) {
+                        $value = (isset($request->value_perluasan[$i][$k])) ? $request->value_perluasan[$i][$k] : null;
+                        $rate  = (isset($request->rate_perluasan[$i][$k])) ? $request->rate_perluasan[$i][$k] : null;
+                        
+                        $perluasan = TransaksiPerluasan::updateOrCreate(
+                            [
+                                'id_transaksi'  => $request->transid,
+                                'id_perluasan'  => $k,
+                                'id_objek'      => $objek->id
+                            ],
+                            [
+                                'rate'          => $rate,
+                                'value'         => $value,
+                                'created_by'    => Auth::user()->id,
+                            ],
+                        );
+                        $data_perluasan[] = $perluasan;
+                    }
                 }
                 
                 $data_objek[] = [$objek,$data_pricing];

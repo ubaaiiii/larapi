@@ -77,7 +77,7 @@
                                         <i class="fa fa-hand-holding-usd text-theme-12" style="font-size: 40px"></i>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-bank"><i class="fas fa-spinner fa-pulse"></i></div>
-                                    <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar Bank</div>
+                                    <div class="text-base text-gray-600 mt-1">Premi Dibayar Bank</div>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,18 @@
                                         <i class="fa fa-hand-holding-usd text-theme-9" style="font-size: 40px"></i>
                                     </div>
                                     <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-dibayar-broker"><i class="fas fa-spinner fa-pulse"></i></div>
-                                    <div class="text-base text-gray-600 mt-1" id="text-dibayar">Premi Dibayar Broker</div>
+                                    <div class="text-base text-gray-600 mt-1">Premi Dibayar Broker</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                            <div class="report-box zoom-in">
+                                <div class="box p-5" onclick="filterInquiry('pengecekan polis')">
+                                    <div class="flex">
+                                        <i class="fa fa-search text-theme-9" style="font-size: 40px"></i>
+                                    </div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-pengecekan-polis"><i class="fas fa-spinner fa-pulse"></i></div>
+                                    <div class="text-base text-gray-600 mt-1">Pengecekan Polis</div>
                                 </div>
                             </div>
                         </div>
@@ -720,6 +731,7 @@
                     $('#angka-tagihan').text(d.Tagihan);
                     $('#angka-dibayar-bank').text(d.DibayarBank);
                     $('#angka-dibayar-broker').text(d.DibayarBroker);
+                    $('#angka-pengecekan-polis').text(d.PengecekanPolis);
                     $('#angka-polis').text(d.Polis);
                     $('#angka-batal').text(d.Batal);
                     // console.log('success: ',d);

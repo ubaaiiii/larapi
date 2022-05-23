@@ -430,11 +430,10 @@ class CetakController extends Controller
                 } else {
                     abort(404);
                 }
-
+                // DB::enableQueryLog();
                 $data = [
                     'transaksi'   => $transaksi,
                     'instype'     => Instype::find($transaksi->id_instype),
-                    'tgl_aktif'   => Activity::where('id_transaksi', $transaksi->transid)->where('id_status', '4')->orderBy('created_at', 'DESC')->first(),
                     'sequential'  => Sequential::where('seqdesc', 'transid')->first(),
                     'tertanggung' => Insured::find($transaksi->id_insured),
                     'cabang'      => Cabang::find($transaksi->id_cabang),
@@ -453,8 +452,7 @@ class CetakController extends Controller
                             'kodepos.*',
                         ])
                         ->get(),
-                    'objek_pricing' => TransaksiObjek::join('kodepos', 'id_kodepos', '=', 'kodepos.id')
-                        ->leftJoin('transaksi_pricing', function ($q) use ($transaksi) {
+                    'objek_pricing' => TransaksiObjek::join('transaksi_pricing', function ($q) use ($transaksi) {
                             $q->on('id_objek', '=', 'transaksi_objek.id')
                                 ->whereNotNull('id_objek')
                                 ->where('transaksi_pricing.id_transaksi', '=', $transaksi->transid);
@@ -463,22 +461,24 @@ class CetakController extends Controller
                         ->where('transaksi_objek.id_transaksi', $transaksi->transid)->get(),
                     'perluasan'   => TransaksiPerluasan::join('perluasan', 'id_perluasan', '=' , 'perluasan.id')
                         ->where('id_transaksi', $transaksi->transid)
-                        // ->select([
-                        //     'perluasan.id',
-                        //     'perluasan.kode',
-                        //     'perluasan.keterangan',
-                        //     'transaksi_perluasan.id_perluasan',
-                        //     DB::raw('IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate) as rate'),
-                        //     DB::raw('IF (transaksi_perluasan.value IS NOT NULL, transaksi_perluasan.value, 0) as value')
-                        // ])
+                        ->select([
+                            'perluasan.id',
+                            'perluasan.kode',
+                            'perluasan.keterangan',
+                            'transaksi_perluasan.id_objek',
+                            'transaksi_perluasan.id_perluasan',
+                            DB::raw('IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate) as rate'),
+                            DB::raw('IF (transaksi_perluasan.value IS NOT NULL, transaksi_perluasan.value, 0) as value')
+                        ])
                         ->get(),
-                    'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
-                        ->where('tsi', 1)
-                        ->where('transaksi_pricing.value', '<>', 0)
-                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get(),
-                    'asuransi'    => Asuransi::where('id', '=', $id_asuransi)->get(),
+                    // 'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
+                    //     ->where('tsi', 1)
+                    //     ->where('transaksi_pricing.value', '<>', 0)
+                    //     ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get(),
+                    'asuransi'    => Asuransi::where('id', '=', $id_asuransi)->first(),
                 ];
-                // dd($data['objek_pricing']);
+                // return DB::getQueryLog();
+                // dd($data['asuransi']);
                 $data['nomor_surat'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "/" . $jenis_kode . "/" . $data['instype']->id . "/UW-01/BDS/" . Functions::angka_romawi(date('m')) . "/" . date('Y');
                 $parameter = [
                     'id' => $transaksi->transid,
@@ -492,8 +492,10 @@ class CetakController extends Controller
                 // view()->share('employee', $data);
                 $pdf = PDF::loadView('prints/wholesales_klausula', compact(
                     'data',
-                    'qrcode'
+                    'qrcode',
                 ));
+
+                // $pdf->set_option("isPhpEnabled", true);
                 // Download PDF without viewing
                 // return $pdf->download('pdf_file.pdf');
 

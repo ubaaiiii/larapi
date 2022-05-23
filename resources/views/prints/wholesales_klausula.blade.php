@@ -1,4 +1,3 @@
-
 <html>
 
 <head>
@@ -30,6 +29,7 @@
       right: 0px;
       /* background-color: lightblue; */
       height: 50px;
+      z-index: -1;
     }
 
     table {
@@ -44,6 +44,10 @@
       padding: 8px;
     }
 
+    table td, table th {
+      word-wrap: break-word;
+    }
+
     li {
       font-size:10pt;
     }
@@ -55,8 +59,7 @@
     }
   </style>
 </head>
-
-<body>
+<body style="color:black">
   <header><img src="{{ public_path('dist/images/Header') }}/Header-BDS.jpg" height="100 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></header>
   <footer><img src="{{ public_path('dist/images/Footer') }}/Footer-BDS.png" height="143 px" style="display:block; margin-top: -15;margin-left: auto;margin-right: auto;"></footer>
   <main>
@@ -82,12 +85,12 @@
         <td>:</td>
         <td>
           {{ $data['instype']->instype_name }}
-          @if (!empty($data['perluasan']))
+          {{-- @if (!empty($data['perluasan']))
             ; amended to include the following risk :<br>
             @foreach ($data['perluasan'] as $perluasan)
               - {{ $perluasan->keterangan }} ({{ $perluasan->kode }}) <br>
             @endforeach
-          @endif
+          @endif --}}
         </td>
       </tr>
       <tr valign="top">
@@ -139,152 +142,62 @@
             </tr>
             @php($i = 1)
             @foreach ($data['objek'] as $objek)
-              <tr>
-                <th>{{ $i++ }}</th>
+              <tr valign="top">
+                <td align="center">{{ $i++ }}</td>
                 <td>{{ $objek->objek }}</td>
                 <td>{{ $objek->alamat_objek . " (" . $objek->no_jaminan . ") / " . $objek->kelurahan . ", " . $objek->kodepos }}</td>
-                <td>{{ $objek->nama_okupasi . " / " . $objek->kode_okupasi }}</td>
+                <td>{{ $objek->nama_okupasi . " / " . $objek->kode_okupasi  . " / " . $objek->nama_kelas }}</td>
               </tr>
             @endforeach
           </table>
         </td>
       </tr>
-      {{-- <tr valign="top">
-        <td>Risk Location / Postal Code</td>
-        <td>:</td>
-        <td style="text-align: justify;">
-          @if (count($data['objek']) > 1)
-            @php($i = 1)
-            <ol>
-            @foreach ($data['objek'] as $objek)
-              <li>{{ $objek->alamat_objek . " (" . $objek->no_jaminan . ") / " . $objek->kelurahan . ", " . $objek->kodepos }}</li>
-            @endforeach
-            </ol>
-          @else 
-            {{ $data['objek']->alamat_objek . " (" . $objek->no_jaminan . ") / " . $objek->kelurahan . ", " . $objek->kodepos }}
-          @endif
-        </td>
-      </tr>
-      <tr valign="top">
-        <td>Occupation / Code</td>
-        <td>:</td>
-        <td style="text-align: justify;">
-          @if (count($data['objek']) > 1)
-            @php($i = 1)
-            <ol>
-            @foreach ($data['objek'] as $objek)
-              <li>{{ $objek->nama_okupasi . " (" . $objek->kode_okupasi . ")" }}</li>
-            @endforeach
-            </ol>
-          @else 
-            {{ $data['objek']->nama_okupasi . " (" . $objek->kode_okupasi . ")" }}
-          @endif
-        </td>
-      </tr> --}}
-      {{-- <tr valign="top">
-        <td>Nomor { jaminan }</td>
-        <td>:</td>
-        <td>{{ $data['transaksi']->no_jaminan }}</td>
-      </tr>
-      <tr valign="top">
-        <td>Kode Pos / Kelurahan</td>
-        <td>:</td>
-        <td>{ kodepos } / { kelurahan }</td>
-      </tr> --}}
-      {{-- <tr valign="top">
-        <td>Interest Insured</td>
-        <td>:</td>
-        @if($data['instype']->id == "PAR")
-        <td style="text-align: justify;">All real and personal property of any kind, nature and description in or
-          about the premises known as the above mentioned building, including materials on the ground and all structural
-          appurtunances, improvements, fixtures, fittings, attached and belonging here to and external wall, gates, fences
-          (including supporting and protective structure) soft furnishing, furniture, fixtures and fitting, machineries of
-          every description, stock, Inventory owned by the Insured or which the Insured may be liable or shall have assumed
-          liability and all other contents, held by them in trust or on commission or for which they are responsible. (as per declare Sum Insured)
-        </td>
-        @else
-        <td style="text-align: justify;">
-          Building (class 1)
-        </td>
-        @endif
-      </tr> --}}
-      {{-- <tr valign="top">
-        <td>Deductibles</td>
-        <td>:</td>
-        <td>
-          <table CELLSPACING=0>
-            <tr valign="top">
-              <td>-</td>
-              <td>Fire, Lightning, Explosion, Aircraft Impact & Smoke ; { deductible }.</td>
-            </tr>
-            @if($data['instype']->id == "PAR")
-            <tr valign="top">
-              <td>-</td>
-              <td>Riot, Strike, Malicious Damage 4.1B/2007 : 10% of claim, minimum IDR 10.000.000,- any one accident.</td>
-            </tr>
-            <tr valign="top">
-              <td>-</td>
-              <td>Typhoon, Storm, Flood & Water Damage (including landslide and subsidience); 10% of claim min IDR 10.000.000,- any one accident.</td>
-            </tr valign="top">
-            <td>-</td>
-            <td>Other Looses ; IDR 1.000.000,- any one accident</td>
-            @endif
-            </tr>
-          </table>
-        </td>
-      </tr> --}}
       <tr valign="top">
         <td><strong>Sum Insured</strong></td>
         <td>:</td>
         <td>
-          <table style="font-size:10pt; width:80%">
+          <table style="font-size:10pt; width:80%;white-space: nowrap;">
             @php($id_objek_pricing = 0)
             @php($i = 1)
+            @php($total_objek_pricing = count($data['objek_pricing']))
             @foreach ($data['objek_pricing'] as $row => $objek_pricing)
             <tr valign="top" style="padding: 0px;">
-              <td width="5%" style="padding: 2px;">@if ($objek_pricing->id_objek !== $id_objek_pricing) {{ $i++ }} @endif</td>
+              <td width="5%"  style="padding: 2px;">@if ($objek_pricing->id_objek !== $id_objek_pricing) {{ $i }}. @endif</td>
               @php($id_objek_pricing = $objek_pricing->id_objek)
               <td width="45%" style="padding: 2px;">{{ $objek_pricing->kodetrans_nama }}</td>
-              <td width="50%" style="padding: 0px;">
-                <table cellspacing=0 style="width: 40% !important" align="right" style="padding: 0px;">
-                  <tr valign="top">
-                    <td>IDR</td>
-                    <td align="right">{{ number_format($objek_pricing->value,2) }}</td>
-                  </tr>
-                </table>
-              </td>
+              <td width="10%" style="padding: 2px;">IDR</td>
+              <td width="35%" align="right" style="padding: 2px;">{{ number_format($objek_pricing->value,2) }}</td>
+              <td width="5%" style="padding: 2px;">@if ($i++ == $total_objek_pricing) + @endif</td>
             </tr>
             @endforeach
             <tr valign="top">
-              <td width="1%" style="padding: 2px;"></td>
-              <td align="right"><strong>TOTAL</strong></td>
-              <td width="50%" style="padding: 0px;">
-                <table cellspacing=0 style="width: 40% !important" align="right" style="padding: 0px;">
-                  <tr>
-                    <td><strong>IDR</strong></td>
-                    <td align="right" style="border-top: 1px solid black;"><strong>{{ number_format($data['pricing'][1]->value,2) }}</strong></td>
-                  </tr>
-                </table>
-              </td>
+              <td style="padding: 2px;"></td>
+              <td align="right" style="padding: 2px;"><strong>TOTAL&nbsp;&nbsp;&nbsp;</strong></td>
+              <td style="padding: 2px;">IDR</td>
+              <td align="right" style="border-top: 1px solid black;padding: 2px;"><strong>{{ number_format($data['pricing'][1]->value,2) }}</strong></td>
+              <td style="padding: 2px;"></td>
             </tr>
           </table>
         </td>
       </tr>
     </table>
+    <br>
     <div style="margin-left:6px !important" class="ql-editor">
       {!! $data['transaksi']->klausula !!}
       @php($jml_installment = count($data['installment']))
       @php($i = 1)
       @if ($jml_installment > 1)
-        <p>
-          Defferred Premium Clause (Installment {{ $jml_installment }} in {{ $jml_installment }} months)<br>
-          <table style="font-size:10pt;">
+        <p class="mt-0">
+          <table style="font-size:10pt;" width="50%">
+            <tr>
+              <td colspan=4 style="padding: 0px">Defferred Premium Clause (Installment {{ $jml_installment }} in {{ $jml_installment }} months)</td>
+            </tr>
             @foreach ($data['installment'] as $installment)
               <tr>
-                <td width="5%">&nbsp;&nbsp;&nbsp;{{ $i }}.</td>
-                <td width="15%">Installment {{ FunctionsHelp::angka_romawi($i++) }}</td>
-                <td width="2%">:</td>
-                <td>{{ date_format(date_create($installment->tgl_tagihan),"d F Y") }}</td>
+                <td width="5%" style="padding: 0px">&nbsp;&nbsp;&nbsp;{{ $i }}.</td>
+                <td width="15%" style="padding: 0px">Installment {{ FunctionsHelp::angka_romawi($i++) }}</td>
+                <td width="2%" style="padding: 0px">:</td>
+                <td style="padding: 0px">{{ date_format(date_create($installment->tgl_tagihan),"d F Y") }}</td>
               </tr>
             @endforeach
           </table>
@@ -292,57 +205,56 @@
       @endif
     </div>
     <br>
-    <table style="font-size: 10pt" cellspacing=0>
+    <table style="font-size:10pt;font-weight:bold; width: 100%;">
       <tr valign="top">
-        <td width="10%"><strong>Rate<br>(per annum)</strong></td>
-        <td width="2%">:</td>
-        <td>
-          <i><u>{{ $data['instype']->instype_name }} :</u></i><br>
-          <table>
-            @php($i = 1)
-            @php($total_rate = 0)
-            @php($jml_objek = count($data['objek']))
-            @foreach ($data['objek'] as $objek)
-              @php($total_rate += $objek->rate)
-              <tr style="padding:0px;" valign="top">
-                <td width="4%" style="padding:0px;">{{ $i++ }}.</td>
-                <td width="78%" style="padding:0px;"><b><i>{{ $objek->nama_okupasi }} ({{ $objek->kode_okupasi }}) ({{ $objek->nama_kelas }})</i></b></td>
-                <td width="2%" style="padding:0px;">:</td>
-                <td style="padding:0px;" align="right">{{ $objek->rate }} ‰</td>
-              </tr>
-              @if (!empty($data['perluasan']))
-              <tr>
-                <td></td>
-                <td colspan="3">
-                  <u>Expansions:</u>
-                </td>
-              </tr>
-                @foreach ($data['perluasan'] as $row => $perluasan)
-                  @if ($perluasan->id_objek == $objek->objek_id)
-                    <tr style="padding:0px;" valign="top">
-                      <td style="padding:0px;" align="right">-</td>
-                      <td style="padding:0px;"><i>{{ $perluasan->keterangan }}</i></td>
-                      <td style="padding:0px;">:</td>
-                      <td style="padding:0px;" align="right">{{ $perluasan->rate }} ‰</td>
-                    </tr>
-                  @endif
-                @endforeach
+        <td width="13%">&nbsp;</td>
+        <td width="2%"></td>
+        <td width="4%"></td>
+        <td width="56%"></td>
+        <td width="6%"></td>
+        <td width="3%"></td>
+        <td width="14%"></td>
+        <td width="2%"></td>
+      </tr>
+      <tr valign="top">
+        <td>Rate (per annum)</td>
+        <td>:</td>
+        <td colspan="6"><i><u>{{ $data['instype']->instype_name }} :</u></i></td>
+      </tr>
+      @foreach ($data['objek'] as $row_objek => $objek)
+        <tr valign="top">
+          <td></td>
+          <td></td>
+          <td>{{ $row_objek + 1 }}.</td>
+          <td colspan="2"><b><i>{{ $objek->nama_okupasi }} ({{ $objek->kode_okupasi }}) ({{ $objek->nama_kelas }})</i></b></td>
+          <td align="right">:</td>
+          <td align="right" colspan="2">{{ $objek->rate }} ‰</td>
+        </tr>
+        @if (isset($data['perluasan']) && count($data['perluasan']) > 0)
+          <tr valign="top" style="font-weight:normal">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td colspan="5"><u><i>Expansions :</i></u></td>
+          </tr>
+            @foreach ($data['perluasan'] as $row => $perluasan)
+              @if ($perluasan->id_objek == $objek->objek_id)
+                <tr valign="top" style="font-weight:normal">
+                  <td></td>
+                  <td></td>
+                  <td align="right">-</td>
+                  <td colspan="2" style="overflow-wrap: anywhere;"><i>(<b>{{ $perluasan->kode }}</b>) {{ $perluasan->keterangan }}</i></td>
+                  <td align="right">:</td>
+                  <td align="right" colspan="2">{{ $perluasan->rate }} ‰</td>
+                </tr>
               @endif
             @endforeach
-          </table>
-        </td>
+          @endif
+      @endforeach
+      <tr>
+        <td colspan="8">&nbsp;</td>
       </tr>
-    </table>
-    <br>
-    <table style="font-size:10pt">
-      <tr valign="top">
-        <td><strong>Perhitungan Premi</strong></td>
-        <td></td>
-        <td></td>
-      </tr>
-    </table>
-    <table style="font-size:10pt;font-weight:bold;">
-      @foreach ($data['objek'] as $row => $objek)
+      @foreach ($data['objek'] as $row_objek => $objek)
         @php($TSI_objek = 0)
         @foreach ($data['objek_pricing'] as $objek_pricing)
           @if($objek->objek_id == $objek_pricing->id_objek)
@@ -350,23 +262,25 @@
           @endif
         @endforeach
         <tr>
-          <td width="10%">@if($row == 0)&nbsp;&nbsp;Premi @endif</td>
-          <td width="5%">@if($row == 0): @endif</td>
-          <td width="55%">TSI ({{ $row + 1 }}) =  IDR {{ number_format($TSI_objek,2) }} &nbsp;&nbsp;&nbsp;x {{ $objek->rate }} ‰</td>
-          <td width="6%" align="right">= IDR</td>
-          <td width="" align="right">{{ number_format($TSI_objek * $objek->rate / 1000,2) }}</td>
-          <td width="1%"></td>
+          <td>@if($row_objek == 0)Premi @endif</td>
+          <td>@if($row_objek == 0): @endif</td>
+          <td>{{ $row_objek + 1 }}.</td>
+          <td>Premi =&nbsp;&nbsp;IDR {{ number_format($TSI_objek,2) }} &nbsp;&nbsp;x {{ $objek->rate }} ‰</td>
+          <td align="right">= IDR</td>
+          <td align="right" colspan="2">{{ number_format($TSI_objek * $objek->rate / 1000,2) }}</td>
+          <td></td>
         </tr>
         @if (!empty($data['perluasan']))
           @foreach ($data['perluasan'] as $row => $perluasan)
             @if ($perluasan->id_objek == $objek->objek_id)
-              <tr>
-                <td width="10%"></td>
-                <td width="5%"></td>
-                <td width="55%">- {{ $perluasan->kode }} =  IDR {{ number_format($perluasan->value,2) }} &nbsp;&nbsp;&nbsp;x {{ $perluasan->rate }} ‰</td>
-                <td width="6%" align="right">= IDR</td>
-                <td width="" align="right">{{ number_format($perluasan->value * $perluasan->rate / 1000,2) }}</td>
-                <td width="1%"></td>
+              <tr valign="top">
+                <td></td>
+                <td></td>
+                <td align="right">-</td>
+                <td>{{ $perluasan->kode }} =&nbsp;&nbsp;IDR {{ number_format($perluasan->value,2) }} &nbsp;&nbsp;x {{ $perluasan->rate }} ‰</td>
+                <td align="right">= IDR</td>
+                <td align="right" colspan="2">{{ number_format($perluasan->value * $perluasan->rate / 1000,2) }}</td>
+                <td></td>
               </tr>
             @endif
           @endforeach
@@ -375,103 +289,112 @@
       <tr>
         <td></td>
         <td></td>
-        <td>Biaya Materai</td>
+        <td colspan="2">Biaya Materai</td>
         <td align="right">= IDR</td>
-        <td align="right">{{ number_format($data['pricing'][10]->value,2) }}</td>
+        <td align="right" colspan="2">{{ number_format($data['pricing'][10]->value,2) }}</td>
         <td></td>
       </tr>
       <tr>
         <td></td>
         <td></td>
-        <td>Biaya Polis</td>
+        <td colspan="2">Biaya Polis</td>
         <td align="right">= IDR</td>
-        <td align="right">{{ number_format($data['pricing'][11]->value,2) }}</td>
+        <td align="right" colspan="2">{{ number_format($data['pricing'][11]->value,2) }}</td>
         <td></td>
       </tr>
       <tr>
         <td></td>
         <td></td>
-        <td>PPH23 (2%)</td>
+        <td colspan="2">Biaya Lain</td>
         <td align="right">= IDR</td>
-        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][15]->value,2) }}</td>
+        <td align="right" colspan="2"  style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][16]->value,2) }}</td>
         <td>+</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td align="right">= IDR</td>
-        <td align="right">{{ number_format($data['pricing'][18]->value,2) }}</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td>Brokerage {{ number_format($data['pricing'][12]->value,2) }}% (Exclude VAT)</td>
-        <td align="right">= IDR</td>
-        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][13]->value,2) }}</td>
-        <td>-</td>
       </tr>
       {{-- <tr>
         <td></td>
         <td></td>
-        <td>PPN (10%)</td>
+        <td colspan="2">PPH23 (2%)</td>
         <td align="right">= IDR</td>
-        <td align="right" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][14]->value,2) }}</td>
+        <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][15]->value,2) }}</td>
+        <td>+</td>
+      </tr> --}}
+      <tr>
+        <td></td>
+        <td></td>
+        <td colspan="2"></td>
+        <td align="right">= IDR</td>
+        <td align="right" colspan="2">{{ number_format($data['pricing'][18]->value,2) }}</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td colspan="2">Brokerage ({{ number_format($data['pricing'][12]->value,0) }}% x Premi)</td>
+        <td align="right">= IDR</td>
+        <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][13]->value,2) }}</td>
         <td>-</td>
-      </tr>  --}}
-      <tr>
+      </tr>
+      <tr> 
         <td></td>
         <td></td>
-        <td><u>TOTAL PREMI</u></td>
+        <td colspan="2"></td>
         <td align="right">= IDR</td>
-        <td align="right">{{ number_format($data['pricing'][19]->value,2) }}</td>
+        <td align="right" colspan="2">{{ number_format($data['pricing'][20]->value,2) }}</td>
+        <td></td>
+      </tr> 
+      <tr> 
+        <td></td>
+        <td></td>
+        <td colspan="2">PPH23 (2% x Brokerage)</td>
+        <td align="right">= IDR</td>
+        <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][15]->value,2) }}</td>
+        <td>+</td>
+      </tr> 
+      <tr>
+        <td></td>
+        <td></td>
+        <td align="right" colspan="2">TOTAL PREMI</td>
+        <td align="right">= IDR</td>
+        <td align="right" colspan="2">{{ number_format($data['pricing'][19]->value,2) }}</td>
         <td></td>
       </tr>
       <tr>
-        <td colspan="6"></td>
+        <td colspan="8">&nbsp;</td>
       </tr>
       <tr>
-        <td width="10%">&nbsp;&nbsp;Security</td>
-          <td width="5%">:</td>
-          <td width="55%">{{ $data['asuransi']->nama_asurasi }}</td>
-          <td width="6%" align="right"></td>
-          <td width="" align="right"></td>
-          <td width="1%"></td>
+        <td>&nbsp;&nbsp;Security</td>
+          <td>:</td>
+          <td colspan="6">{{ $data['asuransi']->nama_asuransi }}</td>
       </tr>
     </table>
     <br>
     <br>
     <table style="font-size: 10pt">
       <tr>
-        <td>
+        <td colspan="5">
           <b>Jakarta, {{ date('d F Y') }}</b><br>
-          Signed for and on behalf of,
+          Signed for and on behalf of,<br>
           <b>PT. BINA DANA SEJAHTERA</b>
-        </td>
-        <td colspan="4"></td>
-      </tr>
-      <tr>
-        <td>Wahyusenja D. AAAIK CIIB</td>
-        <td></td>
-        <td>Hargo Nugroho CIIB</td>
-        <td></td>
-        <td>Broker</td>
-      </tr>
-      {{-- <tr>
-        <td width="70%"></td>
-        <td align="center">JAKARTA, _______________</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td align="center">
-          <br><br><br><br><br><br>
+          <br>
         </td>
       </tr>
       <tr>
+        <td colspan="5"><br></td>
+      </tr>
+      <tr align="center">
+        <td><img src="{{ public_path('dist/images/TTD') }}/ttd-wahyu.png" height="65px"></td>
         <td></td>
-        <td align="center">{ nama_asuransi }</td>
-      </tr> --}}
+        <td><img src="{{ public_path('dist/images/TTD') }}/ttd-hargo.png" height="40px"></td>
+        <td></td>
+        <td><img src="{{ public_path('dist/images/TTD') }}/ttd-vita.png" height="65px"></td>
+      </tr>
+      <tr align="center">
+        <td width="30%" style="border-bottom: 1px solid black !important;">Wahyusenja D. AAAIK CIIB</td>
+        <td></td>
+        <td width="30%" style="border-bottom: 1px solid black !important;">Hargo Nugroho CIIB</td>
+        <td></td>
+        <td width="30%" style="border-bottom: 1px solid black !important;">Achmad Abdi Wicaksono</td>
+      </tr>
     </table>
   </main>
 </body>

@@ -10,7 +10,7 @@
 @endif
 
 @section('content')
-{{-- @dd($data_objek_perluasan) --}}
+
 <style>
     .swal2-container {
         z-index: 999999;
@@ -209,7 +209,7 @@
                                         </script>
                                     @endif
                                 </div>
-                                @if (!empty($data->transid) && $data->id_status > 2)
+                                @if (!empty($data->transid) && $data->id_status > 3)
                                 <div class="form-inline mt-5">
                                     <label for="cover_note" class="form-label sm:w-20">Cover Note</label>
                                     <input type="text" class="form-control allow-decimal" placeholder="Cover Note" name="cover_note"
@@ -376,12 +376,12 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-installment">
-                                                            @if(count($data_installment) > 0)
+                                                            @if(isset($data_installment) && count($data_installment) > 0)
                                                                 @foreach ($data_installment as $row => $installment)
                                                                     <tr id="{{ $installment->id }}">
                                                                         <td>{{ $row + 1 }}</td>
                                                                         <td class="whitespace-nowrap">
-                                                                            <input type="hidden" name="id_installment[{{ $installment->id }}]" value="1">
+                                                                            <input type="hidden" name="id_installment[{{ $installment->id }}]" value="{{ $installment->id }}">
                                                                             <input type="date" class="form-control tgl-tagihan" name="tgl_tagihan[{{ $installment->id }}]" value="{{ $installment->tgl_tagihan }}">
                                                                         </td>
                                                                         @if ($row + 1 == 1)
@@ -499,7 +499,7 @@
                                 </h2>
                                 @if((!empty($method) && !empty($data->transid)) || empty($data->transid))
                                 <div class="w-full sm:w-auto flex items-center sm:ml-auto mt-3 sm:mt-0">
-                                    <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="generatePlacing()"><i class="fa fa-download mr-2"></i> Placing </button>
+                                    {{-- <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="generatePlacing()"><i class="fa fa-download mr-2"></i> Placing </button> --}}
                                     <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="addAsuransiRow()"><i class="fa fa-plus mr-2"></i> Tambah </button>
                                 </div>
                                 @endif
@@ -517,36 +517,38 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-asuransi">
-                                                    @foreach ($data_penanggung as $row => $penanggung)
-                                                        <tr id="{{ $row + 1 }}">
-                                                            <td class="whitespace-nowrap">
-                                                                <select class="asuransi" name="asuransi[{{ $row + 1 }}]" required style="width:100%" d-element="Nama Asuransi">
-                                                                </select>
-                                                                <script>
-                                                                @if (!empty($penanggung->id_asuransi))
-                                                                    $(document).ready(function(){
-                                                                        setTimeout(() => {
-                                                                            var newOption = new Option('{{ $penanggung->nama_asuransi }}', {{ $penanggung->id_asuransi }}, false, false);
-                                                                            $('[name="asuransi\\[{{ $row + 1 }}\\]"]').append(newOption).trigger('change');
-                                                                        }, 500);
-                                                                    });
-                                                                @endif
-                                                            </script>
-                                                            </td>
-                                                            <td class="whitespace-nowrap">
-                                                                <input id="share[{{ $row + 1 }}]" type="text" class="share-asuransi decimal allow-decimal masked form-control form-control-sm" placeholder="Share (%)" aria-describedby="Share (%)" style="text-align: right;" inputmode="decimal" onchange="hitungAsuransi()" d-element="Share Asuransi" value="{{ $penanggung->share_pertanggungan }}">
-                                                                <input type="hidden" name="share[{{ $row + 1 }}]" value="{{ $penanggung->share_pertanggungan }}">
-                                                            </td>
-                                                            <td class="whitespace-nowrap">
-                                                                <div class="flex justify-center items-center">
-                                                                    <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow({{ $row + 1 }})">
-                                                                        <i class="w-4 h-4 mr-1 fa fa-trash"></i>
-                                                                        Hapus
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
+                                                    @if(!empty($data_penanggung))
+                                                        @foreach ($data_penanggung as $row => $penanggung)
+                                                            <tr id="{{ $row + 1 }}">
+                                                                <td class="whitespace-nowrap">
+                                                                    <select class="asuransi" name="asuransi[{{ $row + 1 }}]" required style="width:100%" d-element="Nama Asuransi">
+                                                                    </select>
+                                                                    <script>
+                                                                    @if (!empty($penanggung->id_asuransi))
+                                                                        $(document).ready(function(){
+                                                                            setTimeout(() => {
+                                                                                var newOption = new Option('{{ $penanggung->nama_asuransi }}', {{ $penanggung->id_asuransi }}, false, false);
+                                                                                $('[name="asuransi\\[{{ $row + 1 }}\\]"]').append(newOption).trigger('change');
+                                                                            }, 500);
+                                                                        });
+                                                                    @endif
+                                                                </script>
+                                                                </td>
+                                                                <td class="whitespace-nowrap">
+                                                                    <input id="share[{{ $row + 1 }}]" type="text" class="share-asuransi decimal allow-decimal masked form-control form-control-sm" placeholder="Share (%)" aria-describedby="Share (%)" style="text-align: right;" inputmode="decimal" onchange="hitungAsuransi()" d-element="Share Asuransi" value="{{ $penanggung->share_pertanggungan }}">
+                                                                    <input type="hidden" name="share[{{ $row + 1 }}]" value="{{ $penanggung->share_pertanggungan }}">
+                                                                </td>
+                                                                <td class="whitespace-nowrap">
+                                                                    <div class="flex justify-center items-center">
+                                                                        <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow({{ $row + 1 }})">
+                                                                            <i class="w-4 h-4 mr-1 fa fa-trash"></i>
+                                                                            Hapus
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    @endif
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
@@ -604,7 +606,9 @@
                                                 <th class="text-center whitespace-nowrap">ALAMAT OBJEK / KODEPOS</th>
                                                 <th class="text-center whitespace-nowrap">JENIS JAMINAN / DESKRIPSI</th>
                                                 <th class="text-center whitespace-nowrap">SUM INSURED</th>
-                                                <th class="text-center whitespace-nowrap">PERLUASAN</th>
+                                                @if (!empty($data->transid) && $data->id_status > 1)
+                                                    <th class="text-center whitespace-nowrap">PERLUASAN</th>
+                                                @endif
                                                 <th class="text-center whitespace-nowrap">NILAI PASAR OBJEK / TAKSASI CI / Retaksasi CI</th>
                                                 <th class="whitespace-nowrap"></th>
                                             </tr>
@@ -647,7 +651,7 @@
                                                                 <div id="{{ $row_objek_pricing + 1 }}" class="sumins">
                                                                     <div class="input-group mb-1">
                                                                         @if (((!empty($method) && !empty($data->transid) && $data->id_status == 0)) || (empty($method) && empty($data->transid)))
-                                                                            <button type="button" type="button" class="btn btn-primary form-control btn-tambah" onclick="addSumInsured({{ $row + 1 }})"><i class="fa fa-plus"></i></button>
+                                                                            <button type="button" type="button" class="btn btn-primary form-control btn-tambah" onclick="addSumInsured({{ $row + 1 }})" style="width:50px"><i class="fa fa-plus"></i></button>
                                                                         @endif
                                                                         <div class="input-group-text">
                                                                             <select class="selek2" name="sumins_type[{{ $row + 1 }}][{{ $row_objek_pricing + 1 }}]" required d-element="Tipe Sum Insured {{ $row + 1 }} {{ $row_objek_pricing + 1 }}">
@@ -659,13 +663,14 @@
                                                                         </div>
                                                                         <input type="text" class="form-control allow-decimal currency masked w-40" placeholder="Nilai Pertanggungan" id="sumins_value[{{ $row + 1 }}][{{ $row_objek_pricing + 1 }}]" style="text-align: right;" inputmode="decimal" onchange="hitungTSI()" required d-element="Nilai Pertanggungan {{ $row + 1 }}" value="{{ $objek_pricing->value }}">
                                                                         @if((!empty($method) && !empty($data->transid) && $data->id_status == 0) || (empty($method) && empty($data->transid)))
-                                                                        <button type="button" class="btn btn-danger form-control ml-2 btn-hapus" onclick="removeSumInsured({{ $row + 1 }}, '#{{ $row_objek_pricing + 1 }}')"><i class="fa fa-trash"></i></button>
+                                                                        <button type="button" class="btn btn-danger form-control ml-2 btn-hapus" onclick="removeSumInsured({{ $row + 1 }}, '#{{ $row_objek_pricing + 1 }}')" style="width:50px"><i class="fa fa-trash"></i></button>
                                                                         @endif
                                                                     </div>
                                                                     <input type="hidden" name="sumins_value[{{ $row + 1 }}][{{ $row_objek_pricing + 1 }}]" value="{{ $objek_pricing->value }}">
                                                                 </div>
                                                             @endforeach
                                                         </td>
+                                                        @if (!empty($data->transid) && $data->id_status > 1)
                                                         <td>
                                                             <select class="perluasan" d-id="{{ $row + 1 }}" id="perluasan[{{ $row + 1 }}]" name="perluasan[{{ $row + 1 }}][]" style="width:100%" d-element="Perluasan {{ $row + 1 }}" multiple="multiple"></select>
                                                             <script>
@@ -682,6 +687,7 @@
                                                                 });
                                                             </script>
                                                         </td>
+                                                        @endif
                                                         <td class="text-center">
                                                             <input type="text" class="form-control form-control-sm allow-decimal currency masked w-100" placeholder="Nilai Pasar OBJEK / Taksasi CI / Retaksasi CI" id="agunan_kjpp[{{ $row + 1 }}]" style="text-align: right;" inputmode="decimal" onchange="hitungTSI()" required d-element="Nilai Pasar {{ $row + 1 }}" value="{{ $objek->agunan_kjpp }}">
                                                             <input type="hidden" name="agunan_kjpp[{{ $row + 1 }}]" value="{{ $objek->agunan_kjpp }}">
@@ -737,7 +743,7 @@
                                             <tbody id="body-okupasi" valign="top">
                                                 @if (!empty($data->transid))
                                                     @foreach ($data_objek as $row => $objek)
-                                                        <tr class="intro-x" id="{{ $row + 1 }}">
+                                                        <tr class="intro-x row-okupasi-{{ $row + 1 }}" id="{{ $row + 1 }}">
                                                             <td class="w-10 text-center">
                                                                 {{ $row + 1 }}
                                                             </td>
@@ -782,17 +788,20 @@
                                                         </tr>
                                                         @if(!empty($data_objek_perluasan[$objek->id_objek]))
                                                             @foreach ($data_objek_perluasan[$objek->id_objek] as $row_perluasan => $objek_perluasan)
-                                                                <tr>
+                                                                <tr class="perluasan-row-{{ $row + 1 }}-{{ $objek_perluasan->id }}">
                                                                     <td colspan="2"></td>
                                                                     <td>
-                                                                        ({{ $objek_perluasan->kode }}) {{ $objek_perluasan->keterangan }}
+                                                                        <b>{{ $objek_perluasan->kode }}</b> - {{ $objek_perluasan->keterangan }}
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        <input id="rate_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" type="text" placeholder="Rate Perluasan (‰)" class="rate-perluasan rate form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" required inputmode="decimal" onchange="hitungPerluasan()" d-element="Rate Perluasan {{ $row + 1 }}" value="@if(!empty($objek_perluasan->rate)){{ $objek_perluasan->rate }}@endif">
-                                                                        <input type="hidden" name="rate_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" class="rate" value="@if(!empty($objek_perluasan->rate)){{ $objek_perluasan->rate }}@endif">
+                                                                        <input id="rate_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" type="text" placeholder="Rate Perluasan (‰)" class="rate-perluasan rate form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" required inputmode="decimal" onchange="hitungPerluasan()" d-element="Rate Perluasan {{ $row + 1 }}" value="@if(!empty($objek_perluasan->rate) && $objek_perluasan->rate !== 0){{ $objek_perluasan->rate }}@endif">
+                                                                        <input type="hidden" name="rate_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" class="rate" value="@if(!empty($objek_perluasan->rate) && $objek_perluasan->rate !== 0){{ $objek_perluasan->rate }}@endif">
                                                                     </td>
                                                                     <td class="text-right">
-                                                                        <input type="text" class="rate form-control form-control-sm allow-decimal currency masked" placeholder="Nilai Pengkali Perluasan" id="value_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" d-element="Value Perluasan {{ $row + 1 }}" value="{{ $objek_perluasan->value }}">
+                                                                        <div class="input-group">
+                                                                            <div id="input-group-email" class="form-control form-control-sm input-group-text" style="width:35px;">x</div>
+                                                                            <input type="text" class="rate form-control form-control-sm allow-decimal currency masked" placeholder="Nilai Pengkali Perluasan" id="value_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" d-element="Value Perluasan {{ $row + 1 }}" value="{{ $objek_perluasan->value }}">
+                                                                        </div>
                                                                         <input type="hidden" name="value_perluasan[{{ $row + 1 }}][{{ $objek_perluasan->id }}]" value="{{ $objek_perluasan->value }}">
                                                                     </td>
                                                                     <td class="text-right">
@@ -1158,8 +1167,7 @@
             var LAIN        = isNaN(parseFloat($('[name="kodetrans_value[16]"]').val())) ? 0 : parseFloat($('[name="kodetrans_value[16]"]').val());
 
             var jmlObjek = 0;
-
-            TSI += PERLUASAN;
+            
             $('#body-objek tr').each(function(){
                 var idRow = $(this).attr('id');
                 RATE += parseFloat($("[name='rate_okupasi\\["+idRow+"\\]']").val());
@@ -1167,6 +1175,8 @@
                 PREMI += parseFloat($("[name='kodetrans_value\\[2\\]\\["+idRow+"\\]']").val() * PRORATA);
                 jmlObjek++;
             });
+
+            PREMI += PERLUASAN;
 
             var _RATE = RATE;
 
@@ -1194,7 +1204,9 @@
                 var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val());
             @endforeach
             @foreach ($formula as $row)
-                var {!! $row->kodetrans_input !!} = {!! $row->kodetrans_formula !!};
+                @if ($row->kodetrans_input !== "PREMI")
+                    var {!! $row->kodetrans_input !!} = {!! $row->kodetrans_formula !!};
+                @endif
             @endforeach
 
             @foreach ($formula as $row)
@@ -1242,8 +1254,8 @@
                 // console.log('value_perluasan',value_perluasan);
                 // console.log('total_perluasan',total_perluasan);
                 // console.log('#premi_'+field_perluasan);
-                hitungTOTAL();
             });
+            hitungTOTAL();
         }
 
         function refreshFunction() {
@@ -1288,6 +1300,11 @@
             $('.selek2').select2();
         }
 
+        function printPlacing(id) {
+            var asuransi = $('[name="asuransi['+id+']"]').val();
+            window.open("{{ url('cetak_klausula',$data->transid) }}/placing/"+asuransi, "placing_{{ $data->transid }}");
+        }
+
         function removeAsuransiRow(id) {
             var hitung = $('#body-asuransi tr').length;
             if (hitung > 1) {
@@ -1308,13 +1325,13 @@
                                 <select class="asuransi" name="asuransi[`+id+`]" required style="width:100%" d-element="Nama Asuransi `+id+`"></select>
                             </td>
                             <td class="whitespace-nowrap">
-                                <input id="share[`+id+`]" type="text" class="decimal allow-decimal masked form-control form-control-sm" placeholder="Share (%)" aria-describedby="Share (%)" style="text-align: right;" inputmode="decimal" onchange="hitungAsuransi()" d-element="Share Asuransi `+id+`">
+                                <input id="share[`+id+`]" type="text" class="share-asuransi decimal allow-decimal masked form-control form-control-sm" placeholder="Share (%)" aria-describedby="Share (%)" style="text-align: right;" inputmode="decimal" onchange="hitungAsuransi()" d-element="Share Asuransi `+id+`">
                                 <input type="hidden" name="share[`+id+`]">
                             </td>
                             <td class="whitespace-nowrap">
                                 @if(!empty($method))
                                 <div class="flex justify-center items-center">
-                                    <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="removeAsuransiRow(1)">
+                                    <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="printPlacing(`+id+`)">
                                         <i class="w-4 h-4 mr-1 fa fa-print"></i>
                                         Placing
                                     </button>
@@ -1373,9 +1390,9 @@
                             </td>
                             <td id="col_sumins[`+id+`]">
                                 <div id="1" class="sumins">
-                                    <div class="input-group">
+                                    <div class="input-group mb-1">
                                         @if (((!empty($method) && !empty($data->transid) && $data->id_status == 0)) || (empty($method) && empty($data->transid)))
-                                        <button type="button" class="btn btn-primary form-control btn-tambah" onclick="addSumInsured(`+id+`)" style="width:2%"><i class="fa fa-plus"></i></button>
+                                        <button type="button" class="btn btn-primary form-control btn-tambah" onclick="addSumInsured(`+id+`)" style="width:50px"><i class="fa fa-plus"></i></button>
                                         @endif
                                         <div class="input-group-text">
                                             <select class="selek2" name="sumins_type[`+id+`][1]" required d-element="Tipe Sum Insured `+id+`">
@@ -1396,9 +1413,6 @@
                                     <input type="hidden" name="sumins_value[`+id+`][1]" value="">
                                 </div>
                             </td>
-                            <td>
-                                <select class="perluasan" d-id="`+id+`" id="perluasan[`+id+`]" name="perluasan[`+id+`]" style="width:100%" d-element="Perluasan `+id+`" multiple="multiple"></select>
-                            </td>
                             <td class="text-center">
                                 <input type="text" class="form-control form-control-sm allow-decimal currency masked w-100" placeholder="Nilai Pasar OBJEK / Taksasi CI / Retaksasi CI" id="agunan_kjpp[`+id+`]" style="text-align: right;" inputmode="decimal" onchange="hitungTSI()" required d-element="Nilai Pasar `+id+`">
                                 <input type="hidden" name="agunan_kjpp[`+id+`]">
@@ -1406,7 +1420,7 @@
                             <td class="table-report__action">
                                 @if((!empty($method) && !empty($data->transid) && $data->id_status == 0) || (empty($method) && empty($data->transid)))
                                 <div class="flex justify-center items-center">
-                                    <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeObjekRow(1)">
+                                    <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeObjekRow(`+id+`)">
                                         <i class="w-4 h-4 mr-1 fa fa-trash"></i>
                                         Hapus 
                                     </button>
@@ -1596,7 +1610,7 @@
             var html = `<div id="`+id+`" class="sumins">
                             <div class="input-group mb-1">
                                 @if (!empty($method) || (empty($method) && empty($data->transid)))
-                                <button type="button" class="btn btn-primary form-control btn-tambah" onclick="addSumInsured(`+idRow+`)"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-primary form-control btn-tambah" onclick="addSumInsured(`+idRow+`)" style="width:50px"><i class="fa fa-plus"></i></button>
                                 @endif
                                 <div class="input-group-text">
                                     <select class="selek2" name="sumins_type[`+idRow+`][`+id+`]" style="width:100%">
@@ -1611,7 +1625,7 @@
                                 </div>
                                 <input type="text" class="form-control allow-decimal currency masked w-40" placeholder="Uang Pertanggungan" id="sumins_value[`+idRow+`][`+id+`]" style="text-align: right;" inputmode="decimal" onchange="hitungTSI()" required>
                                 @if (!empty($method) || (empty($method) && empty($data->transid)))
-                                <button type="button" class="btn btn-danger form-control ml-2 btn-hapus" onclick="removeSumInsured(`+idRow+`, '#`+id+`')""><i class="fa fa-trash"></i></button>
+                                <button type="button" class="btn btn-danger form-control ml-2 btn-hapus" onclick="removeSumInsured(`+idRow+`, '#`+id+`')" style="width:50px"><i class="fa fa-trash"></i></button>
                                 @endif
                             </div>
                             <input type="hidden" name="sumins_value[`+idRow+`][`+id+`]" value="">
@@ -1619,6 +1633,42 @@
             $('#col_sumins\\['+idRow+'\\]').append(html);
             refreshFunction();
             hitungTSI();
+        }
+
+        function addPerluasanRow(select, data) {
+            console.log('data', data);
+            var id = select.attr('d-id');
+            var html = `<tr class="perluasan-row-`+id+`-`+data.id+`">
+                            <td colspan="2"></td>
+                            <td>
+                                <b>`+data.text+`</b> - `+data.field+`
+                            </td>
+                            <td class="text-center">
+                                <input id="rate_perluasan[`+id+`][`+data.id+`]" type="text" placeholder="Rate Perluasan (‰)" class="rate-perluasan rate form-control form-control-sm allow-decimal decimal masked" style="text-align: right; width: 100%" required inputmode="decimal" onchange="hitungPerluasan()" d-element="Rate Perluasan `+id+`" value="`+data.rate+`">
+                                <input type="hidden" name="rate_perluasan[`+id+`][`+data.id+`]" class="rate" value="`+data.rate+`">
+                            </td>
+                            <td class="text-right">
+                                <div class="input-group">
+                                    <div id="input-group-email" class="form-control form-control-sm input-group-text" style="width:35px;">x</div>
+                                    <input type="text" class="rate form-control form-control-sm allow-decimal currency masked" placeholder="Nilai Pengkali Perluasan" id="value_perluasan[`+id+`][`+data.id+`]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" d-element="Value Perluasan `+id+`">
+                                </div>
+                                <input type="hidden" name="value_perluasan[`+id+`][`+data.id+`]">
+                            </td>
+                            <td class="text-right">
+                                <input type="text" class="form-control form-control-sm allow-decimal currency masked" placeholder="Premium" id="premi_perluasan[`+id+`][`+data.id+`]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" readonly d-element="Premium `+id+`">
+                                <input type="hidden" name="premi_perluasan[`+id+`][`+data.id+`]" class="premi-perluasan">
+                            </td>
+                        </tr>`;
+            
+            $('.row-okupasi-'+id).after(html);
+            initTSI();
+            initDecimal();
+            initCurrency();
+        }
+
+        function removePerluasanRow(select, data) {
+            var id = select.attr('d-id');
+            $('.perluasan-row-'+id+'-'+data.id).remove();
         }
 
         function cekProrata(prorata) {
@@ -1666,6 +1716,13 @@
                             };
                         },
                     },
+                }).on('select2:select', function(e) {
+                    var data = e.params.data;
+                    addPerluasanRow($(this), data);
+                }).on('select2:unselect', function(e) {
+                    var data = e.params.data;
+                    removePerluasanRow($(this), data);
+                    hitungPerluasan();
                 });
                 setTimeout(() => {
                     $('#perluasan\\['+id+'\\]').val(preselected).change();
@@ -1739,9 +1796,16 @@
             $('.upload-dokumen').hide();
             $('#transid').prop('readonly',false);
             $('#catatan').prop('readonly',false);
+            $('#periode-polis').prop('disabled',true);
         }
 
         $(document).ready(function(){
+            @if (empty($data->transid))
+                addObjekRow();
+            @endif
+            @if (count($data_penanggung) == 0)
+                addAsuransiRow();
+            @endif
             @if (empty($method) && !empty($data->transid))
                 disableForm();
             @elseif (!empty($method) && $data->id_status == 1)
@@ -1751,6 +1815,7 @@
                 $('.perluasan-value').prop('readonly',false);
                 $('.kelas').removeAttr('readonly');
                 $('.okupasi').removeAttr('readonly');
+                $('.perluasan').removeAttr('readonly');
                 $('.rate').prop('readonly',false);
                 $('.biaya').prop('readonly',false);
                 $('#kodetrans_value\\[12\\]').prop('readonly',false);
@@ -1759,9 +1824,9 @@
                 $('.tgl-tagihan').prop('readonly', false);
                 $('#tb-dokumen a.flex').hide();
                 $('[name^="id_objek"]').prop('readonly',false);
-                @elseif (!empty($method) && $data->id_status == 3)
+            @elseif (!empty($method) && $data->id_status == 3)
+                disableForm();
                 setTimeout(() => {
-                    disableForm();
                     $('#cover_note').prop('readonly',false);
                     $('#policy_no').prop('readonly',false);
                     $('.form-asuransi .share-asuransi ').prop('readonly',false);
@@ -1772,12 +1837,6 @@
                     $('#div-asuransi .btn-hapus').show();
                     $('.upload-dokumen').show();
                 }, 500);
-            @endif
-            @if (empty($data->transid))
-                addObjekRow();
-            @endif
-            @if (count($data_penanggung) < 1)
-                addAsuransiRow();
             @endif
             initSelect();
             initTSI();
@@ -1893,10 +1952,10 @@
                             'Berhasil!',
                             d.message,
                             'success'
-                        );
-                        // .then(function() {
-                        //     window.top.close();
-                        // });
+                        )
+                        .then(function() {
+                            window.top.close();
+                        });
                     },
                     error: function (response) {
                         var pesan = "<div style='text-align:left' class='p-10'>";

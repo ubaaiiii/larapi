@@ -232,6 +232,7 @@ class DataController extends Controller
             $list[$key]['id'] = $row->id;
             $list[$key]['text'] = $row->kode;
             $list[$key]['field'] = $row->keterangan;
+            $list[$key]['rate'] = $row->rate;
             if ($row->required) {
                 $list[$key]['selected'] = true;
             } else {
@@ -369,7 +370,9 @@ class DataController extends Controller
                         IFNULL(SUM(case when transaksi.id_status IN (4) then 1 else 0 end), 0) as Bank,
                         IFNULL(SUM(case when transaksi.id_status IN (5) then 1 else 0 end), 0) as Tagihan,
                         IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL AND brokerPaid.id_transaksi IS NULL then 1 else 0 end), 0) as DibayarBank,
-                        IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL AND transaksi.id_status < 9 then 1 else 0 end), 0) as DibayarBroker,
+                        -- IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL AND transaksi.id_status < 9 then 1 else 0 end), 0) as DibayarBroker,
+                        IFNULL(SUM(case when transaksi.id_status IN (7) then 1 else 0 end), 0) as DibayarBroker,
+                        IFNULL(SUM(case when transaksi.id_status IN (8) then 1 else 0 end), 0) as PengecekanPolis,
                         IFNULL(SUM(case when transaksi.id_status IN (10) then 1 else 0 end), 0) as Polis,
                         IFNULL(SUM(case when transaksi.id_status IN (18) then 1 else 0 end), 0) as Batal
                     FROM `transaksi`
@@ -509,14 +512,22 @@ class DataController extends Controller
                         ->whereNull('pmby2.id_transaksi');
                     break;
 
+                // case 'dibayar broker':
+                //     $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
+                //         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                //             ->where('pmby.paid_type', '=', "PD02")
+                //             ->whereNull('pmby.deleted_at');
+                //     });
+                //     $table->whereNotNull('pmby.id_transaksi')
+                //         ->whereRaw('transaksi.id_status < 9');
+                //     break;
+
                 case 'dibayar broker':
-                    $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
-                        $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                            ->where('pmby.paid_type', '=', "PD02")
-                            ->whereNull('pmby.deleted_at');
-                    });
-                    $table->whereNotNull('pmby.id_transaksi')
-                        ->whereRaw('transaksi.id_status < 9');
+                    $table->where('id_status', "7");
+                    break;
+
+                case 'pengecekan polis':
+                    $table->where('id_status', "8");
                     break;
 
                 case 'polis siap':
@@ -1023,7 +1034,7 @@ class DataController extends Controller
             'transaksi_objek.id_kelas',
             'kelas.nama_kelas',
             'transaksi_objek.id_okupasi',
-            DB::raw('CONCAT(okupasi.id, " - ", okupasi.nama_okupasi) as nama_okupasi'),
+            DB::raw('CONCAT(okupasi.kode_okupasi, " - ", okupasi.nama_okupasi) as nama_okupasi'),
             'transaksi_objek.rate',
         ]);
 

@@ -80,7 +80,7 @@
         <div class="flex flex-col lg:flex-row px-5 sm:px-20 pt-10 pb-10 sm:pb-20">
           <div>
             <div class="text-base text-gray-600">Disetujui Oleh</div>
-            <img src="{{ public_path('dist/images/Logo') }}/Logo-{{ $asuransi->akronim }}.jpg">
+            <img src="{{ url('public/dist/images/Logo') }}/Logo-{{ $asuransi->akronim }}.jpg">
             <div class="text-lg font-medium text-theme-1 dark:text-theme-10 mt-2">{{ $asuransi->nama_asuransi }}</div>
             <div class="mt-1">{{ $asuransi->alamat_asuransi }}</div>
             <div class="mt-1">Pada tanggal: <strong>{{ FunctionsHelp::tgl_indo($tgl_aktif->created_at->format('Y-m-d'))
