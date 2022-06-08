@@ -546,7 +546,7 @@ class DataController extends Controller
 
         $joins = [
             ['insured', 'id_insured = insured.id'],
-            ['instype', 'id_instype = instype.id'],
+            ['instype', ['id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
             ['okupasi', 'id_okupasi = okupasi.id'],
             ['asuransi', 'id_asuransi = asuransi.id'],
             ['masters as sts', ['transaksi.id_status = sts.msid', "sts.mstype = status"]],
@@ -900,7 +900,7 @@ class DataController extends Controller
         $data = DB::table('transaksi')
             ->leftJoin('cabang', 'id_cabang', '=', 'cabang.id')
             ->leftJoin('insured', 'id_insured', '=', 'insured.id')
-            ->leftJoin('kodepos', 'id_kodepos', '=', 'kodepos.id')
+            ->leftJoin('kodepos', 'transaksi.id_kodepos', '=', 'kodepos.id')
             ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
             ->leftJoin('instype', 'transaksi.id_instype', '=', 'instype.id')
             ->leftJoin('asuransi', 'id_asuransi', '=', 'asuransi.id')

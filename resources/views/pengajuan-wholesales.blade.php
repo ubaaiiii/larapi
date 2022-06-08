@@ -335,10 +335,10 @@
                                 </div>
                                 <div class="modal-footer text-right">
                                     <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
-                                        Cancel
+                                        Batal
                                     </button>
-                                    <button type="button" id="btn-klausula" class="btn btn-primary w-20">
-                                        Save
+                                    <button type="button" id="btn-klausula" class="btn btn-primary">
+                                        <i class="fa fa-save mr-2"></i> Simpan Klausula
                                     </button>
                                 </div>
                             </div>
@@ -481,10 +481,10 @@
                                 @if((!empty($method) && !empty($data->transid)) || empty($data->transid))
                                 <div class="modal-footer text-right">
                                     <button type="button" onclick="cancelInstallment()" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
-                                        Cancel
+                                        Batal
                                     </button>
-                                    <button type="button" data-dismiss="modal" class="btn btn-primary w-20">
-                                        Save
+                                    <button type="button" data-dismiss="modal" class="btn btn-primary">
+                                        <i class="fa fa-save mr-2"></i> Simpan Installment
                                     </button>
                                 </div>
                                 @endif
@@ -501,6 +501,7 @@
                                 <div class="w-full sm:w-auto flex items-center sm:ml-auto mt-3 sm:mt-0">
                                     {{-- <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="generatePlacing()"><i class="fa fa-download mr-2"></i> Placing </button> --}}
                                     <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="addAsuransiRow()"><i class="fa fa-plus mr-2"></i> Tambah </button>
+                                    <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2" id="btn-asuransi"><i class="fa fa-save mr-2"></i> Simpan Asuransi </button>
                                 </div>
                                 @endif
                             </div>
@@ -540,6 +541,10 @@
                                                                 </td>
                                                                 <td class="whitespace-nowrap">
                                                                     <div class="flex justify-center items-center">
+                                                                        <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="printPlacing({{ $row + 1 }})">
+                                                                            <i class="w-4 h-4 mr-1 fa fa-print"></i>
+                                                                            Placing
+                                                                        </button>
                                                                         <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow({{ $row + 1 }})">
                                                                             <i class="w-4 h-4 mr-1 fa fa-trash"></i>
                                                                             Hapus
@@ -566,14 +571,14 @@
                                                     </tr>
                                                 </tfoot>
                                             </table>
-                                            <div class="text-right border-t">
+                                            {{-- <div class="text-right border-t">
                                                 <button type="button" onclick="cancelInstallment()" data-dismiss="modal" class="mt-2 btn btn-outline-secondary w-20 mr-1">
                                                     Cancel
                                                 </button>
-                                                <button type="button" data-dismiss="modal" class="btn btn-primary w-20">
+                                                <button type="button" id="btn-asuransi" class="btn btn-primary w-20">
                                                     Save
                                                 </button>
-                                            </div>
+                                            </div> --}}
                                         </form>
                                     </div>
                                 </div>
@@ -1300,53 +1305,63 @@
             $('.selek2').select2();
         }
 
-        function printPlacing(id) {
-            var asuransi = $('[name="asuransi['+id+']"]').val();
-            window.open("{{ url('cetak_klausula',$data->transid) }}/placing/"+asuransi, "placing_{{ $data->transid }}");
-        }
-
-        function removeAsuransiRow(id) {
-            var hitung = $('#body-asuransi tr').length;
-            if (hitung > 1) {
-                // btn.parent().parent().remove();
-                $('#body-asuransi tr#'+id).remove();
+        @if(!empty($data->transid))
+            function printPlacing(id) {
+                var asuransi = $('[name="asuransi['+id+']"]').val();
+                if (asuransi !== null) {
+                    window.open("{{ url('cetak_klausula',$data->transid) }}/placing/"+asuransi, "placing_"+asuransi);
+                } else {
+                    Swal.fire(
+                        'Gagal!',
+                        'Harap memilih asuransi terlebih dahulu sebelum cetak placing',
+                        'error'
+                    );
+                }
             }
-            hitungAsuransi();
-        }
 
-        function addAsuransiRow() {
-            var hitung = $('#body-asuransi tr').length;
-            var id = hitung;
-            while ($('#body-asuransi tr#'+id).length > 0) {
-                id++;
+            function removeAsuransiRow(id) {
+                var hitung = $('#body-asuransi tr').length;
+                if (hitung > 1) {
+                    // btn.parent().parent().remove();
+                    $('#body-asuransi tr#'+id).remove();
+                }
+                hitungAsuransi();
             }
-            var html = `<tr id="`+id+`">
-                            <td class="whitespace-nowrap">
-                                <select class="asuransi" name="asuransi[`+id+`]" required style="width:100%" d-element="Nama Asuransi `+id+`"></select>
-                            </td>
-                            <td class="whitespace-nowrap">
-                                <input id="share[`+id+`]" type="text" class="share-asuransi decimal allow-decimal masked form-control form-control-sm" placeholder="Share (%)" aria-describedby="Share (%)" style="text-align: right;" inputmode="decimal" onchange="hitungAsuransi()" d-element="Share Asuransi `+id+`">
-                                <input type="hidden" name="share[`+id+`]">
-                            </td>
-                            <td class="whitespace-nowrap">
-                                @if(!empty($method))
-                                <div class="flex justify-center items-center">
-                                    <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="printPlacing(`+id+`)">
-                                        <i class="w-4 h-4 mr-1 fa fa-print"></i>
-                                        Placing
-                                    </button>
-                                    <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow(`+id+`)">
-                                        <i class="w-4 h-4 mr-1 fa fa-trash"></i>
-                                        Hapus 
-                                    </button>
-                                </div>
-                                @endif
-                            </td>
-                        </tr>`;
-            $('#body-asuransi').append(html);
-            refreshFunction();
-            hitungAsuransi();
-        }
+
+            function addAsuransiRow() {
+                var hitung = $('#body-asuransi tr').length;
+                var id = hitung;
+                while ($('#body-asuransi tr#'+id).length > 0) {
+                    id++;
+                }
+                var html = `<tr id="`+id+`">
+                                <td class="whitespace-nowrap">
+                                    <select class="asuransi" name="asuransi[`+id+`]" required style="width:100%" d-element="Nama Asuransi `+id+`"></select>
+                                </td>
+                                <td class="whitespace-nowrap">
+                                    <input id="share[`+id+`]" type="text" class="share-asuransi decimal allow-decimal masked form-control form-control-sm" placeholder="Share (%)" aria-describedby="Share (%)" style="text-align: right;" inputmode="decimal" onchange="hitungAsuransi()" d-element="Share Asuransi `+id+`">
+                                    <input type="hidden" name="share[`+id+`]">
+                                </td>
+                                <td class="whitespace-nowrap">
+                                    @if(!empty($method))
+                                    <div class="flex justify-center items-center">
+                                        <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="printPlacing(`+id+`)">
+                                            <i class="w-4 h-4 mr-1 fa fa-print"></i>
+                                            Placing
+                                        </button>
+                                        <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow(`+id+`)">
+                                            <i class="w-4 h-4 mr-1 fa fa-trash"></i>
+                                            Hapus 
+                                        </button>
+                                    </div>
+                                    @endif
+                                </td>
+                            </tr>`;
+                $('#body-asuransi').append(html);
+                refreshFunction();
+                hitungAsuransi();
+            }
+        @endif
 
         function removeObjekRow(id) {
             var hitung = $('#body-objek tr').length;
@@ -1803,7 +1818,7 @@
             @if (empty($data->transid))
                 addObjekRow();
             @endif
-            @if (count($data_penanggung) == 0)
+            @if (!empty($data->transid) && (empty($data_penanggung) || count($data_penanggung) == 0))
                 addAsuransiRow();
             @endif
             @if (empty($method) && !empty($data->transid))
@@ -1929,6 +1944,62 @@
                     });
                 }
             });
+
+            @if (!empty($data->transid))
+            $('#btn-klausula').click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url('api/klausula') }}",
+                    data: {
+                        "_token"    : "{{ csrf_token() }}",
+                        "transid"   : "{{ $data->transid }}",
+                        "klausula"  : $('.ql-editor').html()
+                    },
+                    success: function (response) {
+                        Swal.fire(
+                            'Berhasil!',
+                            response.message,
+                            'success'
+                        ).then(function() {
+                            cash('#modal-klausula').modal('hide');
+                        });
+                    },
+                    error: function (response) {
+                        console.log('response',response);
+                    }
+                });
+            });
+
+            $('#btn-asuransi').click(function(){
+                var datanya = $('.form-asuransi').serializeArray();
+                datanya.push(
+                    {name:"_token", value: "{{ csrf_token() }}"},
+                    {name:"transid", value: "{{ $data->transid }}"},
+                );
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url('api/penanggung') }}",
+                    data: datanya,
+                    success: function (response) {
+                        console.log('response',response);
+                        // Swal.fire(
+                        //     'Berhasil!',
+                        //     response.message,
+                        //     'success'
+                        // ).then(function() {
+                        //     window.top.close();
+                        // });
+                    },
+                    error: function (response) {
+                        Swal.fire(
+                            'Gagal!',
+                            response.responseJSON.message,
+                            'error'
+                        )
+                    }
+                });
+            });
+            @endif
 
             @if (!empty($data) && $data->id_status > 0 && $method == 'approve')
             $('.btn-approve').click(function(){

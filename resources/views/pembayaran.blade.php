@@ -22,7 +22,7 @@
                 <option>50</option>
                 <option>100</option>
             </select>
-            <div class="ml-3">
+            {{-- <div class="ml-3">
                 <div class="flex flex-col sm:flex-row">
                     <label class="mr-2">Filter Data : </label>
                     <div class="form-check mr-2">
@@ -34,7 +34,7 @@
                         <label class="form-check-label" for="sudah_dibayar">Sudah Dibayar</label>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <script>
                 $(document).ready(function(){
                     $('.cek-filter').click(function() {
@@ -44,7 +44,7 @@
                 });
             </script>
         </div>
-        @role('broker|adm')
+        @role('broker|adm|finance')
         <a href="javascript:;" data-toggle="modal" data-target="#modal-import"
             class="ml-3 mt-3 sm:mt-0 md:ml-3 btn btn-primary">
             <i data-feather="upload" class="w-4 h-4 dark:text-gray-300 mr-2"></i>Import Excel</a>
@@ -238,7 +238,7 @@
 </div>
 
 <div id="modal-import" class="modal" tabindex="-1" data-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl" style="width: 1300px;">
     <div class="modal-content">
             <!-- BEGIN: Modal Header -->
             <div class="modal-header">
@@ -269,7 +269,7 @@
                                 <th class="whitespace-nowrap">Tertanggung</th>
                                 <th class="whitespace-nowrap">Debit</th>
                                 <th class="whitespace-nowrap">Credit</th>
-                                <th class="whitespace-nowrap">Saldo</th>
+                                <th class="whitespace-nowrap">Nominal Seharusnya</th>
                                 <th class="whitespace-nowrap">Status</th>
                             </tr>
                         </thead>
@@ -718,7 +718,7 @@
             });
             tableImport.draw();
 
-            $('#frm-import').submit(function(e){
+            $('#frm-import').submit(function(e) {
                 e.preventDefault();
                 var data = new FormData(this);
                 $.ajax({

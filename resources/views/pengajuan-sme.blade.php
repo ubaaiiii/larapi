@@ -221,6 +221,18 @@
                                 <label for="alamat_insured" class="form-label sm:w-20">Alamat Tertanggung</label>
                                 <textarea id="alamat_insured" name="alamat_insured" class="form-control" required @if (!empty($data->alamat_insured)) @endif>@if (!empty($data->alamat_insured)){{ $data->alamat_insured }}@endif</textarea>
                             </div>
+                            <div class="form-inline mt-5">
+                                <label for="kodepos_tertanggung" class="ml-3 form-label sm:w-20">Kode Pos Tertanggung</label>
+                                <select id="kodepos_tertanggung" style="width:100%" name="kodepos_tertanggung" required>
+                                </select>
+                            </div>
+                            @if (!empty($data->id_kodepos))
+                                <script>
+                                    var newOption = new Option("{{ $data->kodepos . ' / ' . $data->kelurahan . ' / ' . $data->kecamatan }}",
+                                    {{ $data->id_kodepos }}, false, false);
+                                    $('#kodepos_tertanggung').append(newOption).trigger('change');
+                                </script>
+                            @endif
                             @role('maker|checker|broker|approver|adm')
                             <div class="form-inline mt-5">
                                 <label for="plafond_kredit" class="form-label sm:w-20">Plafond Kredit</label>

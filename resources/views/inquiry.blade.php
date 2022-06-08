@@ -462,7 +462,7 @@
                         // console.log('datanya: ', d);
                     },
                     // success: function(d) {
-                    //     // console.log(d);
+                    //     console.log(d);
                     //     $.each(d.sql, function(i,v) {
                     //         console.log(v.query);
                     //     })

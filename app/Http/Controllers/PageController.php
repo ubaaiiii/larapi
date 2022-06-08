@@ -119,8 +119,10 @@ class PageController extends Controller
         // die;
         // echo $data['formula']->kodetrans_input[0];
         $transaksi = Transaksi::find($transid);
-        if (!empty($transaksi)) {
-            if (empty($transaksi)) {
+        // echo json_encode($transaksi);
+        // die;
+        if (!empty($transid)) {
+            if (empty($transaksi) ||$transaksi == null) {
                 abort(404, "ID Transaksi Tidak Ditemukan");
             }
             $level = Auth::user()->getRoleNames()[0];
@@ -224,14 +226,19 @@ class PageController extends Controller
                 default:
                     break;
             }
+
+            $laporan = Laporan::join('role_has_laporan as rl', 'laporan.id', '=', 'rl.laporan_id')
+                ->join('model_has_roles as mr', 'rl.role_id', '=', 'mr.role_id')
+                ->where('mr.model_id', '=', Auth::user()->id);
+
+            if ($level == "insurance") {
+                $laporan = $laporan->where('id_asuransi', '=', Auth::user()->id_asuransi);
+            }
             
             $data = [
                 'cabang'    => $cabang,
                 'asuransi'  => $asuransi,
-                'laporan'   => Laporan::join('role_has_laporan as rl','laporan.id','=','rl.laporan_id')
-                ->join('model_has_roles as mr','rl.role_id','=','mr.role_id')
-                ->where('mr.model_id','=',Auth::user()->id)
-                ->get(),
+                'laporan'   => $laporan->get(),
                 'instype'   => Instype::all(),
             ];
             

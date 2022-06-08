@@ -386,14 +386,14 @@
         <td></td>
         <td><img src="{{ public_path('dist/images/TTD') }}/ttd-hargo.png" height="40px"></td>
         <td></td>
-        <td><img src="{{ public_path('dist/images/TTD') }}/ttd-vita.png" height="65px"></td>
+        <td><img src="{{ public_path('dist/images/TTD') }}/ttd-{{ Auth::user()->id }}.png" height="65px"></td>
       </tr>
       <tr align="center">
         <td width="30%" style="border-bottom: 1px solid black !important;">Wahyusenja D. AAAIK CIIB</td>
         <td></td>
         <td width="30%" style="border-bottom: 1px solid black !important;">Hargo Nugroho CIIB</td>
         <td></td>
-        <td width="30%" style="border-bottom: 1px solid black !important;">Achmad Abdi Wicaksono</td>
+        <td width="30%" style="border-bottom: 1px solid black !important;">{{ Auth::user()->name }}</td>
       </tr>
     </table>
   </main>

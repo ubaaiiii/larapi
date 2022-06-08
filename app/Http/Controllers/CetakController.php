@@ -434,12 +434,13 @@ class CetakController extends Controller
                 $data = [
                     'transaksi'   => $transaksi,
                     'instype'     => Instype::find($transaksi->id_instype),
-                    'sequential'  => Sequential::where('seqdesc', 'transid')->first(),
                     'tertanggung' => Insured::find($transaksi->id_insured),
                     'cabang'      => Cabang::find($transaksi->id_cabang),
+                    'installment' => Installment::where('id_transaksi', '=', $transaksi->transid)->get(),
+                    'asuransi'    => Asuransi::where('id', '=', $id_asuransi)->first(),
+                    'sequential'  => Sequential::where('seqdesc', 'transid')->first(),
                     'jenis'       => $jenis_text,
                     'pricing'     => $pricing,
-                    'installment' => Installment::where('id_transaksi', '=', $transaksi->transid)->get(),
                     'objek'       => TransaksiObjek::join('kodepos', 'id_kodepos', '=', 'kodepos.id')
                         ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
                         ->leftJoin('kelas_pertanggungan', 'id_kelas', '=', 'kelas_pertanggungan.id')
@@ -475,7 +476,6 @@ class CetakController extends Controller
                     //     ->where('tsi', 1)
                     //     ->where('transaksi_pricing.value', '<>', 0)
                     //     ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get(),
-                    'asuransi'    => Asuransi::where('id', '=', $id_asuransi)->first(),
                 ];
                 // return DB::getQueryLog();
                 // dd($data['asuransi']);

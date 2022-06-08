@@ -7,6 +7,7 @@ use App\Imports\ImportPembayaran;
 use App\Models\Activity;
 use App\Models\Master;
 use App\Models\Pembayaran;
+use App\Models\Pricing;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,8 +22,7 @@ class ImportController extends Controller
         $rows = Excel::toCollection(new ImportPembayaran, $request->file('file-import'))[0];
         $arr = [];
         // DB::enableQueryLog();
-        foreach($rows as $row)
-        {
+        foreach ($rows as $row) {
             if (!is_numeric($row[0])) {
                 continue;
             }
@@ -30,52 +30,71 @@ class ImportController extends Controller
             $tertanggung = explode(" ", $row[2])[3];
             $transaksi   = Transaksi::find($transid);
             $cek         = "";
-            $i           = 0;
             $status      = "";
+            $i           = 0;
+            $seharusnya  = 0;
 
             if (!empty($transaksi)) {
                 $cek    = "checked";
                 $i      = 1;
                 $status = "OK";
-                $pembayaran = Pembayaran::where('id_transaksi',$transid);
+                $cek_masuk  = Pembayaran::where('id_transaksi', $transid)->where('paid_type', 'PD01')->get();
+                $cek_keluar = Pembayaran::where('id_transaksi', $transid)->where('paid_type', 'PD02')->get();
                 if ($row[4] !== 0) {
-                    $pembayaran->where('paid_type','PD02')->get();
-                    if ($pembayaran->count() > 0) {
+                    if ($cek_keluar->count() > 0) {
                         $cek    = "";
                         $i      = 0;
                         $status = "Sudah Dibayar Ke Asuransi";
+                    } else {
+                        if ($cek_masuk->count() == 0) {
+                            $cek    = "";
+                            $i      = 0;
+                            $status = "<p style='color:red'>Belum Terima Uang Masuk</p>";
+                        }
                     }
-                } elseif ($row[5] !== 0) {
-                    $pembayaran->where('paid_type','PD01')->get();
-                    if ($pembayaran->count() > 0) {
+                    $seharusnya = Pricing::where('id_transaksi', $transid)->where('id_kodetrans', 19)->first()->value;
+                    if ($seharusnya != $row[4]) {
                         $cek    = "";
                         $i      = 0;
-                        $status = "Sudah Dibayar Oleh Bank";
+                        $status = "<p style='color:red'>Nominal Tidak Sesuai</p>";
+                    }
+                } elseif ($row[5] !== 0) {
+                    if ($cek_masuk->count() > 0) {
+                        $cek    = "";
+                        $i      = 0;
+                        $status = "Sudah Diterima Dari Bank";
+                    }
+                    $seharusnya = Pricing::where('id_transaksi', $transid)->where('id_kodetrans', 18)->first()->value;
+                    if ($seharusnya != $row[5]) {
+                        $cek    = "";
+                        $i      = 0;
+                        $status = "Nominal Tidak Sesuai";
                     }
                 }
+                $seharusnya = (!empty($seharusnya)) ? $seharusnya : 0;
 
-                if ($transaksi->id_status < 5 or in_array($transaksi->id_status,[11,12,13])) {
-                    $master = Master::where('msid', $transaksi->id_status)->where('mstype','status')->first();
+                if ($transaksi->id_status < 5 or in_array($transaksi->id_status, [11, 12, 13])) {
+                    $master = Master::where('msid', $transaksi->id_status)->where('mstype', 'status')->first();
                     $cek    = "";
                     $i      = 0;
-                    $status = "Status Belum Sesuai: ".$master->msdesc;
+                    $status = "Status Belum Sesuai: " . $master->msdesc;
                 }
             } else {
-                $status = "Tidak Ditemukan";
+                $status = "ID Transaksi Tidak Ditemukan";
             }
 
             $arr[] = [
-                '<p hidden>'. $i .$cek.'</p>',
+                '<p hidden>' . $i . $cek . '</p>',
                 $row[0],
-                Date::excelToDateTimeObject($row[1])->format('Y-m-d H:i:s'),
-                explode(" ",$row[2])[1],
-                explode(" ",$row[2])[3],
+                Date::excelToDateTimeObject($row[1])->format('Y-m-d'),
+                explode(" ", $row[2])[1],
+                explode(" ", $row[2])[3],
                 $row[4],
                 $row[5],
-                $row[6],
+                $seharusnya,
                 $status
             ];
-        } 
+        }
         // return DB::getQueryLog();
         return response()->json($arr);
     }
@@ -112,21 +131,21 @@ class ImportController extends Controller
             $status_excel   = $row[8];  // harusnya "OK"
 
             // Bayar ke Asuransi
-            if ($debit != "0") {
+            if ($debit !== "0") {
                 $paid_type  = "PD02";
                 $nominal    = $debit;
                 $dc         = "D";
                 $status     = "9";
-            } 
+            }
 
             // Pembayaran dari Bank
-            elseif ($credit != "0") {
+            elseif ($credit !== "0") {
                 $paid_type  = "PD01";
                 $nominal    = $credit;
                 $dc         = "C";
                 $status     = "6";
             }
-            
+
             // Tidak ada nominal credit & debit
             else {
                 $data_error[] = $row;
@@ -138,9 +157,9 @@ class ImportController extends Controller
                 continue;  // skip, cegah duplikat
             }
 
-            $master = Master::where('msid',$paid_type)->where('mstype','paidtype')->first();
+            $master = Master::where('msid', $paid_type)->where('mstype', 'paidtype')->first();
 
-            Pembayaran::create([ 
+            Pembayaran::create([
                 'id_transaksi'  => $id_transaksi,
                 'paid_amount'   => $nominal,
                 'paid_at'       => $tgl_bayar,
@@ -149,11 +168,11 @@ class ImportController extends Controller
                 'dc'            => $dc,
                 'saldo'         => $saldo,
             ]);
-            
-            Activity::create([  
+
+            Activity::create([
                 'id_transaksi'  => $id_transaksi,
                 'id_status'     => $status,
-                'deskripsi'     => $master->msdesc.". Status pembayaran: ". $status_excel,
+                'deskripsi'     => $master->msdesc . ". Status pembayaran: " . $status_excel,
                 'created_by'    => Auth::user()->id
             ]);
             $data_sukses[] = $row;
@@ -161,7 +180,7 @@ class ImportController extends Controller
         }
 
         return response()->json([
-            'message'    => 'Berhasil Import '.$i.' Data',
+            'message'    => 'Berhasil Import ' . $i . ' Data',
             'data'       => $data_sukses,
             'data_error' => $data_error,
         ], 200);

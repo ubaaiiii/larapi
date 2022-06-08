@@ -593,7 +593,18 @@ class ProcessController extends Controller
 
     public function klausula(Request $request)
     {
-        
+        // return $request->all();
+        $transaksi = Transaksi::where('transid',$request->transid);
+        if (!empty($transaksi)) {
+            $transaksi->update(['klausula'=>$request->klausula]);
+            return response()->json([
+                'message'   => 'Klausula berhasil diperbaharui',
+            ], 200);
+        } else {
+            return response()->json([
+                'message'   => 'ID transaksi tidak ditemukan',
+            ], 400);
+        }
     }
 
     public function wholesales(Request $request)
@@ -755,7 +766,15 @@ class ProcessController extends Controller
                             $this->objek($request);
                             // $this->perluasan($request);
                             $this->installment($request);
+                        } else if ($transaksi->id_status == 3) {
+                            $status = 4;
+                            $string = "setujui asuransi";
 
+                            if ($request->total_share !== 100) {
+                                return response()->json([
+                                    'message'   => 'Total share belum mencapai 100%',
+                                ], 400);
+                            }
                         } else if ($transaksi->id_status == 8) {
                             $status = 10;
                             $string = "cek kebenaran polisnya";
@@ -1620,16 +1639,18 @@ class ProcessController extends Controller
         }
     }
 
-    public function penanggung($request)
+    public function penanggung(Request $request)
     {
-        if (!empty($request->asuransi)) {
+        // return $request->all();
+        $request->share = array_filter($request->share);
+        if (!empty($request->asuransi) && !empty($request->share)) {
             $id_asuransi = [];
             foreach ($request->asuransi as $i => $v) {
                 $arr[] = $i . " " . $v;
                 $row = TransaksiPenanggung::updateOrCreate(
                     [
-                        'id_asuransi'           => $v,
                         'id_transaksi'          => $request->transid,
+                        'id_asuransi'           => $v,
                     ],
                     [
                         'share_pertanggungan'   => $request->share[$i],
@@ -1644,6 +1665,20 @@ class ProcessController extends Controller
             TransaksiPenanggung::where('id_transaksi', $request->transid)->whereNotIn('id_asuransi', $id_asuransi)->forceDelete();
 
             return $asuransi;
+        } else {
+            $txt = "";
+            if (empty($request->asuransi)) {
+                $txt .= "memilih asuransi";
+            }
+            if (empty($request->share)) {
+                if (empty($request->asuransi)) {
+                    $txt .= " dan ";
+                }
+                $txt .= "mengisi share";
+            }
+            return response()->json([
+                'message'   => "Harap $txt terlebih dahulu",
+            ], 400);
         }
     }
 
