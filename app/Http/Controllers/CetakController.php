@@ -460,7 +460,7 @@ class CetakController extends Controller
                         })
                         ->leftJoin('transaksi_kode', 'id_kodetrans', '=', 'kodetrans_id')
                         ->where('transaksi_objek.id_transaksi', $transaksi->transid)->get(),
-                    'perluasan'   => TransaksiPerluasan::join('perluasan', 'id_perluasan', '=' , 'perluasan.id')
+                    'perluasan'   => TransaksiPerluasan::join('perluasan', 'id_perluasan', '=', 'perluasan.id')
                         ->where('id_transaksi', $transaksi->transid)
                         ->select([
                             'perluasan.id',
@@ -500,7 +500,7 @@ class CetakController extends Controller
                 // return $pdf->download('pdf_file.pdf');
 
                 // Streaming PDF, not saved on local
-                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                return $pdf->setpaper('a4', 'portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
                 exit(0);
 
                 // Saving PDF to local and redirect to the file
@@ -550,7 +550,7 @@ class CetakController extends Controller
             abort(404);
         }
     }
-
+    
     public function cetakAkseptasi($transid)
     {
         // DB::enableQueryLog();

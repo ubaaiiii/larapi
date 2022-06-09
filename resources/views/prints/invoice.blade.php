@@ -108,9 +108,12 @@
           <td>TANGGAL JATUH TEMPO</td>
           @php
             $date = date_create($data['transaksi']->billing_at);
-            date_add($date,date_interval_create_from_date_string("14 days"));
+            date_add($date,date_interval_create_from_date_string("30 days"));
           @endphp
-          <td colspan="3">{{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }}</td>
+          <td colspan="3">
+			  {{ FunctionsHelp::tgl_indo($date->format('Y-m-d')) }} (30 Hari sejak <i>Cover Note</i> diterbitkan)<br>
+			  <b>*Transaksi akan hilang setelah tanggal jatuh tempo, harap input pengajuan kembali saat transaksi hilang.</b>
+			</td>
         </tr>
       </table>
     </tr>
@@ -123,9 +126,7 @@
         <i>
           <b>
             Pembayaran ditransfer ke rekening PT. BINA DANA SEJAHTERA pada:<br>
-            PT. Bank KB Bukopin Capem Bulog II, Jakarta No. 101.5266.011 (IDR Rupiah)<br>
-            Mohon pembayaran premi tidak melebihi dari 14 hari untuk menjaga<br>
-            berlakunya coverage/jaminan dari polis ini.
+            PT. Bank KB Bukopin Capem Bulog II, Jakarta No. 101.5266.011 (IDR Rupiah)
           </b>
         </i>
       </td>

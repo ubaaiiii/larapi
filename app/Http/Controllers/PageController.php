@@ -68,10 +68,10 @@ class PageController extends Controller
             $level = Auth::user()->getRoleNames()[0];
             $dataController     = new DataController;
             $transaksi = $dataController->dataPengajuan($transid);
-
+			
             if (empty($transaksi)) {
-                abort(404, "ID Transaksi Tidak Ditemukan");
-            }
+				abort(404, "ID Transaksi $transid Tidak Ditemukan");
+			}
 
             if (in_array($level,['maker','checker'])) {
                 if (Auth::user()->id_cabang !== 1) { // Not All Cabang
@@ -101,7 +101,7 @@ class PageController extends Controller
     function pengajuan_wholesales($transid = null, Request $request)
     {
         $data = [
-            'cabang'    => Cabang::withoutTrashed()->orderBy('nama_cabang','asc')->get(),
+            'cabang'    => Cabang::withoutTrashed()->orderBy('nama_cabang', 'asc')->get(),
             'asuransi'  => Asuransi::all(),
             'okupasi'   => Okupasi::all(),
             'instype'   => Instype::all(),
@@ -122,21 +122,21 @@ class PageController extends Controller
         // echo json_encode($transaksi);
         // die;
         if (!empty($transid)) {
-            if (empty($transaksi) ||$transaksi == null) {
+            if (empty($transaksi) || $transaksi == null) {
                 abort(404, "ID Transaksi Tidak Ditemukan");
             }
             $level = Auth::user()->getRoleNames()[0];
             $dataController     = new DataController;
             $transaksi = $dataController->dataPengajuan($transid);
 
-            if (in_array($level,['maker','checker'])) {
+            if (in_array($level, ['maker', 'checker'])) {
                 if (Auth::user()->id_cabang !== 1) { // Not All Cabang
                     if ($transaksi->created_by !== Auth::user()->id) {
                         abort(401, "Tidak Berkepentingan, <br>Bukan Otorisasi Anda");
                     }
                 }
             }
-            if (in_array($level,['approval'])) {
+            if (in_array($level, ['approval'])) {
                 if (Auth::user()->id_cabang !== 1) { // Not All Cabang
                     if ($transaksi->id_cabang !== Auth::user()->id_cabang) {
                         abort(401, "Tidak Berkepentingan, <br>Bukan Otorisasi Anda");
@@ -152,7 +152,7 @@ class PageController extends Controller
             // $data['data_perluasan']      = $dataController->dataPerluasan($transid);
             $data['data_installment']       = $dataController->dataInstallment($transid);
             $data['data_penanggung']        = $dataController->dataPenanggung($transid);
-            $data['status']                 = Master::where('msid', $transaksi->id_status)->where('mstype','status')->first();
+            $data['status']                 = Master::where('msid', $transaksi->id_status)->where('mstype', 'status')->first();
             // dd($data['data_objek_perluasan']);
         } else {
             Sequential::where('seqdesc', 'transid')->update(['seqno' => $data['transid']->seqno + 1]);

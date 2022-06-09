@@ -76,6 +76,10 @@ class DataController extends Controller
         foreach ($instype as $row) {
             $list[$key]['id'] = $row['id'];
             $list[$key]['text'] = $row['instype_name'];
+            $list[$key]['brokerage_percent'] = $row['brokerage_percent'];
+            $list[$key]['klausula_template'] = $row['klausula_template'];
+            $list[$key]['max_tsi'] = $row['max_tsi'];
+            $list[$key]['max_periode_tahun'] = $row['max_periode_tahun'];
             $key++;
         }
         return response()->json($list);
@@ -118,9 +122,9 @@ class DataController extends Controller
         if ($format == "wholesales") {
             $okupasi->where('bisnis', '=', 'WHOLESALES')
                 ->where('id_instype', 'like', '%' . $request->id_instype . '%')
-                ->where('wilayah','like', '%' . $request-> wilayah . '%');
+                ->where('wilayah', 'like', '%' . $request->wilayah . '%');
             if (!empty($request->id_kelas)) {
-                $okupasi->where('id_kelas_pertanggungan', 'like', '%' . $request->id_kelas. '%');
+                $okupasi->where('id_kelas_pertanggungan', 'like', '%' . $request->id_kelas . '%');
             }
         } elseif (isNull($format) || $format == "sme") {
             $okupasi->where('bisnis', '=', 'SME');
@@ -948,7 +952,7 @@ class DataController extends Controller
     public function cekPerluasan(Request $request)
     {
         DB::enableQueryLog();
-        $perluasan = Perluasan::where('id_instype',$request->instype);
+        $perluasan = Perluasan::where('id_instype', $request->instype);
         $select = [
             'perluasan.id',
             'perluasan.kode',
@@ -957,16 +961,18 @@ class DataController extends Controller
         ];
 
         if (!empty($request->transid)) {
-            array_push($select,
+            array_push(
+                $select,
                 DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, IF (transaksi_perluasan.rate IS NOT NULL, transaksi_perluasan.rate, perluasan.rate), perluasan.rate) as rate'),
                 DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, IF (transaksi_perluasan.value IS NOT NULL, transaksi_perluasan.value, 0), 0) as value'),
-                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, "checked", NULL) as checked'));
-            $perluasan->leftJoin('transaksi_perluasan', function($q) use ($request) {
+                DB::raw('IF (transaksi_perluasan.id_transaksi IS NOT NULL, "checked", NULL) as checked')
+            );
+            $perluasan->leftJoin('transaksi_perluasan', function ($q) use ($request) {
                 $q->on('perluasan.id', '=', 'id_perluasan')
                 ->where('id_transaksi', '=', $request->transid);
             })->select($select);
         } else {
-            array_push($select,'perluasan.rate', DB::raw('null as checked'));
+            array_push($select, 'perluasan.rate', DB::raw('null as checked'));
             $perluasan->select($select);
         }
         // $perluasan->get();
@@ -1058,8 +1064,7 @@ class DataController extends Controller
             'activities.deskripsi',
         ];
 
-        $table = DB::table("activities");
-        $table->where('id_transaksi', $request->transid);
+        $table = DB::table("activities")->where('id_transaksi', $request->transid);
 
         $joins = [
             ['masters', ['activities.id_status = masters.msid', 'masters.mstype = status']],
@@ -1111,7 +1116,7 @@ class DataController extends Controller
         $table->where('id_transaksi', $request->transid);
         $table->where(function ($q) use ($role) {
             $q->whereNull('visible_by')
-                ->orWhere('visible_by', 'like', '%' . $role . '%');
+              ->orWhere('visible_by', 'like', '%' . $role . '%');
         });
         $table->whereNull('documents.deleted_at');
 
@@ -1147,7 +1152,7 @@ class DataController extends Controller
                                     Hapus
                                 </a>';
             }
-            $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url($row->lokasi_file) . "' target='_blank'>" . $row->nama_file . "</a>";
+            $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url($row->lokasi_file) . "?t=" . date('Y-m-d_h:m:s') . "' target='_blank'>" . $row->nama_file . "</a>";
             $nestedData[] = $row->created_at;
             $nestedData[] = $row->username;
             $nestedData[] = number_format((float)$row->ukuran_file, 2, '.', '') . " MB";
@@ -1269,8 +1274,8 @@ class DataController extends Controller
                 ->where('id_instype', $request->id_instype)
                 ->whereRaw($request->premi . " BETWEEN `min_premi` AND `max_premi`")
                 ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`");
-            // ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
-
+                // ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
+            
             $data = $config->first();
         } else {
             $data = [
