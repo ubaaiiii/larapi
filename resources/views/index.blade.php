@@ -59,6 +59,19 @@
                                 </div>
                             </div>
                         </div>
+                        @unlessrole('insurance')
+                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                            <div class="report-box zoom-in">
+                                <div class="box p-5" onclick="filterInquiry('menunggu ftc wholesale')">
+                                    <div class="flex">
+                                        <i class="fas fa-spinner fa-pulse text-theme-12" style="font-size: 40px"></i>
+                                    </div>
+                                    <div class="text-3xl font-medium leading-8 mt-6 text-right" id="angka-menunggu-ftc"><i class="fas fa-spinner fa-pulse"></i></div>
+                                    <div class="text-base text-gray-600 mt-1">Menunggu FTC (Wholesale)</div>
+                                </div>
+                            </div>
+                        </div>
+                        @endunlessrole
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                             <div class="report-box zoom-in">
                                 <div class="box p-5" onclick="filterInquiry('tagihan')">
@@ -728,6 +741,7 @@
                     $('#angka-verifikasi').text(d.Verifikasi);
                     $('#angka-asuransi').text(d.Asuransi);
                     $('#angka-bank').text(d.Bank);
+                    $('#angka-menunggu-ftc').text(d.MenungguFTC);
                     $('#angka-tagihan').text(d.Tagihan);
                     $('#angka-dibayar-bank').text(d.DibayarBank);
                     $('#angka-dibayar-broker').text(d.DibayarBroker);

@@ -75,11 +75,17 @@ class LaporanController extends Controller
                         'sts.msdesc',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -139,12 +145,17 @@ class LaporanController extends Controller
                         'catatan',
                     ];
 
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['transaksi_pembayaran AS pd', 'transid = pd.id_transaksi'],
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -189,12 +200,18 @@ class LaporanController extends Controller
                         'kl.nilai_yang_disetujui',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['transaksi_klaim AS kl', 'transid = kl.id_transaksi'],
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                     ];
@@ -245,11 +262,17 @@ class LaporanController extends Controller
                         'sts.msdesc',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -291,12 +314,18 @@ class LaporanController extends Controller
                         'rf.refund',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['transaksi_refund AS rf', 'transid = rf.id_transaksi'],
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                     ];
@@ -345,11 +374,17 @@ class LaporanController extends Controller
                         'polis_end',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -404,11 +439,17 @@ class LaporanController extends Controller
                         'polis_end',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -464,11 +505,17 @@ class LaporanController extends Controller
                         'sts.msdesc',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -524,11 +571,17 @@ class LaporanController extends Controller
                         'polis_end',
                         'sts.msdesc',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -607,10 +660,15 @@ class LaporanController extends Controller
                         'bayar.paid_at',
                     ];
 
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -678,11 +736,17 @@ class LaporanController extends Controller
                         'sts.msdesc',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
@@ -739,11 +803,17 @@ class LaporanController extends Controller
                         'sts.msdesc',
                         'catatan',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
                         ['transaksi_pembayaran AS pemb', ['pemb.id_transaksi = transid', 'pemb.paid_type = PD01']],
@@ -803,6 +873,7 @@ class LaporanController extends Controller
                     'nama_asuransi          AS "Asuransi"',
                     'instype_name           AS "Tipe Asuransi"',
                     'nama_cabang            AS "Cabang"',
+                    'alamat_cabang          AS "Alamat Cabang Bukopin"',
                     'nama_insured           AS "Nama Tertanggung"',
                     'nik_insured            AS "NIK"',
                     'npwp_insured           AS "NPWP"',
@@ -838,6 +909,7 @@ class LaporanController extends Controller
                             'nama_asuransi',
                             'instype_name', 
                             'nama_cabang', 
+                            'alamat_cabang', 
                             'nama_insured', 
                             'nik_insured', 
                             'npwp_insured', 
@@ -868,6 +940,7 @@ class LaporanController extends Controller
                         'nama_asuransi',
                         'instype_name',
                         'nama_cabang',
+                        'alamat_cabang',
                         'nama_insured',
                         'nik_insured',
                         'npwp_insured',
@@ -888,14 +961,20 @@ class LaporanController extends Controller
                         'transaksi.created_at',
                         'sts.msdesc',
                     ];
+
+                    $table->leftJoin('instype', function ($q) {
+                        $q->on('transaksi.id_instype', '=', 'instype.id')
+                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                    });
+
                     $joins = [
                         ['insured', 'id_insured = insured.id'],
                         ['okupasi', 'id_okupasi = okupasi.id'],
                         ['asuransi', 'id_asuransi = asuransi.id'],
-                        ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+                        // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
                         ['masters AS sts', ['id_status = sts.msid', 'sts.mstype = status']],
                         ['cabang', 'id_cabang = cabang.id'],
-                        ['kodepos', 'id_kodepos = kodepos.id'],
+                        ['kodepos', 'transaksi.id_kodepos = kodepos.id'],
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
                         ['transaksi_pricing AS premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
                         ['transaksi_pricing AS bangunan', ['transid = bangunan.id_transaksi', 'bangunan.id_kodetrans = 3', 'bangunan.value <> 0', 'bangunan.id_objek IS NULL']],

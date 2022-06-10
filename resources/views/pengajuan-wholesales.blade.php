@@ -334,10 +334,10 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer text-right">
-                                    <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
+                                    <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1 btn-simpan">
                                         Batal
                                     </button>
-                                    <button type="button" id="btn-klausula" class="btn btn-primary">
+                                    <button type="button" id="btn-klausula" class="btn btn-primary btn-simpan">
                                         <i class="fa fa-save mr-2"></i> Simpan Klausula
                                     </button>
                                 </div>
@@ -480,10 +480,10 @@
                                 </div>
                                 @if((!empty($method) && !empty($data->transid)) || empty($data->transid))
                                 <div class="modal-footer text-right">
-                                    <button type="button" onclick="cancelInstallment()" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
+                                    <button type="button" onclick="cancelInstallment()" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1 btn-simpan">
                                         Batal
                                     </button>
-                                    <button type="button" data-dismiss="modal" class="btn btn-primary">
+                                    <button type="button" data-dismiss="modal" class="btn btn-primary btn-simpan">
                                         <i class="fa fa-save mr-2"></i> Simpan Installment
                                     </button>
                                 </div>
@@ -501,7 +501,7 @@
                                 <div class="w-full sm:w-auto flex items-center sm:ml-auto mt-3 sm:mt-0">
                                     {{-- <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="generatePlacing()"><i class="fa fa-download mr-2"></i> Placing </button> --}}
                                     <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="addAsuransiRow()"><i class="fa fa-plus mr-2"></i> Tambah </button>
-                                    <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2" id="btn-asuransi"><i class="fa fa-save mr-2"></i> Simpan Asuransi </button>
+                                    <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-simpan" id="btn-asuransi"><i class="fa fa-save mr-2"></i> Simpan Asuransi </button>
                                 </div>
                                 @endif
                             </div>
@@ -553,6 +553,11 @@
                                                                 </td>
                                                             </tr>
                                                         @endforeach
+                                                        <script>
+                                                            $(document).ready(function(){
+                                                                hitungAsuransi();
+                                                            });
+                                                        </script>
                                                     @endif
                                                 </tbody>
                                                 <tfoot>
@@ -1069,6 +1074,7 @@
                 @if ($data->id_status == 4)
                     @role('adm|maker|checker')
                         <button class="btn btn-success mr-1 btn-approve"><i class="fa fa-check mr-2"></i>Setujui</button>
+                        <button class="btn btn-warning mr-1 btn-rollback"><i class="fa fa-redo-alt mr-2"></i>Kembalikan</button>
                     @endrole
                 @endif
                 @role('adm|broker|approver')
@@ -1806,6 +1812,7 @@
         function disableForm() {
             $('.formnya :input').prop('readonly',true);
             $('.formnya select').attr('readonly',true);
+            $('.btn-simpan').hide();
             $('.btn-tambah').hide();
             $('.btn-hapus').hide();
             $('.upload-dokumen').hide();
@@ -1815,6 +1822,22 @@
         }
 
         $(document).ready(function(){
+            @if (!empty($data->transid) && $data->id_status >=2)
+                let Font = Quill.import('formats/font');
+                Font.whitelist = ['inconsolata', 'roboto', 'mirza', 'arial'];
+                Quill.register(Font, true);
+
+                var quill = new Quill('#editor', {
+                    modules: {
+                        toolbar: '#toolbar-container',
+                        imageResize: {
+                            displaySize: true
+                        }
+                    },
+                    theme: 'snow'
+                });
+            @endif
+
             @if (empty($data->transid))
                 addObjekRow();
             @endif
@@ -1852,6 +1875,11 @@
                     $('#div-asuransi .btn-hapus').show();
                     $('.upload-dokumen').show();
                 }, 500);
+            @elseif (!empty($method) && $data->id_status == 4)
+                disableForm();
+                quill.disable();
+                $('#toolbar-container').hide();
+                $('.upload-dokumen').show();
             @endif
             initSelect();
             initTSI();
@@ -1863,22 +1891,6 @@
                 var id = $(this).attr('d-id');
                 resetOkupasi(id);
             });
-
-            @if (!empty($data->transid) && $data->id_status >=2)
-                let Font = Quill.import('formats/font');
-                Font.whitelist = ['inconsolata', 'roboto', 'mirza', 'arial'];
-                Quill.register(Font, true);
-
-                var quill = new Quill('#editor', {
-                    modules: {
-                        toolbar: '#toolbar-container',
-                        imageResize: {
-                            displaySize: true
-                        }
-                    },
-                    theme: 'snow'
-                });
-            @endif
 
             $('#btn-simpan, #btn-ajukan').click(function(e){
                 e.preventDefault();
@@ -1982,13 +1994,11 @@
                     data: datanya,
                     success: function (response) {
                         console.log('response',response);
-                        // Swal.fire(
-                        //     'Berhasil!',
-                        //     response.message,
-                        //     'success'
-                        // ).then(function() {
-                        //     window.top.close();
-                        // });
+                        Swal.fire(
+                            'Berhasil!',
+                            response.message,
+                            'success'
+                        );
                     },
                     error: function (response) {
                         Swal.fire(
@@ -2029,6 +2039,7 @@
                         });
                     },
                     error: function (response) {
+                        console.log('response',response);
                         var pesan = "<div style='text-align:left' class='p-10'>";
                         $.each(response.responseJSON.errors, function (i, v) { 
                             pesan += "- " + v + "<br>";

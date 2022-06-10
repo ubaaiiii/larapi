@@ -372,6 +372,7 @@ class DataController extends Controller
                         IFNULL(SUM(case when transaksi.id_status IN (2) then 1 else 0 end), 0) as Verifikasi,
                         IFNULL(SUM(case when transaksi.id_status IN (3) then 1 else 0 end), 0) as Asuransi,
                         IFNULL(SUM(case when transaksi.id_status IN (4) then 1 else 0 end), 0) as Bank,
+                        IFNULL(SUM(case when transaksi.id_status IN (4.5) then 1 else 0 end), 0) as MenungguFTC,
                         IFNULL(SUM(case when transaksi.id_status IN (5) then 1 else 0 end), 0) as Tagihan,
                         IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL AND brokerPaid.id_transaksi IS NULL then 1 else 0 end), 0) as DibayarBank,
                         -- IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL AND transaksi.id_status < 9 then 1 else 0 end), 0) as DibayarBroker,
@@ -497,6 +498,10 @@ class DataController extends Controller
                     $table->where('id_status', "4");
                     break;
 
+                case 'menunggu ftc wholesale':
+                    $table->where('id_status', "4.5");
+                    break;
+
                 case 'tagihan':
                     $table->where('id_status', "5");
                     break;
@@ -548,9 +553,14 @@ class DataController extends Controller
             }
         }
 
+        $table->leftJoin('instype', function ($q){
+            $q->on('transaksi.id_instype', '=', 'instype.id')
+                ->on('instype.bisnis', '=', 'transaksi.bisnis');
+        });
+
         $joins = [
             ['insured', 'id_insured = insured.id'],
-            ['instype', ['id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+            // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
             ['okupasi', 'id_okupasi = okupasi.id'],
             ['asuransi', 'id_asuransi = asuransi.id'],
             ['masters as sts', ['transaksi.id_status = sts.msid', "sts.mstype = status"]],

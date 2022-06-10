@@ -804,7 +804,7 @@
                                     catatan = result.value;
                                 }
                                 $.ajax({
-                                    url: "{{ url('') }}/" + bisnis + "/" + transid,
+                                    url: "{{ url('api') }}/" + bisnis,
                                     data: {
                                         transid,
                                         _token,
@@ -845,6 +845,7 @@
                     bisnis = tablenya.row({selected: true}).data()[16],
                     _token = "{{ csrf_token() }}",
                     method = "rollback";
+                    
                 Swal.fire({
                     title: 'Apakah Anda Yakin?',
                     html: "Data <b>" + transid + "</b> akan dikembalikan ke status sebelumnya.",
@@ -867,7 +868,7 @@
                                     catatan = result.value;
                                 }
                                 $.ajax({
-                                    url: "{{ url('') }}/" + bisnis + "/" + transid,
+                                    url: "{{ url('api') }}/" + bisnis,
                                     data: {
                                         transid,
                                         _token,

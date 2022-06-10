@@ -741,6 +741,13 @@ class ProcessController extends Controller
             case 'approve':
                 $transaksi = Transaksi::find($request->transid);
                 switch ($role) {
+                    case 'maker':
+                        if ($transaksi->id_status == 4) {
+                            $status         = "4.5";
+                            $string         = "setujui";
+                        }
+                        break;
+
                     case 'approver':
                         $status = 2;
                         $string = "setujui";
@@ -768,13 +775,20 @@ class ProcessController extends Controller
                             $this->installment($request);
                         } else if ($transaksi->id_status == 3) {
                             $status = 4;
-                            $string = "setujui asuransi";
+                            $string = "tawarkan ke tertanggung";
 
-                            if ($request->total_share !== 100) {
+                            $request->validate([
+                                'asuransi'               => 'required|array',
+                                'asuransi.*'             => 'required',
+                            ]);
+
+                            if ($request->total_share != 100) {
                                 return response()->json([
-                                    'message'   => 'Total share belum mencapai 100%',
+                                    'message'   => 'Total share belum mencapai 100% = '.$request->total_share,
                                 ], 400);
                             }
+                            $this->penanggung($request);
+
                         } else if ($transaksi->id_status == 8) {
                             $status = 10;
                             $string = "cek kebenaran polisnya";
@@ -1697,7 +1711,10 @@ class ProcessController extends Controller
             }
             TransaksiPenanggung::where('id_transaksi', $request->transid)->whereNotIn('id_asuransi', $id_asuransi)->forceDelete();
 
-            return $asuransi;
+            // return $asuransi;
+            return response()->json([
+                'message'   => "Berhasil simpan data asuransi",
+            ], 200);
         } else {
             $txt = "";
             if (empty($request->asuransi)) {
