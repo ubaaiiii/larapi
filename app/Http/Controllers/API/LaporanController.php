@@ -78,7 +78,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -147,7 +147,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -203,7 +203,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -265,7 +265,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -317,7 +317,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -377,7 +377,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -442,7 +442,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -508,7 +508,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -574,7 +574,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -662,7 +662,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -739,7 +739,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -806,7 +806,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -898,37 +898,38 @@ class LaporanController extends Controller
                     $table->whereBetween('transaksi.created_at', [$request->periode_start, $request->periode_end])
                         ->where('transaksi.id_status', '=', '7')
                         // digrup biar ga duplikat laporannya
-                        ->groupBy('transid', 
-                            'kode_okupasi', 
-                            'location', 
-                            'kodepos', 
-                            'kelurahan', 
-                            'nama_okupasi', 
-                            'no_jaminan', 
-                            'transid', 
+                        ->groupBy(
+                            'kode_okupasi',
+                            'location',
+                            'kodepos',
+                            'kelurahan',
+                            'nama_okupasi',
+                            'no_jaminan',
+                            'transid',
                             'nama_asuransi',
-                            'instype_name', 
-                            'nama_cabang', 
-                            'alamat_cabang', 
-                            'nama_insured', 
-                            'nik_insured', 
-                            'npwp_insured', 
-                            'policy_no', 
-                            'cover_note', 
-                            'nopinjaman', 
-                            'polis_start', 
-                            'polis_end', 
-                            'bangunan.value', 
-                            'kendaraan.value', 
-                            'mesin.value', 
-                            'stok.value', 
-                            'inventaris.value', 
-                            'perabotan.value', 
-                            'lain.value', 
-                            'tsi.value', 
-                            'premi.value', 
-                            'transaksi.created_at', 
-                            'sts.msdesc');
+                            'instype_name',
+                            'nama_cabang',
+                            'alamat_cabang',
+                            'nama_insured',
+                            'nik_insured',
+                            'npwp_insured',
+                            'policy_no',
+                            'cover_note',
+                            'nopinjaman',
+                            'polis_start',
+                            'polis_end',
+                            'bangunan.value',
+                            'kendaraan.value',
+                            'mesin.value',
+                            'stok.value',
+                            'inventaris.value',
+                            'perabotan.value',
+                            'lain.value',
+                            'tsi.value',
+                            'premi.value',
+                            'transaksi.created_at',
+                            'sts.msdesc'
+                        );
 
                     $column = [
                         'kode_okupasi',
@@ -955,7 +956,7 @@ class LaporanController extends Controller
                         'stok.value',
                         'inventaris.value',
                         'perabotan.value',
-                        'lain.value', 
+                        'lain.value',
                         'tsi.value',
                         'premi.value',
                         'transaksi.created_at',
@@ -964,7 +965,7 @@ class LaporanController extends Controller
 
                     $table->leftJoin('instype', function ($q) {
                         $q->on('transaksi.id_instype', '=', 'instype.id')
-                        ->on('instype.bisnis', '=', 'transaksi.bisnis');
+                            ->on('instype.bisnis', '=', 'transaksi.bisnis');
                     });
 
                     $joins = [
@@ -978,12 +979,12 @@ class LaporanController extends Controller
                         ['transaksi_pricing AS tsi', ['transid = tsi.id_transaksi', 'tsi.id_kodetrans = 1']],
                         ['transaksi_pricing AS premi', ['transid = premi.id_transaksi', 'premi.id_kodetrans = 2']],
                         ['transaksi_pricing AS bangunan', ['transid = bangunan.id_transaksi', 'bangunan.id_kodetrans = 3', 'bangunan.value <> 0', 'bangunan.id_objek IS NULL']],
-                        ['transaksi_pricing AS kendaraan', ['transid = kendaraan.id_transaksi','kendaraan.id_kodetrans = 4','kendaraan.value <> 0', 'kendaraan.id_objek IS NULL']],
-                        ['transaksi_pricing AS mesin', ['transid = mesin.id_transaksi','mesin.id_kodetrans = 5','mesin.value <> 0', 'mesin.id_objek IS NULL']],
-                        ['transaksi_pricing AS stok', ['transid = stok.id_transaksi','stok.id_kodetrans = 6','stok.value <> 0', 'stok.id_objek IS NULL']],
-                        ['transaksi_pricing AS inventaris', ['transid = inventaris.id_transaksi','inventaris.id_kodetrans = 7','inventaris.value <> 0', 'inventaris.id_objek IS NULL']],
-                        ['transaksi_pricing AS perabotan', ['transid = perabotan.id_transaksi','perabotan.id_kodetrans = 8','perabotan.value <> 0', 'perabotan.id_objek IS NULL']],
-                        ['transaksi_pricing AS lain', ['transid = lain.id_transaksi','lain.id_kodetrans = 9','lain.value <> 0', 'lain.id_objek IS NULL']],
+                        ['transaksi_pricing AS kendaraan', ['transid = kendaraan.id_transaksi', 'kendaraan.id_kodetrans = 4', 'kendaraan.value <> 0', 'kendaraan.id_objek IS NULL']],
+                        ['transaksi_pricing AS mesin', ['transid = mesin.id_transaksi', 'mesin.id_kodetrans = 5', 'mesin.value <> 0', 'mesin.id_objek IS NULL']],
+                        ['transaksi_pricing AS stok', ['transid = stok.id_transaksi', 'stok.id_kodetrans = 6', 'stok.value <> 0', 'stok.id_objek IS NULL']],
+                        ['transaksi_pricing AS inventaris', ['transid = inventaris.id_transaksi', 'inventaris.id_kodetrans = 7', 'inventaris.value <> 0', 'inventaris.id_objek IS NULL']],
+                        ['transaksi_pricing AS perabotan', ['transid = perabotan.id_transaksi', 'perabotan.id_kodetrans = 8', 'perabotan.value <> 0', 'perabotan.id_objek IS NULL']],
+                        ['transaksi_pricing AS lain', ['transid = lain.id_transaksi', 'lain.id_kodetrans = 9', 'lain.value <> 0', 'lain.id_objek IS NULL']],
                     ];
                 }
                 break;

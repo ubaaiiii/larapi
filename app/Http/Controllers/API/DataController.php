@@ -207,7 +207,7 @@ class DataController extends Controller
             );
             $perluasan->leftJoin('transaksi_perluasan', function ($q) use ($request) {
                 $q->on('perluasan.id', '=', 'id_perluasan')
-                ->where('id_transaksi', '=', $request->transid);
+                    ->where('id_transaksi', '=', $request->transid);
             })->select($select);
         } else {
             array_push($select, 'perluasan.rate', DB::raw('null as checked'));
@@ -498,10 +498,6 @@ class DataController extends Controller
                     $table->where('id_status', "4");
                     break;
 
-                case 'menunggu ftc wholesale':
-                    $table->where('id_status', "4.5");
-                    break;
-
                 case 'tagihan':
                     $table->where('id_status', "5");
                     break;
@@ -521,15 +517,15 @@ class DataController extends Controller
                         ->whereNull('pmby2.id_transaksi');
                     break;
 
-                // case 'dibayar broker':
-                //     $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
-                //         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
-                //             ->where('pmby.paid_type', '=', "PD02")
-                //             ->whereNull('pmby.deleted_at');
-                //     });
-                //     $table->whereNotNull('pmby.id_transaksi')
-                //         ->whereRaw('transaksi.id_status < 9');
-                //     break;
+                    // case 'dibayar broker':
+                    //     $table->leftJoin('transaksi_pembayaran as pmby', function ($q) use ($user) {
+                    //         $q->on('transaksi.transid', '=', 'pmby.id_transaksi')
+                    //             ->where('pmby.paid_type', '=', "PD02")
+                    //             ->whereNull('pmby.deleted_at');
+                    //     });
+                    //     $table->whereNotNull('pmby.id_transaksi')
+                    //         ->whereRaw('transaksi.id_status < 9');
+                    //     break;
 
                 case 'dibayar broker':
                     $table->where('id_status', "7");
@@ -553,14 +549,14 @@ class DataController extends Controller
             }
         }
 
-        $table->leftJoin('instype', function ($q){
+        $table->leftJoin('instype', function ($q) {
             $q->on('transaksi.id_instype', '=', 'instype.id')
                 ->on('instype.bisnis', '=', 'transaksi.bisnis');
         });
 
         $joins = [
             ['insured', 'id_insured = insured.id'],
-            // ['instype', ['transaksi.id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
+            // ['instype', ['id_instype = instype.id', 'instype.bisnis = transaksi.bisnis']],
             ['okupasi', 'id_okupasi = okupasi.id'],
             ['asuransi', 'id_asuransi = asuransi.id'],
             ['masters as sts', ['transaksi.id_status = sts.msid', "sts.mstype = status"]],
@@ -979,7 +975,7 @@ class DataController extends Controller
             );
             $perluasan->leftJoin('transaksi_perluasan', function ($q) use ($request) {
                 $q->on('perluasan.id', '=', 'id_perluasan')
-                ->where('id_transaksi', '=', $request->transid);
+                    ->where('id_transaksi', '=', $request->transid);
             })->select($select);
         } else {
             array_push($select, 'perluasan.rate', DB::raw('null as checked'));
@@ -1126,7 +1122,7 @@ class DataController extends Controller
         $table->where('id_transaksi', $request->transid);
         $table->where(function ($q) use ($role) {
             $q->whereNull('visible_by')
-              ->orWhere('visible_by', 'like', '%' . $role . '%');
+                ->orWhere('visible_by', 'like', '%' . $role . '%');
         });
         $table->whereNull('documents.deleted_at');
 
@@ -1284,8 +1280,8 @@ class DataController extends Controller
                 ->where('id_instype', $request->id_instype)
                 ->whereRaw($request->premi . " BETWEEN `min_premi` AND `max_premi`")
                 ->whereRaw($request->tsi . " BETWEEN `min_tsi` AND `max_tsi`");
-                // ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
-            
+            // ->whereRaw($request->periode_tahun . " BETWEEN `min_periode_tahun` AND `max_periode_tahun`");
+
             $data = $config->first();
         } else {
             $data = [

@@ -1846,7 +1846,9 @@
             @endif
             @if (empty($method) && !empty($data->transid))
                 disableForm();
-            @elseif (!empty($method) && $data->id_status == 1)
+            @elseif (!empty($method) && $data->id_status == 0)
+				disableForm();
+			@elseif (!empty($method) && $data->id_status == 1)
                 disableForm();
             @elseif (!empty($method) && $data->id_status == 2)
                 disableForm();
