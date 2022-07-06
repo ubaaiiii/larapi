@@ -18,6 +18,7 @@ use App\Models\Pricing;
 use App\Models\Sequential;
 use App\Models\Transaksi;
 use App\Models\TransaksiObjek;
+use App\Models\TransaksiPenanggung;
 use App\Models\TransaksiPerluasan;
 use App\Models\User;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -63,24 +64,57 @@ class CetakController extends Controller
                     Transaksi::where('transid',$transaksi->transid)->update(['billing_at' => date('Y-m-d')]);
                     $transaksi = Transaksi::find($transid);
                 }
-                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)->orderBy('id_kodetrans')->get();
-                foreach ($dataPricing as $row) {
-                    // echo $row->id_kodetrans;
-                    $pricing[$row->id_kodetrans] = $row;
+                if ($transaksi->bisnis == "sme") {
+                    $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)->orderBy('id_kodetrans')->get();
+                    foreach ($dataPricing as $row) {
+                        // echo $row->id_kodetrans;
+                        $pricing[$row->id_kodetrans] = $row;
+                    }
+
+                    $data = [
+                            'instype'     => Instype::find($transaksi->id_instype),
+                            'transaksi'   => $transaksi,
+                            'insured'     => Insured::find($transaksi->id_insured),
+                            // 'pricing'     => $pricing,
+                            'cabang'      => Cabang::find($transaksi->id_cabang),
+                            'due_date'    => Activity::where([
+                                ['id_transaksi', $transaksi->transid],
+                                ['id_status', 4],
+                            ])->get(),
+                        ];
+
+                    $data['asuransi'][0]    = Asuransi::find($transaksi->id_asuransi);
+                    $data['pricing'][0]     = $pricing;
+                    $data['objek'][0]       = "";
+                    
+                } else if ($transaksi->bisnis == "wholesales") {
+                    $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)->orderBy('id_kodetrans')->get();
+                    foreach ($dataPricing as $row) {
+                        // echo $row->id_kodetrans;
+                        $pricing[$row->id_kodetrans] = $row;
+                    }
+
+                    $data = [
+                        'instype'     => Instype::find($transaksi->id_instype),
+                        'asuransi'    => TransaksiPenanggung::where('id_transaksi', $transaksi->transid)->join('asuransi', 'asuransi.id', '=', 'id_asuransi')->get(),
+                        'transaksi'   => $transaksi,
+                        'insured'     => Insured::find($transaksi->id_insured),
+                        'pricing'     => $pricing,
+                        'cabang'      => Cabang::find($transaksi->id_cabang),
+                        'due_date'    => Activity::where([
+                            ['id_transaksi', $transaksi->transid],
+                            ['id_status', 4],
+                        ])->get(),
+                        'objek'       => TransaksiObjek::where('id_transaksi', $transaksi->transid)->get()
+                    ];
+                    return response()->json([
+                        'data' => $data['objek']
+                    ], 200);
+
+                } else {
+                    abort(404, "Data tidak ditemukan");
                 }
 
-                $data = [
-                    'instype'     => Instype::find($transaksi->id_instype),
-                    'asuransi'    => Asuransi::find($transaksi->id_asuransi),
-                    'transaksi'   => $transaksi,
-                    'insured'     => Insured::find($transaksi->id_insured),
-                    'pricing'     => $pricing,
-                    'cabang'      => Cabang::find($transaksi->id_cabang),
-                    'due_date'    => Activity::where([
-                        ['id_transaksi',$transaksi->transid],
-                        ['id_status',4],
-                    ])->get(),
-                ];
                 $qrcode = base64_encode(QrCode::format('svg')->size(70)->errorCorrection('H')->generate($url));
                 // share data to view
                 // view()->share('employee', $data);
@@ -92,8 +126,8 @@ class CetakController extends Controller
                 // return $pdf->download('pdf_file.pdf');
         
                 // Streaming PDF, not saved on local
-                // return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
-                // exit(0);
+                return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                exit(0);
         
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
@@ -223,95 +257,100 @@ class CetakController extends Controller
     {
         // DB::enableQueryLog();
         $transaksi = Transaksi::find($transid);
-        if (!empty($transaksi)) {
-            if ($transaksi->id_status >= 4) {
-                $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)
-                    ->join('transaksi_kode as tk','transaksi_pricing.id_kodetrans','=','tk.kodetrans_id')
-                    ->orderBy('id_kodetrans','ASC')
-                    ->get();
-                foreach ($dataPricing as $row) {
-                    // echo $row->id_kodetrans;
-                    $pricing[$row->id_kodetrans] = $row;
+        if ($transaksi->cover_note_manual == 0) {
+            if (!empty($transaksi)) {
+                if ($transaksi->id_status >= 4) {
+                    $dataPricing = Pricing::where('id_transaksi', $transaksi->transid)
+                        ->join('transaksi_kode as tk','transaksi_pricing.id_kodetrans','=','tk.kodetrans_id')
+                        ->orderBy('id_kodetrans','ASC')
+                        ->get();
+                    foreach ($dataPricing as $row) {
+                        // echo $row->id_kodetrans;
+                        $pricing[$row->id_kodetrans] = $row;
+                    }
+                    // DB::enableQueryLog();
+                    // $okupasi = Okupasi::where('id', $transaksi->id_okupasi)->get();
+                    // return response()->json(DB::getQueryLog());
+    
+                    $data = [
+                        'transaksi'   => $transaksi,
+                        'asuransi'    => Asuransi::find($transaksi->id_asuransi),
+                        'instype'     => Instype::find($transaksi->id_instype),
+                        'tgl_aktif'   => Activity::where('id_transaksi',$transaksi->transid)->where('id_status','4')->orderBy('created_at','DESC')->first(),
+                        'sequential'  => Sequential::where('seqdesc','transid')->first(),
+                        'tertanggung' => Insured::find($transaksi->id_insured),
+                        'cabang'      => Cabang::find($transaksi->id_cabang),
+                        'okupasi'     => Okupasi::find($transaksi->id_okupasi),
+                        'kodepos'     => KodePos::find($transaksi->id_kodepos),
+                        'jaminan'     => Master::where('msid', $transaksi->id_jaminan)->where('mstype', 'jaminan')->first(),
+                        'pricing'     => $pricing,
+                        'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
+                            ->where('tsi',1)
+                            ->where('transaksi_pricing.value','<>',0)
+                            ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
+                    ];
+                    // dd($data['pricing']);
+                    $data['covernote'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen)."/CN-BDS/".$data['asuransi']->akronim."/".Functions::angka_romawi(date('m'))."/".date('Y');
+                    $transaksi->update(['cover_note'=>$data['covernote']]);
+                    $parameter = [
+                        'id' => $data['covernote'],
+                    ];
+                    $parameter = Crypt::encrypt($parameter);
+                    $url = url('cek_covernote') . "/" . $parameter;
+                    // return $data['tsi'];
+                    
+                    $qrcode = base64_encode(QrCode::format('svg')->size(100)->errorCorrection('H')->generate($url));
+                    // share data to view
+                    // view()->share('employee', $data);
+                    $pdf = PDF::loadView('prints/cover_note', compact(
+                        'data',
+                        'qrcode'
+                    ));
+                    // Download PDF without viewing
+                    // return $pdf->download('pdf_file.pdf');
+    
+                    // Streaming PDF, not saved on local
+                    // return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                    // exit(0);
+    
+                    // Saving PDF to local and redirect to the file
+                    $output = $pdf->setpaper('a4', 'portrait')->output();
+                    $path   = "files/$transid/";
+                    $filename = "Cover_Note-$transid.pdf";
+                    if (!is_dir(public_path($path))) {
+                        mkdir(public_path($path), 0777, TRUE);
+                    }
+    
+                    $eksis = false;
+                    if (file_exists(public_path($path . $filename))) {
+                        $eksis = true;
+                    }
+    
+                    file_put_contents(public_path($path) . $filename, $output);
+                    // return redirect($path . $filename);
+                    $insert = [
+                        'id_transaksi'  => $transaksi->transid,
+                        'nama_file'     => $filename,
+                        'tipe_file'     => "pdf",
+                        'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
+                        'lokasi_file'   => "public/".$path . $filename,
+                        'jenis_file'    => "COVERNOTE",
+                        'created_by'    => 1,
+                    ];
+                    
+                    if (!$eksis) {
+                        Document::create($insert);
+                    }
+    
+                    return $data['covernote'];
+                } elseif ($transaksi->id_status < 4) {
+                    abort(403, "Belum disetujui oleh asuransi");
+                } else {
+                    abort(404);
                 }
-
-                $data = [
-                    'transaksi'   => $transaksi,
-                    'asuransi'    => Asuransi::find($transaksi->id_asuransi),
-                    'instype'     => Instype::find($transaksi->id_instype),
-                    'tgl_aktif'   => Activity::where('id_transaksi',$transaksi->transid)->where('id_status','4')->orderBy('created_at','DESC')->first(),
-                    'sequential'  => Sequential::where('seqdesc','transid')->first(),
-                    'tertanggung' => Insured::find($transaksi->id_insured),
-                    'cabang'      => Cabang::find($transaksi->id_cabang),
-                    'okupasi'     => Okupasi::find($transaksi->id_okupasi),
-                    'kodepos'     => KodePos::find($transaksi->id_kodepos),
-                    'jaminan'     => Master::where('msid', $transaksi->id_jaminan)->where('mstype', 'jaminan')->first(),
-                    'pricing'     => $pricing,
-                    'tsi'         => Pricing::where('id_transaksi', $transaksi->transid)
-                        ->where('tsi',1)
-                        ->where('transaksi_pricing.value','<>',0)
-                        ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get()
-                ];
-                // dd($data['pricing']);
-                $data['covernote'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen)."/CN-BDS/".$data['asuransi']->akronim."/".Functions::angka_romawi(date('m'))."/".date('Y');
-                $transaksi->update(['cover_note'=>$data['covernote']]);
-                $parameter = [
-                    'id' => $data['covernote'],
-                ];
-                $parameter = Crypt::encrypt($parameter);
-                $url = url('cek_covernote') . "/" . $parameter;
-                // return $data['tsi'];
-                
-                $qrcode = base64_encode(QrCode::format('svg')->size(100)->errorCorrection('H')->generate($url));
-                // share data to view
-                // view()->share('employee', $data);
-                $pdf = PDF::loadView('prints/cover_note', compact(
-                    'data',
-                    'qrcode'
-                ));
-                // Download PDF without viewing
-                // return $pdf->download('pdf_file.pdf');
-
-                // Streaming PDF, not saved on local
-                // return $pdf->setpaper('a4','portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
-                // exit(0);
-
-                // Saving PDF to local and redirect to the file
-                $output = $pdf->setpaper('a4', 'portrait')->output();
-                $path   = "files/$transid/";
-                $filename = "Cover_Note-$transid.pdf";
-                if (!is_dir(public_path($path))) {
-                    mkdir(public_path($path), 0777, TRUE);
-                }
-
-                $eksis = false;
-                if (file_exists(public_path($path . $filename))) {
-                    $eksis = true;
-                }
-
-                file_put_contents(public_path($path) . $filename, $output);
-                // return redirect($path . $filename);
-                $insert = [
-                    'id_transaksi'  => $transaksi->transid,
-                    'nama_file'     => $filename,
-                    'tipe_file'     => "pdf",
-                    'ukuran_file'   => File::size(public_path("files/$transid/$filename")) / 1024000,
-                    'lokasi_file'   => "public/".$path . $filename,
-                    'jenis_file'    => "COVERNOTE",
-                    'created_by'    => 1,
-                ];
-                
-                if (!$eksis) {
-                    Document::create($insert);
-                }
-
-                return $data['covernote'];
-            } elseif ($transaksi->id_status < 4) {
-                abort(403, "Belum disetujui oleh asuransi");
             } else {
                 abort(404);
             }
-        } else {
-            abort(404);
         }
     }
 
@@ -401,7 +440,7 @@ class CetakController extends Controller
     }
 
     //Wholesales
-    public function cetakKlausula($transid, $jenis, $id_asuransi)
+    public function cetakKlausula($transid, $jenis, $id_asuransi = null)
     {
         // DB::enableQueryLog();
         $transaksi = Transaksi::find($transid);
@@ -427,6 +466,11 @@ class CetakController extends Controller
                     $jenis_kode = "FTC";
                     $jenis_link = "cek_ftc";
                     $jenis_file = "FTC";
+                } else if ($jenis == "quotation") {
+                    $jenis_text = "QUOTATION";
+                    $jenis_kode = "IS";     // udah tanya mas riyan
+                    $jenis_link = "cek_quotation";
+                    $jenis_file = "QUOTATION";
                 } else {
                     abort(404);
                 }
@@ -477,6 +521,14 @@ class CetakController extends Controller
                     //     ->where('transaksi_pricing.value', '<>', 0)
                     //     ->join('transaksi_kode as tk', 'transaksi_pricing.id_kodetrans', '=', 'tk.kodetrans_id')->get(),
                 ];
+
+                if ($jenis !== "placing") {
+                    $data['asuransi'] = TransaksiPenanggung::where('id_transaksi',$transaksi->transid)
+                        ->join('asuransi', 'id_asuransi', '=', 'asuransi.id')
+                        ->get();
+                }
+                
+                // return response()->json($data['asuransi']);
                 // return DB::getQueryLog();
                 // dd($data['asuransi']);
                 $data['nomor_surat'] = substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "/" . $jenis_kode . "/" . $data['instype']->id . "/UW-01/BDS/" . Functions::angka_romawi(date('m')) . "/" . date('Y');
@@ -500,17 +552,19 @@ class CetakController extends Controller
                 // return $pdf->download('pdf_file.pdf');
 
                 // Streaming PDF, not saved on local
-                return $pdf->setpaper('a4', 'portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
-                exit(0);
+                // return $pdf->setpaper('a4', 'portrait')->stream("dompdf_out.pdf", array("Attachment" => false));
+                // exit(0);
 
                 // Saving PDF to local and redirect to the file
                 $output = $pdf->setpaper('a4', 'portrait')->output();
                 $path   = "files/$transid/";
 
                 if ($jenis == "placing") {
-                    $filename = "PS-" . substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "- " . $data['instype']->id . " - " . $data['tertanggung']->nama_insured . ".pdf";
+                    $filename = "PS-" . substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "- " . $data['instype']->id . " - " . $data['asuransi']->akronim . " - " . $data['tertanggung']->nama_insured . ".pdf";
                 } else if ($jenis == "ftc") {
-                    $filename = "FTC-" . substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "- " . $data['instype']->id . " - " . $data['tertanggung']->nama_insured . ".pdf";
+                    $filename = "FTC-" . substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "- " . $data['instype']->id . " - " . $data['asuransi']->akronim . " - " . $data['tertanggung']->nama_insured . ".pdf";
+                } else if ($jenis == "quotation") {
+                    $filename = "IS-" . substr($data['transaksi']->transid, -$data['sequential']->seqlen) . "- " . $data['instype']->id . " - " . $data['asuransi']->akronim . " - " . $data['tertanggung']->nama_insured . ".pdf";
                 } else {
                     abort(404);
                 }
@@ -540,7 +594,13 @@ class CetakController extends Controller
                     Document::create($insert);
                 }
 
-                return redirect(url("public/" . $path) . "/" . $filename);
+                if ($jenis == "ftc") {
+                    return response()->json([
+                        'message'   => 'Berhasil cetak FTC',
+                    ], 200);
+                }
+
+                return redirect(url("public/" . $path) . "/" . $filename . "?t=" . date('Y-m-d_h:m:s'));
             } elseif ($transaksi->id_status < 3) {
                 abort(403, "Belum disetujui oleh asuransi");
             } else {

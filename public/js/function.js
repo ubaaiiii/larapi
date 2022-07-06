@@ -280,4 +280,5 @@ $(document).ready(function() {
 
     initTSI();
     $(".date-range").inputmask("99/99/9999 - 99/99/9999");
+    $(".date").inputmask("99/99/9999");
 });

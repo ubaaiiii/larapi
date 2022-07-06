@@ -60,7 +60,7 @@
                 @endrole
                 @role('adm|insurance')
                     <button class="btn btn-sm btn-success btn-approve"><i class="fa fa-check mr-3"></i>Setujui</button>
-                    <button class="btn btn-sm btn-primary" id="btn-update"><i class="fa fa-save mr-3"></i>Simpan</button>
+                    {{-- <button class="btn btn-sm btn-primary" id="btn-update"><i class="fa fa-save mr-3"></i>Simpan</button> --}}
                     <?php 
                         $status_rollback = "DIVERIFIKASI";
                     ?>
@@ -87,36 +87,140 @@
                         <a href="javascript:;" data-toggle="modal" data-target="#modal-klausula" class="btn btn-primary mr-1 mb-2"><i class="fa fa-file-alt mr-2"></i>Klausula</a>
                             @role('insurance|adm')
                             <a class="btn btn-primary mr-1 mb-2" href="{{ url('cetak_placing/'.$data->transid) }}" target="placing"><i class="fa fa-download mr-2"></i>Placing</a>
+                            @if ($data->id_status == 3)
+                                <a class="btn btn-outline-primary mr-1 mb-2" data-toggle="modal" data-target="#modal-covernote"><i class="fa fa-upload mr-2"></i>Cover Note</a>
+                            @endif
                             @endrole
                         @endrole
                     @endif
                 </div>
                 {{-- <div class="alert alert-primary-soft show flex items-center mb-2" role="alert"> <i data-feather="alert-circle" class="w-6 h-6 mr-2"></i> Awesome alert with icon </div> --}}
-                <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2><b><i class="fa fa-edit mr-2 icon-klausula" style="display: none;"></i>Klausula</b></h2>
+                @if (!empty($data->transid))
+                    <div id="modal-covernote" class="modal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <form id="frm-covernote">
+                                    <div class="modal-header">
+                                        <h2><b><i class="fa fa-upload mr-2"></i>Upload Cover Note</b></h2>
+                                    </div>
+                                    <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+                                        <div class="col-span-12">
+                                            <i class="fa fa-info-circle mr-2"></i>Cover Note yang di<i>upload</i> di sini akan <b>menggantikan</b> Cover Note yang dikeluarkan otomatis oleh sistem.
+                                        </div>
+                                        <div class="col-span-12">
+                                            <label for="no_covernote" class="form-label">No. Cover Note</label>
+                                            <input type="text" name="transid" value="{{ $data->transid }}" hidden>
+                                            <input type="text" class="form-control allow-decimal" placeholder="Cover Note" name="no_covernote" id="no_covernote">
+                                        </div>
+                                        <div class="col-span-12">
+                                            <label for="modal-form-3" class="form-label">File</label>
+                                            <input name="file" type="file" class="form-control" placeholder="Important Meeting" id="file_cover_note" name="file_cover_note" accept="application/pdf"/>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer text-right">
+                                        <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
+                                            Batal
+                                        </button>
+                                        <button type="submit" class="btn btn-primary w-20">
+                                            Upload
+                                        </button>
+                                    </div>
+                                </form>
+                                <script>
+                                    $(document).ready(function(){
+                                        $('#frm-covernote').submit(function(e) {
+                                            e.preventDefault();
+                                            var data = new FormData(this);
+                                            data.append("method", "covernote");
+                                            $.ajax({
+                                                url: "{{ url('api/dokumen') }}",
+                                                headers: {
+                                                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                                                },
+                                                data: data,
+                                                type: "POST",
+                                                cache:false,
+                                                contentType: false,
+                                                processData: false,
+                                                success: function(d) {
+                                                    Swal.fire(
+                                                        'Berhasil!',
+                                                        d.message,
+                                                        'success'
+                                                    ).then(function() {
+                                                        // cash('#modal-covernote').hide();
+                                                        $('#tb-dokumen').DataTable().ajax.reload();
+                                                        $('#tb-aktifitas').DataTable().ajax.reload();
+                                                    });
+                                                },
+                                                error: function(d) {
+                                                    console.log('error',d);
+                                                    Swal.fire(
+                                                        'Gagal!',
+                                                        d.responseJSON.message,
+                                                        'error'
+                                                    );
+                                                },
+                                            });
+                                        });
+                                    });
+                                </script>
                             </div>
-                            <div class="modal-body">
-                                <div class="p-5" id="editor">
-                                    <p>@if(!empty($data->klausula)){!! $data->klausula !!}@endif</p>
-                                </div>
-                            </div>
-                            <script>
-								$('.icon-klausula').show();
-							</script>
-							<div class="modal-footer text-right">
-								<button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
-									Cancel
-								</button>
-								<button type="button" id="btn-klausula" class="btn btn-primary w-20">
-									Save
-								</button>
-							</div>
                         </div>
                     </div>
-                </div>
+                    <div id="modal-klausula" class="modal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2><b><i class="fa fa-edit mr-2 icon-klausula" style="display: none;"></i>Klausula</b></h2>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="p-5" id="editor">
+                                        <p>@if(!empty($data->klausula)){!! $data->klausula !!}@endif</p>
+                                    </div>
+                                </div>
+                                <script>
+                                    $('.icon-klausula').show();
+                                </script>
+                                <div class="modal-footer text-right">
+                                    <button type="button" data-dismiss="modal" class="btn btn-outline-secondary w-20 mr-1">
+                                        Cancel
+                                    </button>
+                                    <button type="button" id="btn-klausula" class="btn btn-primary w-20">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        $(document).ready(function(){
+                            var toolbarOptions = [
+                                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    
+                                [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+    
+                                [{ align: '' }, { 'align': 'center' }, { 'align': 'right' }, { 'align': 'justify' }],
+    
+                                ['clean']                                         // remove formatting button
+                            ];
+                            var quill = new Quill('#editor', {
+                                modules: {
+                                    toolbar: toolbarOptions
+                                },
+                                theme: 'bubble'
+                            });
+
+                            var klausulaValue = ($('.ql-editor').length > 0) ? $('.ql-editor').html() : "<p><br></p>";
+                            
+                            quill.on('text-change', function() {
+                                klausulaValue = $('.ql-editor').html();
+                            });
+                        });
+                    </script>
+                @endif
                 <div id="horizontal-form" class="p-5">
                     <form class="formnya">
                         <div class="preview">
@@ -153,7 +257,7 @@
                             @if (!empty($data) && $data->id_status >= 2)
                             <div class="form-inline mt-5">
                                 <label for="asuransi" class="ml-3 form-label sm:w-20">Asuransi</label>
-                                <select id="asuransi" name="asuransi" required style="width:100%" onchange="hitung(); asuransiConfig();">
+                                <select id="asuransi" name="asuransi" required style="width:100%" onchange="asuransiConfig();">
                                     {{-- @foreach ($asuransi as $val)
                                         <option value="{{ $val->id }}" @if (!empty($data->id_asuransi) && $val->id === $data->id_asuransi) selected="true" @endif>
                                             {{ $val->nama_asuransi }}
@@ -222,15 +326,15 @@
                                 <textarea id="alamat_insured" name="alamat_insured" class="form-control" required @if (!empty($data->alamat_insured)) @endif>@if (!empty($data->alamat_insured)){{ $data->alamat_insured }}@endif</textarea>
                             </div>
                             <div class="form-inline mt-5">
-                                <label for="kodepos_tertanggung" class="ml-3 form-label sm:w-20">Kode Pos Tertanggung</label>
-                                <select id="kodepos_tertanggung" style="width:100%" name="kodepos_tertanggung" required>
+                                <label for="kodepos_insured" class="ml-3 form-label sm:w-20">Kode Pos Tertanggung</label>
+                                <select id="kodepos_insured" style="width:100%" name="kodepos_insured" class="kodepos" required>
                                 </select>
                             </div>
-                            @if (!empty($data->id_kodepos))
+                            @if (!empty($data->insd_idkodepos))
                                 <script>
-                                    var newOption = new Option("{{ $data->kodepos . ' / ' . $data->kelurahan . ' / ' . $data->kecamatan }}",
+                                    var newOption = new Option("{{ $data->insd_kodepos . ' / ' . $data->insd_kelurahan . ' / ' . $data->insd_kecamatan }}",
                                     {{ $data->id_kodepos }}, false, false);
-                                    $('#kodepos_tertanggung').append(newOption).trigger('change');
+                                    $('#kodepos_insured').append(newOption).trigger('change');
                                 </script>
                             @endif
                             @role('maker|checker|broker|approver|adm')
@@ -330,7 +434,7 @@
                             </div>
                             <div class="form-inline mt-5">
                                 <label for="kodepos" class="ml-3 form-label sm:w-20">Kode Pos</label>
-                                <select id="kodepos" style="width:100%" name="kodepos" required>
+                                <select id="kodepos" style="width:100%" name="kodepos" class="kodepos" required>
                                 </select>
                             </div>
                             @if (!empty($data->id_kodepos))
@@ -404,22 +508,22 @@
                             <div class="mt-2" @if (!empty($data) && $data->id_status >= 2) @else style="display:none" @endif>
                                 <label for="kodetrans_value[2]" class="form-label">Premium</label>
                                 <input id="kodetrans_value[2]" d-input="PREMI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Premium" readonly aria-describedby="Premium" value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[2]">
+                                <input type="hidden" name="kodetrans_value[2]" value="@if (!empty($pricing[2]->value)){{ $pricing[2]->value }}@endif">
                             </div>
                             <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
                                 <label for="kodetrans_value[10]" class="form-label">Biaya Polis</label>
                                 <input id="kodetrans_value[10]" d-input="POLIS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Polis" aria-describedby="Biaya Polis" value="@if (!empty($pricing[10]->value)){{ $pricing[10]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[10]">
+                                <input type="hidden" name="kodetrans_value[10]" value="@if (!empty($pricing[10]->value)){{ $pricing[10]->value }}@endif">
                             </div>
                             <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
                                 <label for="kodetrans_value[11]" class="form-label">Biaya Materai</label>
                                 <input id="kodetrans_value[11]" d-input="MATERAI" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Biaya Materai" aria-describedby="Biaya Materai" value="@if (!empty($pricing[11]->value)){{ $pricing[11]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[11]">
+                                <input type="hidden" name="kodetrans_value[11]" value="@if (!empty($pricing[11]->value)){{ $pricing[11]->value }}@endif">
                             </div>
                             <div class="mt-2" @if (empty($data) || $data->id_status <=1) style="display:none" @endif>
                                 <label for="kodetrans_value[18]" class="form-label">Gross</label>
                                 <input id="kodetrans_value[18]" d-input="GROSS" onChange="hitung()" type="text" class="currency allow-decimal masked form-control" placeholder="Gross" aria-describedby="Gross" value="@if (!empty($pricing[18]->value)){{ $pricing[18]->value }}@endif">
-                                <input type="hidden" name="kodetrans_value[18]">
+                                <input type="hidden" name="kodetrans_value[18]" value="@if (!empty($pricing[18]->value)){{ $pricing[18]->value }}@endif">
                             </div>
                         </div>
                     </div>
@@ -437,8 +541,8 @@
                                 <div class="mt-2">
                                     <label for="total_rate" class="form-label">Total Rate (‰)</label>
                                     <input id="total_rate" d-input="_RATE" readonly
-                                        onChange="hitung()" type="text" class="decimal allow-decimal masked form-control"
-                                        placeholder="Total Rate" aria-describedby="Total Rate">
+                                    onChange="hitung()" type="text" class="decimal allow-decimal masked form-control"
+                                    placeholder="Total Rate" aria-describedby="Total Rate">
                                     <input type="hidden" name="total_rate">
                                 </div>
                                 @foreach ($hitung as $row)
@@ -448,7 +552,7 @@
                                         onChange="hitung()" type="text" class="@if(strpos($row->kodetrans_nama, '%') !== false) decimal @else currency @endif allow-decimal masked form-control"
                                         placeholder="{{ $row->kodetrans_nama }}" aria-describedby="{{ $row->kodetrans_nama }}"
                                         value="@if(!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
-                                    <input type="hidden" name="kodetrans_value[{{ $row->kodetrans_id }}]">
+                                    <input type="hidden" name="kodetrans_value[{{ $row->kodetrans_id }}]" value="@if(!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
                                 </div>
                                 @endforeach
                             </div>
@@ -602,6 +706,14 @@
             OTHERS  = null,
             maxPeriode = null,
             maxTSI  = null;
+
+        @if(!empty($data->polis_start) && !empty($data->polis_end))
+            var startPolis = moment("{{ $data->polis_start }}","YYYY-MM-DD");
+            var endPolis = moment("{{ $data->polis_end }}","YYYY-MM-DD");
+        @else 
+            var startPolis = moment();
+            var endPolis = moment().add(1, 'year');
+        @endif
         
         @if (!empty($data->id_kodepos))
             TSFWD = {{ $data->rate_TSFWD }};
@@ -637,14 +749,18 @@
                 var OKUPASI = $('#okupasi').val(),
                     _RATE   = totalRate(),
                     PRORATA = $('#PRORATA').val();
+                    // PRORATA = prorata(startPolis, endPolis);
+                
+                // console.log('PRORATA',PRORATA);
+
                 $('#total_rate').val(_RATE);
                 @foreach ($value as $row)
                 var {!! $row->kodetrans_input !!} = (isNaN(parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val()))) ? 0 : parseFloat($('[name="kodetrans_value[{!! $row->kodetrans_id !!}]"]').val());
                 @endforeach
                 if (_RATE == null || OKUPASI == null || TSI == null) {
-                    // console.log('Rate: ',_RATE);
-                    // console.log('Okupasi: ',OKUPASI);
-                    // console.log('TSI: ',TSI);
+                    console.log('Rate: ',_RATE);
+                    console.log('Okupasi: ',OKUPASI);
+                    console.log('TSI: ',TSI);
                     return false;
                 }
                 
@@ -658,54 +774,17 @@
                 @endforeach
                 // Selesai Hitung Gross
     
-                @foreach ($formula as $row)
-                    console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
-                @endforeach
-                console.log('TSI: ', TSI);
-                console.log('Premium: ', PREMI);
-                console.log("Rate: ", RATE);
-                console.log("Materai: ", MATERAI);
-                console.log("Polis: ", POLIS);
-                console.log("Biaya Lain: ", LAIN);
+                // @foreach ($formula as $row)
+                //     console.log('{!! $row->kodetrans_nama !!}',{!! $row->kodetrans_input !!});
+                // @endforeach
+                // console.log('TSI: ', TSI);
+                // console.log('Premium: ', PREMI);
+                // console.log("Rate: ", RATE);
+                // console.log("Materai: ", MATERAI);
+                // console.log("Polis: ", POLIS);
+                // console.log("Biaya Lain: ", LAIN);
                 $('.masked').trigger('keyup');
             // });
-        }
-
-        function asuransiConfig() {
-            var id_insurance    = $('#asuransi').val(),
-                id_instype      = $("#type_insurance").val(),
-                premi           = $('[d-input=PREMI').closest('div').find(':hidden').val(),
-                tsi             = $('[d-input=TSI').closest('div').find(':hidden').val(),
-                periode_tahun   = $('#PRORATA').val();
-            if (id_insurance !== null && id_instype !== null && premi !== null && tsi !== null && periode_tahun !== null) {
-                $.ajax({
-                    "url": "{{ url('api/biayaKlausula') }}",
-                    "type": "GET",
-                    "data": {id_insurance, id_instype, premi, tsi, periode_tahun},
-                    "success": function(data) {
-                        // console.log('data',data);
-                        @if (empty($pricing[10]->value))
-                            $('[d-input=POLIS').val(data.by_polis).trigger('keyup');
-                        @endif
-                        @if (empty($pricing[11]->value))
-                            $('[d-input=MATERAI').val(data.by_materai).trigger('keyup');
-                        @endif
-                        @if (empty($pricing[16]->value))
-                            $('[d-input=LAIN').val(data.by_lain).trigger('keyup');
-                        @endif
-                        @if(empty($data->klausula))
-                            $('.ql-editor').html(data.klausula_template);
-                        @endif
-                        @if (empty($pricing[16]->value))
-                            $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
-                        @endif
-                        hitung();
-                    },
-                    "error": function(response) {
-                        console.log('error biaya:',response);
-                    },
-                });
-            }
         }
 
         function disableInput() {
@@ -718,6 +797,46 @@
             $('[name*="_length"]').removeAttr('disabled');
         }
         @if ($act !== 'add' && !empty($data->transid))
+            function asuransiConfig() {
+                var id_insurance    = $('#asuransi').val(),
+                    id_instype      = $("#type_insurance").val(),
+                    premi           = $('[d-input=PREMI').closest('div').find(':hidden').val(),
+                    tsi             = $('[d-input=TSI').closest('div').find(':hidden').val(),
+                    periode_tahun   = $('#PRORATA').val();
+                if (id_insurance !== null && id_instype !== null && premi !== null && tsi !== null && periode_tahun !== null) {
+                    $.ajax({
+                        "url": "{{ url('api/biayaKlausula') }}",
+                        "type": "GET",
+                        "data": {id_insurance, id_instype, premi, tsi, periode_tahun},
+                        "success": function(data) {
+                            if ({{ $pricing[10]->value }} == 0) {
+                                $('[d-input=POLIS').val(data.by_polis).trigger('keyup');
+                                console.log('by.polis', data.by_polis);
+                            }
+                            if ({{ $pricing[11]->value }} == 0) {
+                                $('[d-input=MATERAI').val(data.by_materai).trigger('keyup');
+                                console.log('by.materai', data.by_materai);
+                            }
+                            if ({{ $pricing[16]->value }} == 0) {
+                                $('[d-input=LAIN').val(data.by_lain).trigger('keyup');
+                                console.log('by.lain', data.by_lain);
+                            }
+                            if ({{ $pricing[12]->value }} == 0) {
+                                $('[d-input="BROKERPERC"]').val(data.brokerage_percent).trigger('keyup');
+                                console.log('brokerage_percent', data.brokerage_percent);
+                            }
+                            if (`{!! $data->klausula !!}` === `<p><br></p>`) {
+                                $('.ql-editor').html(data.klausula_template);
+                            }
+                            hitung();
+                        },
+                        "error": function(response) {
+                            console.log('error biaya:',response);
+                        },
+                    });
+                }
+            }
+            
             function hapusDokumen(id){
                 console.log('hapus');
                 $.ajax({
@@ -920,13 +1039,6 @@
                 {{ $data->id_asuransi }}, false, false);
                 $('#asuransi').append(newOption).trigger('change');
             @endif
-            @if(!empty($data->polis_start) && !empty($data->polis_end))
-                var startPolis = moment("{{ $data->polis_start }}","YYYY-MM-DD");
-                var endPolis = moment("{{ $data->polis_end }}","YYYY-MM-DD");
-            @else 
-                var startPolis = moment();
-                var endPolis = moment().add(1, 'year');
-            @endif
             
             function cekType() {
                 if ($("#type_insurance").val() === "PAR") {
@@ -996,7 +1108,7 @@
                 },
             });
 
-            $("#kodepos").select2({
+            $(".kodepos").select2({
                 language: "id",
                 minimumInputLength: 3,
                 placeholder: "Masukkan Kode Pos / Kelurahan / Kecamatan",
@@ -1279,6 +1391,8 @@
                         $('#multiple-file-upload').show();
                         $('#policy_no').prop('readonly', false);
                         $('#cover_note').prop('readonly', false);
+                        $('#no_covernote').prop('readonly', false);
+                        $('#file_cover_note').prop('readonly', false);  
                         $('[d-input="POLIS"]').prop('readonly', false);
                         $('[d-input="MATERAI"]').prop('readonly', false);
                         $('[d-input="ADMIN"]').prop('readonly', false);
@@ -1300,33 +1414,13 @@
                 @endswitch
             @endif
 
-            var toolbarOptions = [
-                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-
-                [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-
-                [{ align: '' }, { 'align': 'center' }, { 'align': 'right' }, { 'align': 'justify' }],
-
-                ['clean']                                         // remove formatting button
-            ];
-            var quill = new Quill('#editor', {
-                modules: {
-                    toolbar: toolbarOptions
-                },
-                theme: 'bubble'
-            });
-            var klausulaValue = $('.ql-editor').html();
-            quill.on('text-change', function() {
-                klausulaValue = $('.ql-editor').html();
-            });
 
             $('#btn-add, #btn-update').click(function(){
                 var btnHtml = $(this).html(),
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
                     nama_insured = $('#insured option:selected').text(),
-                    nama_cabang = $('#cabang option:selected').text();
+                    nama_cabang = $('#cabang option:selected').text(),
+                    klausulaValue = ($('.ql-editor').length > 0) ? $('.ql-editor').html() : "<p><br></p>";
                 $(this)
                     .attr('disabled',true)
                     .html(loading);
@@ -1376,7 +1470,8 @@
                 var btnHtml = $(this).html(),
                     loading = "<i class='fas fa-spinner fa-pulse' class='mr-2'></i>&nbsp;&nbsp;Loading...",
                     nama_insured = $('#insured option:selected').text(),
-                    nama_cabang = $('#cabang option:selected').text();
+                    nama_cabang = $('#cabang option:selected').text(),
+                    klausulaValue = ($('.ql-editor').length > 0) ? $('.ql-editor').html() : "<p><br></p>";
 
                 $(this)
                     .attr('disabled',true)
@@ -1548,8 +1643,8 @@
             RATE = parseFloat($("#okupasi option:selected").text().slice($("#okupasi option:selected").text().indexOf("(") + 1, $("#okupasi option:selected").text().lastIndexOf("‰")));
             $('.masked').trigger('keyup');
             @if(!empty($pricing))
-                asuransiConfig();
-                hitung();
+                // asuransiConfig();
+                // hitung();
             @endif
             // $(':input').change();
         });

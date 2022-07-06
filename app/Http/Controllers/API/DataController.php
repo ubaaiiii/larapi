@@ -172,7 +172,7 @@ class DataController extends Controller
         $kelas = DB::table("kelas_pertanggungan")
             ->where('id_instype', 'like', '%' . $request->tipe . '%');
         if (!empty($request->search)) {
-            $kelas->where('nama_kelas', 'like', '%' . $request->tipe . '%');
+            $kelas->where('nama_kelas', 'like', '%' . $request->search . '%');
         }
         $kelas = $kelas->orderBy('id')->get();
 
@@ -246,6 +246,27 @@ class DataController extends Controller
         return response()->json($list);
     }
 
+    public function selectCurrency(Request $request)
+    {
+        // return $request->all();
+        $kelas = DB::table("currency");
+        if (!empty($request->search)) {
+            $kelas->where('id', 'like', '%' . $request->search . '%')
+            ->orWhere('currency', 'like', '%' . $request->search . '%');
+        }
+        $kelas = $kelas->orderBy('id')->get();
+
+        $list = [];
+        $key = 0;
+        foreach ($kelas as $row) {
+            $list[$key]['id'] = $row->id;
+            $list[$key]['text'] = $row->id . " - " . $row->currency;
+            // $list[$key]['field'] = $row->nama_field;
+            $key++;
+        }
+        return response()->json($list);
+    }
+
     public function generateQuery($request, $table, $columns, $select, $joins)
     {
         DB::enableQueryLog();
@@ -291,7 +312,7 @@ class DataController extends Controller
             });
         }
 
-        if (!empty($request->order) && isset($request->order)) {
+        if (!empty($request->order) && $request->has('order')) {
             for ($i = 0; $i < count($request->order); $i++) {
                 $table->orderBy($columns[$request->order[$i]['column']], $request->order[$i]['dir']);
             }
@@ -372,7 +393,7 @@ class DataController extends Controller
                         IFNULL(SUM(case when transaksi.id_status IN (2) then 1 else 0 end), 0) as Verifikasi,
                         IFNULL(SUM(case when transaksi.id_status IN (3) then 1 else 0 end), 0) as Asuransi,
                         IFNULL(SUM(case when transaksi.id_status IN (4) then 1 else 0 end), 0) as Bank,
-                        IFNULL(SUM(case when transaksi.id_status IN (4.5) then 1 else 0 end), 0) as MenungguFTC,
+                        IFNULL(SUM(case when transaksi.id_status IN (14) then 1 else 0 end), 0) as MenungguFTC,
                         IFNULL(SUM(case when transaksi.id_status IN (5) then 1 else 0 end), 0) as Tagihan,
                         IFNULL(SUM(case when bankPaid.id_transaksi IS NOT NULL AND brokerPaid.id_transaksi IS NULL then 1 else 0 end), 0) as DibayarBank,
                         -- IFNULL(SUM(case when brokerPaid.id_transaksi IS NOT NULL AND transaksi.id_status < 9 then 1 else 0 end), 0) as DibayarBroker,
@@ -464,7 +485,7 @@ class DataController extends Controller
                 break;
 
             case 'finance':
-
+                
                 break;
 
             case 'adm':
@@ -640,11 +661,11 @@ class DataController extends Controller
 
         $table = DB::table("transaksi_pembayaran as pby_bank")->whereNull('pby_bank.deleted_at')->where('pby_bank.paid_type', 'PD01');
 
-        if (isset($request->filter_sudah_dibayar) && isset($request->filter_belum_dibayar)) {
+        if ($request->has('filter_sudah_dibayar') && $request->has('filter_belum_dibayar')) {
             $table->whereRaw('1');
-        } elseif (!isset($request->filter_sudah_dibayar) && isset($request->filter_belum_dibayar)) {
+        } elseif (!$request->has('filter_sudah_dibayar') && $request->has('filter_belum_dibayar')) {
             $table->whereNull('pby_broker.id_transaksi');
-        } elseif (isset($request->filter_sudah_dibayar) && !isset($request->filter_belum_dibayar)) {
+        } elseif ($request->has('filter_sudah_dibayar') && !$request->has('filter_belum_dibayar')) {
             $table->whereNotNull('pby_broker.id_transaksi');
         } else {
             $table->whereRaw('0');
@@ -888,32 +909,39 @@ class DataController extends Controller
     public function dataPengajuan($transid)
     {
         $select = [
-            'transaksi.*',
-            'alamat_cabang',
+            'asuransi.nama_asuransi',
+            'cabang.alamat_cabang',
+            'currency.currency',
+            'instype_name',
             'insured.nama_insured as tertanggung',
             'insured.npwp_insured',
             'insured.nik_insured',
             'insured.alamat_insured',
             'insured.nohp_insured',
+            'insured.id_kodepos as insd_idkodepos',
             'okupasi.kode_okupasi',
             'okupasi.nama_okupasi',
             'okupasi.rate',
-            'asuransi.nama_asuransi',
-            'kecamatan',
-            'kelurahan',
-            'kodepos',
-            'rate_TSFWD',
-            'rate_RSMDCC',
-            'rate_OTHERS',
-            'instype_name',
+            'kodepos.kecamatan',
+            'kodepos.kelurahan',
+            'kodepos.kodepos',
+            'kodepos.rate_TSFWD',
+            'kodepos.rate_RSMDCC',
+            'kodepos.rate_OTHERS',
+            'pos_insured.kecamatan as insd_kecamatan',
+            'pos_insured.kelurahan as insd_kelurahan',
+            'pos_insured.kodepos as insd_kodepos',
+            'transaksi.*',
         ];
         $data = DB::table('transaksi')
+            ->leftJoin('asuransi', 'id_asuransi', '=', 'asuransi.id')
             ->leftJoin('cabang', 'id_cabang', '=', 'cabang.id')
+            ->leftJoin('currency', 'id_currency', '=', 'currency.id')
+            ->leftJoin('instype', 'transaksi.id_instype', '=', 'instype.id')
             ->leftJoin('insured', 'id_insured', '=', 'insured.id')
             ->leftJoin('kodepos', 'transaksi.id_kodepos', '=', 'kodepos.id')
+            ->leftJoin('kodepos as pos_insured', 'insured.id_kodepos', '=', 'pos_insured.id')
             ->leftJoin('okupasi', 'id_okupasi', '=', 'okupasi.id')
-            ->leftJoin('instype', 'transaksi.id_instype', '=', 'instype.id')
-            ->leftJoin('asuransi', 'id_asuransi', '=', 'asuransi.id')
             ->where('transid', '=', $transid)
             ->select($select)
             ->first();
@@ -1109,13 +1137,13 @@ class DataController extends Controller
             'documents.id',
             'nama_file',
             'documents.created_at',
-            'username',
+            'name',
             'ukuran_file',
         ];
 
         $select = [
             'documents.*',
-            'username',
+            'name',
         ];
         $role = Auth::user()->getRoleNames()[0];
         $table = DB::table("documents");
@@ -1141,6 +1169,12 @@ class DataController extends Controller
                 if ($transaksi->id_status <= 8 && $row->jenis_file == 'POLIS') {
                     continue;
                 }
+                if ($transaksi->id_status <= 4 && $row->jenis_file == 'COVERNOTE') {
+                    continue;
+                }
+                if ($row->jenis_file == 'PLACING') {
+                    continue;
+                }
             }
             $nestedData = array();
             if ($row->jenis_file !== null) {
@@ -1160,7 +1194,7 @@ class DataController extends Controller
             }
             $nestedData[] = "<i data-feather='link' class='w-4 h-4 dark:text-gray-300 mr-2'></i><a href='" . url($row->lokasi_file) . "?t=" . date('Y-m-d_h:m:s') . "' target='_blank'>" . $row->nama_file . "</a>";
             $nestedData[] = $row->created_at;
-            $nestedData[] = $row->username;
+            $nestedData[] = $row->name;
             $nestedData[] = number_format((float)$row->ukuran_file, 2, '.', '') . " MB";
 
             $data[] = $nestedData;
@@ -1310,5 +1344,47 @@ class DataController extends Controller
         $data['insured']  = Insured::find($data['transaksi']->id_insured);
         $data['asuransi'] = Asuransi::find($data['transaksi']->id_asuransi);
         return $data;
+    }
+
+    function getExchangeRate(Request $request)
+    {
+        if ($request->id_currency == "IDR") {
+            $kurs_beli      = 1;
+            $kurs_jual      = 1;
+            $tanggal_kurs   = $request->tanggal_kurs;
+        } else {
+            $client = new \GuzzleHttp\Client();
+
+            $response = $client->request(
+                'GET',
+                // exchange rate sesuai ketentuan BI
+                "https://www.bi.go.id/biwebservice/wskursbi.asmx/getSubKursLokal3",
+                [
+                    'headers' => [
+                        "Content-Type"  => "text/xml",
+                        "charset"       => "utf-8",
+                    ],
+                    'query' => [
+                        'mts'       => $request->id_currency,
+                        'startdate' => date('Y-m-d', strtotime($request->tanggal_kurs)),
+                        'enddate'   => date('Y-m-d', strtotime($request->tanggal_kurs)),
+                    ],
+                ]
+            );
+
+            $temp   = simplexml_load_string($response->getBody(), 'SimpleXMLElement', LIBXML_NOCDATA);
+            $table  = $temp->children('diffgr', true)->diffgram->children()->NewDataSet->Table;
+
+            $kurs_beli      = $table->beli_subkurslokal;
+            $kurs_jual      = $table->jual_subkurslokal;
+            $tanggal_kurs   = $table->tgl_subkurslokal;
+        }
+        
+        return response()->json([
+            "kurs_beli"     => (float) $kurs_beli,
+            "kurs_jual"     => (float) $kurs_jual,
+            "kurs_tengah"   => ((float) $kurs_beli + (float) $kurs_jual) / 2,
+            "tanggal_kurs"  => date('Y-m-d', strtotime($tanggal_kurs)),
+        ], $response->getStatusCode());
     }
 }

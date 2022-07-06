@@ -75,7 +75,9 @@ Route::group(['middleware' => 'auth'], function () {
   Route::get('cetak_nota_pembayaran/{any}', [CetakController::class, 'cetakNotaPembayaran'])->name('notapembayaran')->middleware('role:adm|broker|finance');
   Route::get('cetak_covernote/{any}', [CetakController::class, 'cetakCoverNote'])->name('covernote')->middleware('role:maker|checker|adm|broker|finance');
   Route::get('cetak_placing/{any}', [CetakController::class, 'cetakPlacing'])->name('placing')->middleware('role:insurance|adm|broker');
+  Route::get('cetak_quotation/{any}', [CetakController::class, 'cetakQuotation'])->name('quotation')->middleware('role:insurance|adm|broker');
   Route::get('cetak_klausula/{transid}/{jenis}/{id_asuransi}', [CetakController::class, 'cetakKlausula'])->name('klausulaWholesales')->middleware('role:insurance|adm|broker');
+  Route::get('cetak_klausula/{transid}/{jenis}', [CetakController::class, 'cetakKlausula'])->name('klausulaWholesales')->middleware('role:insurance|adm|broker');
 
   // inquiry
   Route::get('inquiry', [PageController::class, 'inquiry'])->name('inquiry');
@@ -110,4 +112,8 @@ Route::group(['middleware' => 'auth'], function () {
   // master
   Route::get('user', [PageController::class, 'user'])->name('user')->middleware('role:adm|broker');
   Route::get('gagalBayar', [ProcessController::class, 'cekGagalBayar']);
+  
+  // test
+  Route::get('testApi/{any}', [PageController::class, 'testApi']);
+  
 });

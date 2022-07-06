@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/selectasuransi', 'API\DataController@selectAsuransi');
     Route::get('/selectkelas', 'API\DataController@selectKelas');
     Route::get('/selectperluasan', 'API\DataController@selectPerluasan');
+    Route::get('/selectcurrency', 'API\DataController@selectCurrency');
     Route::get('/datadashboard', 'API\DataController@dataDashboard');
     Route::get('/cekperluasan', 'API\DataController@cekPerluasan');
 
@@ -56,6 +57,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // cek biaya sama klausula asuransi
     Route::get('/biayaKlausula', 'API\DataController@getBiayaKlausula');
+    Route::get('/exchangeRate', 'API\DataController@getExchangeRate');
 
     // proses data
     Route::post('/user', 'API\ProcessController@user');

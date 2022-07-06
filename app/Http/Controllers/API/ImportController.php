@@ -108,7 +108,7 @@ class ImportController extends Controller
             'data.*.1'  => 'required|numeric',
             'data.*.2'  => 'required|date',
             'data.*.3'  => 'required|alpha_num',
-            'data.*.4'  => 'required|string',
+            // 'data.*.4'  => 'required|string',
             'data.*.5'  => 'required|numeric',
             'data.*.6'  => 'required|numeric',
             'data.*.7'  => 'required|numeric',
@@ -124,7 +124,7 @@ class ImportController extends Controller
             // $nomor          = $row[1];  // nomor dari excel
             $tgl_bayar      = $row[2];
             $id_transaksi   = $row[3];
-            $nama_insured   = $row[4];
+            // $nama_insured   = $row[4];
             $debit          = $row[5];
             $credit         = $row[6];
             $saldo          = $row[7];
@@ -156,6 +156,8 @@ class ImportController extends Controller
             if ($cekPembayaran->count() > 0) {
                 continue;  // skip, cegah duplikat
             }
+
+            Transaksi::where('transid', $id_transaksi)->update(["id_status" => 7]);
 
             $master = Master::where('msid', $paid_type)->where('mstype', 'paidtype')->first();
 

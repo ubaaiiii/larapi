@@ -7,6 +7,7 @@ use App\Http\Controllers\API\LaporanController;
 use App\Http\Controllers\API\ProcessController;
 use App\Models\Asuransi;
 use App\Models\Cabang;
+use App\Models\Currency;
 use App\Models\Instype;
 use App\Models\KodePos;
 use App\Models\KodeTrans;
@@ -23,6 +24,7 @@ use App\Models\TransaksiPerluasan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use SimpleXMLElement;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -68,6 +70,7 @@ class PageController extends Controller
             $level = Auth::user()->getRoleNames()[0];
             $dataController     = new DataController;
             $transaksi = $dataController->dataPengajuan($transid);
+            // return response()->json($transaksi);
 			
             if (empty($transaksi)) {
 				abort(404, "ID Transaksi $transid Tidak Ditemukan");
@@ -105,6 +108,7 @@ class PageController extends Controller
             'asuransi'  => Asuransi::all(),
             'okupasi'   => Okupasi::all(),
             'instype'   => Instype::all(),
+            'currency'  => Currency::all(), 
             'jaminan'   => Master::withoutTrashed()->where('mstype', 'jaminan')->get(),
             'act'       => 'add',
             'price'     => KodeTrans::withoutTrashed()->where('tsi', true)->where('id_bisnis', 'like', '%WHOLESALES%')->orderBy('kodetrans_index', 'ASC')->get(),
@@ -306,5 +310,36 @@ class PageController extends Controller
             'qsearch'   => $search
         ];
         return view('user', $data);
+    }
+
+    function testApi($currency)
+    {
+        $client = new \GuzzleHttp\Client();
+
+        $response = $client->request(
+            'GET',
+            "https://www.bi.go.id/biwebservice/wskursbi.asmx/getSubKursLokal3",
+            [
+                'headers' => [
+                    "Content-Type" => "text/xml",
+                    "charset"   => "utf-8",
+                ],
+                'query' => [
+                    'mts'       => $currency,
+                    'startdate' => date("Y-m-d"),
+                    'enddate'   => date("Y-m-d"),
+                ],
+            ]
+        );
+        $temp   = simplexml_load_string($response->getBody(), 'SimpleXMLElement', LIBXML_NOCDATA);
+        $table  = $temp->children('diffgr', true)->diffgram->children()->NewDataSet->Table;
+        $table->beli_subkurslokal;
+
+        return response()->json([
+            "beli_subkurslokal"     => (float) $table->beli_subkurslokal,
+            "jual_subkurslokal"     => (float) $table->jual_subkurslokal,
+            "tengah_subkurslokal"   => ((float) $table->beli_subkurslokal + (float) $table->jual_subkurslokal) / 2,
+            "tgl_subkurslokal"      => date('Y-m-d', strtotime($table->tgl_subkurslokal)),
+        ], $response->getStatusCode());
     }
 }

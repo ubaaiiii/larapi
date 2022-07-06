@@ -1,5 +1,4 @@
 <html>
-
 <head>
   <style>
     @page {
@@ -112,11 +111,11 @@
         <td>:</td>
         <td>{{ $data['cabang']->alamat_cabang }}</td>
       </tr>
-      <tr valign="top">
+      {{-- <tr valign="top">
         <td>Phone Number</td>
         <td>:</td>
         <td>+62 {{ $data['tertanggung']->nohp_insured }}</td>
-      </tr>
+      </tr> --}}
       <tr valign="top">
         <td>Period of Insurance</td>
         <td>:</td>
@@ -165,7 +164,7 @@
               <td width="5%"  style="padding: 2px;">@if ($objek_pricing->id_objek !== $id_objek_pricing) {{ $i }}. @endif</td>
               @php($id_objek_pricing = $objek_pricing->id_objek)
               <td width="45%" style="padding: 2px;">{{ $objek_pricing->kodetrans_nama }}</td>
-              <td width="10%" style="padding: 2px;">IDR</td>
+              <td width="10%" style="padding: 2px;">{{ $data['transaksi']->id_currency }}</td>
               <td width="35%" align="right" style="padding: 2px;">{{ number_format($objek_pricing->value,2) }}</td>
               <td width="5%" style="padding: 2px;">@if ($i++ == $total_objek_pricing) + @endif</td>
             </tr>
@@ -173,7 +172,7 @@
             <tr valign="top">
               <td style="padding: 2px;"></td>
               <td align="right" style="padding: 2px;"><strong>TOTAL&nbsp;&nbsp;&nbsp;</strong></td>
-              <td style="padding: 2px;">IDR</td>
+              <td style="padding: 2px;">{{ $data['transaksi']->id_currency }}</td>
               <td align="right" style="border-top: 1px solid black;padding: 2px;"><strong>{{ number_format($data['pricing'][1]->value,2) }}</strong></td>
               <td style="padding: 2px;"></td>
             </tr>
@@ -265,8 +264,8 @@
           <td>@if($row_objek == 0)Premi @endif</td>
           <td>@if($row_objek == 0): @endif</td>
           <td>{{ $row_objek + 1 }}.</td>
-          <td>Premi =&nbsp;&nbsp;IDR {{ number_format($TSI_objek,2) }} &nbsp;&nbsp;x {{ $objek->rate }} ‰</td>
-          <td align="right">= IDR</td>
+          <td>Premi =&nbsp;&nbsp;{{ $data['transaksi']->id_currency }} {{ number_format($TSI_objek,2) }} &nbsp;&nbsp;x {{ $objek->rate }} ‰</td>
+          <td align="right">= {{ $data['transaksi']->id_currency }}</td>
           <td align="right" colspan="2">{{ number_format($TSI_objek * $objek->rate / 1000,2) }}</td>
           <td></td>
         </tr>
@@ -277,8 +276,8 @@
                 <td></td>
                 <td></td>
                 <td align="right">-</td>
-                <td>{{ $perluasan->kode }} =&nbsp;&nbsp;IDR {{ number_format($perluasan->value,2) }} &nbsp;&nbsp;x {{ $perluasan->rate }} ‰</td>
-                <td align="right">= IDR</td>
+                <td>{{ $perluasan->kode }} =&nbsp;&nbsp;{{ $data['transaksi']->id_currency }} {{ number_format($perluasan->value,2) }} &nbsp;&nbsp;x {{ $perluasan->rate }} ‰</td>
+                <td align="right">= {{ $data['transaksi']->id_currency }}</td>
                 <td align="right" colspan="2">{{ number_format($perluasan->value * $perluasan->rate / 1000,2) }}</td>
                 <td></td>
               </tr>
@@ -290,7 +289,7 @@
         <td></td>
         <td></td>
         <td colspan="2">Biaya Materai</td>
-        <td align="right">= IDR</td>
+        <td align="right">= {{ $data['transaksi']->id_currency }}</td>
         <td align="right" colspan="2">{{ number_format($data['pricing'][10]->value,2) }}</td>
         <td></td>
       </tr>
@@ -298,7 +297,7 @@
         <td></td>
         <td></td>
         <td colspan="2">Biaya Polis</td>
-        <td align="right">= IDR</td>
+        <td align="right">= {{ $data['transaksi']->id_currency }}</td>
         <td align="right" colspan="2">{{ number_format($data['pricing'][11]->value,2) }}</td>
         <td></td>
       </tr>
@@ -306,7 +305,7 @@
         <td></td>
         <td></td>
         <td colspan="2">Biaya Lain</td>
-        <td align="right">= IDR</td>
+        <td align="right">= {{ $data['transaksi']->id_currency }}</td>
         <td align="right" colspan="2"  style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][16]->value,2) }}</td>
         <td>+</td>
       </tr>
@@ -314,57 +313,72 @@
         <td></td>
         <td></td>
         <td colspan="2">PPH23 (2%)</td>
-        <td align="right">= IDR</td>
+        <td align="right">= {{ $data['transaksi']->id_currency }}</td>
         <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][15]->value,2) }}</td>
         <td>+</td>
       </tr> --}}
       <tr>
         <td></td>
         <td></td>
-        <td colspan="2"></td>
-        <td align="right">= IDR</td>
+        <td align="right" colspan="2">@if ($data['jenis'] !== "PLACING SLIP") TOTAL PREMI @endif</td>
+        <td align="right">= {{ $data['transaksi']->id_currency }}</td>
         <td align="right" colspan="2">{{ number_format($data['pricing'][18]->value,2) }}</td>
         <td></td>
       </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td colspan="2">Brokerage ({{ number_format($data['pricing'][12]->value,0) }}% x Premi)</td>
-        <td align="right">= IDR</td>
-        <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][13]->value,2) }}</td>
-        <td>-</td>
-      </tr>
-      <tr> 
-        <td></td>
-        <td></td>
-        <td colspan="2"></td>
-        <td align="right">= IDR</td>
-        <td align="right" colspan="2">{{ number_format($data['pricing'][20]->value,2) }}</td>
-        <td></td>
-      </tr> 
-      <tr> 
-        <td></td>
-        <td></td>
-        <td colspan="2">PPH23 (2% x Brokerage)</td>
-        <td align="right">= IDR</td>
-        <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][15]->value,2) }}</td>
-        <td>+</td>
-      </tr> 
-      <tr>
-        <td></td>
-        <td></td>
-        <td align="right" colspan="2">TOTAL PREMI</td>
-        <td align="right">= IDR</td>
-        <td align="right" colspan="2">{{ number_format($data['pricing'][19]->value,2) }}</td>
-        <td></td>
-      </tr>
+      @if ($data['jenis'] == "PLACING SLIP")
+        <tr>
+          <td></td>
+          <td></td>
+          <td colspan="2">Brokerage ({{ number_format($data['pricing'][12]->value,0) }}% x Premi)</td>
+          <td align="right">= {{ $data['transaksi']->id_currency }}</td>
+          <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][13]->value,2) }}</td>
+          <td>-</td>
+        </tr>
+        <tr> 
+          <td></td>
+          <td></td>
+          <td colspan="2"></td>
+          <td align="right">= {{ $data['transaksi']->id_currency }}</td>
+          <td align="right" colspan="2">{{ number_format($data['pricing'][20]->value,2) }}</td>
+          <td></td>
+        </tr> 
+        <tr> 
+          <td></td>
+          <td></td>
+          <td colspan="2">PPH23 (2% x Brokerage)</td>
+          <td align="right">= {{ $data['transaksi']->id_currency }}</td>
+          <td align="right" colspan="2" style="border-bottom: 1px solid black !important;">{{ number_format($data['pricing'][15]->value,2) }}</td>
+          <td>+</td>
+        </tr> 
+        <tr>
+          <td></td>
+          <td></td>
+          <td align="right" colspan="2">TOTAL PREMI</td>
+          <td align="right">= {{ $data['transaksi']->id_currency }}</td>
+          <td align="right" colspan="2">{{ number_format($data['pricing'][19]->value,2) }}</td>
+          <td></td>
+        </tr>
+      @endif
       <tr>
         <td colspan="8">&nbsp;</td>
       </tr>
       <tr>
-        <td>&nbsp;&nbsp;Security</td>
-          <td>:</td>
-          <td colspan="6">{{ $data['asuransi']->nama_asuransi }}</td>
+        <td valign="top">Security</td>
+          <td valign="top">:</td>
+          <td colspan="6" valign="top">
+            @if ($data['jenis'] == "PLACING SLIP")
+              {{ $data['asuransi']->nama_asuransi }}
+            @else
+              @if (count($data['asuransi']) > 1)
+                @php($i = 1)
+                @foreach($data['asuransi'] as $row)
+                {{ $i }}. {{ $row->nama_asuransi }} ({{ round($row->share_pertanggungan) }} %) @if($i++ == 1) (Leader)@endif <br>
+                @endforeach
+              @else
+                {{ $data['asuransi'][0]->nama_asuransi }}
+              @endif
+            @endif
+          </td>
       </tr>
     </table>
     <br>
@@ -386,14 +400,16 @@
         <td></td>
         <td><img src="{{ public_path('dist/images/TTD') }}/ttd-hargo.png" height="40px"></td>
         <td></td>
-        <td><img src="{{ public_path('dist/images/TTD') }}/ttd-{{ Auth::user()->id }}.png" height="65px"></td>
+        {{-- <td><img src="{{ public_path('dist/images/TTD') }}/ttd-{{ Auth::user()->id }}.png" height="65px"></td> --}}
+        <td><img src="{{ public_path('dist/images/TTD') }}/ttd-372.png" height="65px"></td>
       </tr>
       <tr align="center">
         <td width="30%" style="border-bottom: 1px solid black !important;">Wahyusenja D. AAAIK CIIB</td>
         <td></td>
         <td width="30%" style="border-bottom: 1px solid black !important;">Hargo Nugroho CIIB</td>
         <td></td>
-        <td width="30%" style="border-bottom: 1px solid black !important;">{{ Auth::user()->name }}</td>
+        {{-- <td width="30%" style="border-bottom: 1px solid black !important;">{{ Auth::user()->name }}</td> --}}
+        <td width="30%" style="border-bottom: 1px solid black !important;">Novieta</td>
       </tr>
     </table>
   </main>

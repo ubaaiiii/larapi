@@ -181,6 +181,17 @@
                                 <label for="alamat_insured" class="form-label sm:w-20">Alamat Tertanggung</label>
                                 <textarea id="alamat_insured" name="alamat_insured" class="form-control" required @if (!empty($data->alamat_insured)) @endif d-element="Alamat Tertanggung">@if (!empty($data->alamat_insured)){{ $data->alamat_insured }}@endif</textarea>
                             </div>
+                            <div class="form-inline mt-5">
+                                <label for="kodepos_insured" class="ml-3 form-label sm:w-20">Kode Pos Tertanggung</label>
+                                <select id="kodepos_insured" style="width:100%" name="kodepos_insured" class="kodepos" required>
+                                </select>
+                            </div>
+                            @if (!empty($data->insd_idkodepos))
+                                <script>
+                                    var newOption = new Option("{{ $data->insd_kodepos . ' / ' . $data->insd_kelurahan . ' / ' . $data->insd_kecamatan }}", {{ $data->insd_idkodepos }}, false, false);
+                                    $('#kodepos_insured').append(newOption).trigger('change');
+                                </script>
+                            @endif
                         </form>
                     </div>
                 </div>
@@ -210,16 +221,16 @@
                                     @endif
                                 </div>
                                 @if (!empty($data->transid) && $data->id_status > 3)
-                                <div class="form-inline mt-5">
-                                    <label for="cover_note" class="form-label sm:w-20">Cover Note</label>
-                                    <input type="text" class="form-control allow-decimal" placeholder="Cover Note" name="cover_note"
-                                        id="cover_note" value="@if (!empty($data->cover_note)){{ $data->cover_note }}@endif" d-element="Cover Note">
-                                </div>
-                                <div class="form-inline mt-5">
-                                    <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
-                                    <input type="text" class="form-control allow-decimal" placeholder="Nomor Polis" name="policy_no"
-                                        id="policy_no" value="@if (!empty($data->policy_no)){{ $data->policy_no }}@endif" d-element="Nomor Polis">
-                                </div>
+                                    <div class="form-inline mt-5">
+                                        <label for="cover_note" class="form-label sm:w-20">Cover Note</label>
+                                        <input type="text" class="form-control allow-decimal" placeholder="Cover Note" name="cover_note"
+                                            id="cover_note" value="@if (!empty($data->cover_note)){{ $data->cover_note }}@endif" d-element="Cover Note">
+                                    </div>
+                                    <div class="form-inline mt-5">
+                                        <label for="policy_no" class="form-label sm:w-20">Nomor Polis</label>
+                                        <input type="text" class="form-control allow-decimal" placeholder="Nomor Polis" name="policy_no"
+                                            id="policy_no" value="@if (!empty($data->policy_no)){{ $data->policy_no }}@endif" d-element="Nomor Polis">
+                                    </div>
                                 @endif
                                 <div class="form-inline mt-5">
                                     <label for="periode-polis" class="form-label sm:w-20">Periode Polis</label>
@@ -235,6 +246,35 @@
                                         <div id="masa" class="input-group-text">Hari</div>
                                     </div>
                                 </div>
+                                <div class="form-inline mt-5">
+                                    <label for="currency" class="ml-3 form-label sm:w-20">Mata Uang</label>
+                                    <select id="currency" name="id_currency" required style="width:100%" d-element="Mata Uang">
+                                    </select>
+                                    @if (!empty($data->id_currency))
+                                        <script>
+                                            var newOption = new Option("{{ $data->id_currency }} - {{ $data->currency }}","{{ $data->id_currency }}", false, false);
+                                            $('#currency').append(newOption).trigger('change');
+                                        </script>
+                                    @else
+                                        <script>
+                                            var newOption = new Option("IDR - Indonesian Rupiah","IDR", false, false);
+                                            $('#currency').append(newOption).trigger('change');
+                                        </script>
+                                    @endif
+                                    <input type="hidden" name="tanggal_kurs" value="@if (!empty($data->exchange_rate_date)){{ $data->exchange_rate_date }}@else{{ date("Y-m-d") }}@endif">
+                                </div>
+                                {{-- @if (!empty($data->transid) && $data->id_status > 4) --}}
+                                    {{-- <div class="form-inline mt-5">
+                                        <label for="nilai_kurs" class="ml-3 form-label sm:w-20">Nilai Kurs Tengah (BI)</label>
+                                        <div class="input-group w-full">
+                                            <input type="text" class="form-control currency masked" id="nilai_kurs" value="@if (!empty($data->exchange_rate)){{ $data->exchange_rate }}@else 1 @endif" required d-element="Nilai Tukar Kurs" readonly>
+                                            <input type="hidden" name="nilai_kurs" value="@if (!empty($data->exchange_rate)){{ $data->exchange_rate }}@else 1 @endif">
+                                            <label for="tanggal_kurs" class="input-group-text">Tanggal</label>
+                                            <input type="text" class="form-control" id="tanggal_kurs" value="@if (!empty($data->exchange_rate_date)){{ date("d/m/Y", strtotime($data->exchange_rate_date)) }}@else{{ date("d/m/Y") }}@endif" required d-element="Tanggal Tukar Kurs" readonly>
+                                            <input type="hidden" name="tanggal_kurs" value="@if (!empty($data->exchange_rate_date)){{ $data->exchange_rate_date }}@else{{ date("Y-m-d") }}@endif">
+                                        </div>
+                                    </div> --}}
+                                {{-- @endif --}}
                             </form>
                         </div>
                     </div>
@@ -282,7 +322,7 @@
                         <div class="modal-dialog modal-xl">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h2><b><i class="fa fa-edit mr-2"></i>Klausula</b></h2>
+                                    <h2><b><i class="fa fa-edit mr-2"></i>Klausulas</b></h2>
                                 </div>
                                 <div class="modal-body">
                                     <div id="standalone-container">
@@ -497,13 +537,14 @@
                                 <h2 class="font-medium text-base mr-auto">
                                     Data Asuransi
                                 </h2>
-                                @if((!empty($method) && !empty($data->transid)) || empty($data->transid))
-                                <div class="w-full sm:w-auto flex items-center sm:ml-auto mt-3 sm:mt-0">
-                                    {{-- <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="generatePlacing()"><i class="fa fa-download mr-2"></i> Placing </button> --}}
-                                    <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="addAsuransiRow()"><i class="fa fa-plus mr-2"></i> Tambah </button>
-                                    <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-simpan" id="btn-asuransi"><i class="fa fa-save mr-2"></i> Simpan Asuransi </button>
-                                </div>
-                                @endif
+                                @role('adm|broker')
+                                    @if((!empty($method) && !empty($data->transid)) || empty($data->transid))
+                                    <div class="w-full sm:w-auto flex items-center sm:ml-auto mt-3 sm:mt-0">
+                                        <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-tambah" onclick="addAsuransiRow()"><i class="fa fa-plus mr-2"></i> Tambah </button>
+                                        <button type="button" class="btn btn-sm btn-primary w-32 mr-2 mb-2 btn-simpan" id="btn-asuransi"><i class="fa fa-save mr-2"></i> Simpan Asuransi </button>
+                                    </div>
+                                    @endif
+                                @endrole
                             </div>
                             <div class="p-5" id="responsive-table">
                                 <div class="preview">
@@ -514,7 +555,11 @@
                                                     <tr>
                                                         <th width="50%" class="border-b-2 dark:border-dark-5 whitespace-nowrap">ASURANSI</th>
                                                         <th width="20%" class="text-center border-b-2 dark:border-dark-5 whitespace-nowrap">SHARE (%)</th>
-                                                        <th width="30%" class="border-b-2 dark:border-dark-5 whitespace-nowrap"></th>
+                                                        @role('adm|broker')
+                                                            @if (!empty($method))
+                                                                <th width="30%" class="border-b-2 dark:border-dark-5 whitespace-nowrap"></th>
+                                                            @endif
+                                                        @endrole
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-asuransi">
@@ -539,18 +584,31 @@
                                                                     <input id="share[{{ $row + 1 }}]" type="text" class="share-asuransi decimal allow-decimal masked form-control form-control-sm" placeholder="Share (%)" aria-describedby="Share (%)" style="text-align: right;" inputmode="decimal" onchange="hitungAsuransi()" d-element="Share Asuransi" value="{{ $penanggung->share_pertanggungan }}">
                                                                     <input type="hidden" name="share[{{ $row + 1 }}]" value="{{ $penanggung->share_pertanggungan }}">
                                                                 </td>
-                                                                <td class="whitespace-nowrap">
-                                                                    <div class="flex justify-center items-center">
-                                                                        <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="printPlacing({{ $row + 1 }})">
-                                                                            <i class="w-4 h-4 mr-1 fa fa-print"></i>
-                                                                            Placing
-                                                                        </button>
-                                                                        <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow({{ $row + 1 }})">
-                                                                            <i class="w-4 h-4 mr-1 fa fa-trash"></i>
-                                                                            Hapus
-                                                                        </button>
-                                                                    </div>
-                                                                </td>
+                                                                @role('adm|broker')
+                                                                    @if (!empty($method))
+                                                                        <td class="whitespace-nowrap">
+                                                                            <div class="flex justify-center items-center">
+                                                                                <button type="button" class="flex items-center text-theme-9 btn-hapus mr-6" onclick="printPlacing({{ $row + 1 }})">
+                                                                                    <i class="w-4 h-4 mr-1 fa fa-print"></i>
+                                                                                    Placing
+                                                                                </button>
+                                                                                {{-- <div class="dropdown w-1/2 sm:w-auto">
+                                                                                    <button type="button" class="dropdown-toggle flex items-center text-theme-1 btn-hapus mr-4" aria-expanded="false"> <i class="w-4 h-4 mr-1 fa fa-print"></i> Print </button>
+                                                                                    <div class="dropdown-menu w-40">
+                                                                                        <div class="dropdown-menu__content box dark:bg-dark-1 p-2">
+                                                                                            <a href="javascript:;" onclick="printPlacing({{ $row + 1 }})" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Placing </a>
+                                                                                            <a href="javascript:;" onclick="printQuotation({{ $row + 1 }})" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Quotation </a>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div> --}}
+                                                                                <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow({{ $row + 1 }})">
+                                                                                    <i class="w-4 h-4 mr-1 fa fa-trash"></i>
+                                                                                    Hapus
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                    @endif
+                                                                @endrole
                                                             </tr>
                                                         @endforeach
                                                         <script>
@@ -567,12 +625,19 @@
                                                         </td>
                                                         <td class="border-t whitespace-nowrap">
                                                             <input id="total_share" type="text" class="decimal allow-decimal masked form-control form-control-sm" placeholder="Total Share (%)" aria-describedby="Total Share (%)" style="text-align: right; font-weight:bold;" inputmode="decimal" readonly>
-                                                            <div class="pristine-error text-primary-3 mt-2" hidden>
+                                                            <div class="pristine-error text-primary-3 mt-2" hidden id="share-err">
                                                                 Total share tidak boleh lebih dari 100%
                                                             </div>
                                                             <input type="hidden" name="total_share">
                                                         </td>
-                                                        <td class="border-t whitespace-nowrap"></td>
+                                                        @if (!empty($method) && $data->id_status == 3)
+                                                        <td class="border-t whitespace-nowrap">
+                                                            <button type="button" class="flex items-center text-theme-9 btn-hapus mr-6" onclick="printQuotation()">
+                                                                <i class="w-4 h-4 mr-1 fa fa-print"></i>
+                                                                Quotation
+                                                            </button>
+                                                        </td>
+                                                        @endif
                                                     </tr>
                                                 </tfoot>
                                             </table>
@@ -883,35 +948,39 @@
                         </div>
                     </div>
                 </div>
-                <div class="intro-y col-span-12 mb-5">
-                    <div class="intro-y box">
-                        <div class="flex flex-col sm:flex-row items-center p-3 border-b border-gray-200">
-                            <h2 class="font-medium text-base mr-auto">
-                                Data Biaya
-                            </h2>
-                        </div>
-                        <div class="p-5">
-                            <div class="preview">
-                                <div class="overflow-x-auto">
-                                    <form class="formnya">
-                                        <div class="grid grid-cols-12 p-3">
-                                            @foreach ($hitung as $row)
-                                            <div class="mb-2 mr-2 col-span-6 lg:col-span-3">
-                                                <label for="kodetrans_value[{{ $row->kodetrans_id }}]" class="form-label">{{ $row->kodetrans_nama }}</label>
-                                                <input id="kodetrans_value[{{ $row->kodetrans_id }}]" d-input="{{ $row->kodetrans_input }}" {!! $row->kodetrans_attribute !!}
-                                                    onChange="hitungTOTAL()" type="text" class="@if(strpos($row->kodetrans_nama, '%') !== false) decimal @else currency @endif allow-decimal masked form-control"
-                                                    placeholder="{{ $row->kodetrans_nama }}" aria-describedby="{{ $row->kodetrans_nama }}"
-                                                    value="@if(!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
-                                                <input type="hidden" name="kodetrans_value[{{ $row->kodetrans_id }}]" value="@if(!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
+                @unlessrole('maker|checker|approver')
+                    <div class="intro-y col-span-12 mb-5">
+                        <div class="intro-y box">
+                            <div class="flex flex-col sm:flex-row items-center p-3 border-b border-gray-200">
+                                <h2 class="font-medium text-base mr-auto">
+                                    Data Biaya
+                                </h2>
+                            </div>
+                            <div class="p-5">
+                                <div class="preview">
+                                    <div class="overflow-x-auto">
+                                        <form class="formnya">
+                                            <div class="grid grid-cols-12 p-3">
+                                                @foreach ($hitung as $row)
+                                                @if ($row->kodetrans_id != 16)
+                                                    <div class="mb-2 mr-2 col-span-6 lg:col-span-3">
+                                                        <label for="kodetrans_value[{{ $row->kodetrans_id }}]" class="form-label">{{ $row->kodetrans_nama }}</label>
+                                                        <input id="kodetrans_value[{{ $row->kodetrans_id }}]" d-input="{{ $row->kodetrans_input }}" {!! $row->kodetrans_attribute !!}
+                                                            onChange="hitungTOTAL()" type="text" class="@if(strpos($row->kodetrans_nama, '%') !== false) decimal @else currency @endif allow-decimal masked form-control"
+                                                            placeholder="{{ $row->kodetrans_nama }}" aria-describedby="{{ $row->kodetrans_nama }}"
+                                                            value="@if(!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
+                                                        <input type="hidden" name="kodetrans_value[{{ $row->kodetrans_id }}]" value="@if(!empty($pricing[$row->kodetrans_id]->value)){{ $pricing[$row->kodetrans_id]->value }}@endif">
+                                                    </div>
+                                                @endif
+                                                @endforeach
                                             </div>
-                                            @endforeach
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endunlessrole
             @endif
         </div>
         @if (!empty($data->transid))
@@ -1155,9 +1224,16 @@
             });
 
             $('#total_share').val(SHARE).keyup();
-            if (SHARE > 100) {
+            console.log('SHARE', SHARE);
+            console.log('IF', SHARE < 100);
+            if (SHARE < 100) {
                 $('#total_share').parent('td').addClass('has-error');
                 $('#total_share').next().show();
+                $('#share-err').text('Total share tidak boleh kurang dari 100%');
+            } else if (SHARE > 100) {
+                $('#total_share').parent('td').addClass('has-error');
+                $('#total_share').next().show();
+                $('#share-err').text('Total share tidak boleh lebih dari 100%');
             } else {
                 $('#total_share').parent('td').removeClass('has-error');
                 $('#total_share').next().hide();
@@ -1325,6 +1401,10 @@
                 }
             }
 
+            function printQuotation() {
+                window.open("{{ url('cetak_klausula',$data->transid) }}/quotation", "quotation_{{ $data->transid }}");
+            }
+
             function removeAsuransiRow(id) {
                 var hitung = $('#body-asuransi tr').length;
                 if (hitung > 1) {
@@ -1351,10 +1431,19 @@
                                 <td class="whitespace-nowrap">
                                     @if(!empty($method))
                                     <div class="flex justify-center items-center">
-                                        <button type="button" class="flex items-center text-theme-1 btn-hapus mr-2" onclick="printPlacing(`+id+`)">
-                                            <i class="w-4 h-4 mr-1 fa fa-print"></i>
-                                            Placing
-                                        </button>
+                                        <button type="button" class="flex items-center text-theme-9 btn-hapus mr-2" onclick="printPlacing(`+id+`)">
+                                             <i class="w-4 h-4 mr-1 fa fa-print"></i>
+                                             Placing
+                                         </button>
+                                        {{-- <div class="dropdown w-1/2 sm:w-auto">
+                                            <button type="button" class="dropdown-toggle flex items-center text-theme-1 btn-hapus mr-4" aria-expanded="false"> <i class="w-4 h-4 mr-1 fa fa-print"></i> Print </button>
+                                            <div class="dropdown-menu w-40">
+                                                <div class="dropdown-menu__content box dark:bg-dark-1 p-2">
+                                                    <a href="javascript:;" onclick="printPlacing(`+id+`)" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Placing </a>
+                                                    <a href="javascript:;" onclick="printQuotation(`+id+`)" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Quotation </a>
+                                                </div>
+                                            </div>
+                                        </div> --}}
                                         <button type="button" class="flex items-center text-theme-6 btn-hapus" onclick="removeAsuransiRow(`+id+`)">
                                             <i class="w-4 h-4 mr-1 fa fa-trash"></i>
                                             Hapus 
@@ -1671,9 +1760,9 @@
                             <td class="text-right">
                                 <div class="input-group">
                                     <div id="input-group-email" class="form-control form-control-sm input-group-text" style="width:35px;">x</div>
-                                    <input type="text" class="rate form-control form-control-sm allow-decimal currency masked" placeholder="Nilai Pengkali Perluasan" id="value_perluasan[`+id+`][`+data.id+`]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" d-element="Value Perluasan `+id+`">
+                                    <input type="text" class="rate form-control form-control-sm allow-decimal currency masked" placeholder="Nilai Pengkali Perluasan" id="value_perluasan[`+id+`][`+data.id+`]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" d-element="Value Perluasan `+id+`" value="">
                                 </div>
-                                <input type="hidden" name="value_perluasan[`+id+`][`+data.id+`]">
+                                <input type="hidden" name="value_perluasan[`+id+`][`+data.id+`]" value="">
                             </td>
                             <td class="text-right">
                                 <input type="text" class="form-control form-control-sm allow-decimal currency masked" placeholder="Premium" id="premi_perluasan[`+id+`][`+data.id+`]" style="text-align: right; width: 100%" inputmode="decimal" onchange="hitungPerluasan()" readonly d-element="Premium `+id+`">
@@ -1682,6 +1771,8 @@
                         </tr>`;
             
             $('.row-okupasi-'+id).after(html);
+            $(`#value_perluasan\\[`+id+`\\]\\[`+data.id+`\\]`).val($('[name="kodetrans_value[1]['+id+']"]').val());
+            $(`[name="value_perluasan[`+id+`][`+data.id+`]"]`).val($('[name="kodetrans_value[1]['+id+']"]').val());
             initTSI();
             initDecimal();
             initCurrency();
@@ -1821,6 +1912,28 @@
             $('#periode-polis').prop('disabled',true);
         }
 
+        // function cekExchangeRate(id_currency, tanggal_kurs) {
+        //     if (id_currency == "IDR") {
+        //         $('#nilai_kurs').val(1).trigger('change');
+        //     } else {
+        //         $.ajax({
+        //             url: "{{ url('api/exchangeRate') }}",
+        //             type: "GET",
+        //             data: {id_currency, tanggal_kurs},
+        //             headers: {
+        //                 'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+        //             },
+        //             dataType: "json",
+        //             success: function (d) {
+        //                 $('#nilai_kurs').val(d.kurs_tengah).trigger('change');
+        //             },
+        //             error: function (d) {
+        //                 console.log('error',d);
+        //             }
+        //         });
+        //     }
+        // }
+
         $(document).ready(function(){
             @if (!empty($data->transid) && $data->id_status >=2)
                 let Font = Quill.import('formats/font');
@@ -1858,6 +1971,7 @@
                 $('.perluasan').removeAttr('readonly');
                 $('.rate').prop('readonly',false);
                 $('.biaya').prop('readonly',false);
+                $('.btn-simpan').show();
                 $('#kodetrans_value\\[12\\]').prop('readonly',false);
                 $('#modal-installment .btn-tambah').show();
                 $('#modal-installment .btn-hapus').show();
@@ -1871,6 +1985,7 @@
                     $('#policy_no').prop('readonly',false);
                     $('.form-asuransi .share-asuransi ').prop('readonly',false);
                     $('.form-asuransi select').removeAttr('readonly');
+                    $('.btn-simpan').show();
                     $('#modal-installment .btn-tambah').show();
                     $('#modal-installment .btn-hapus').show();
                     $('#div-asuransi .btn-tambah').show();
@@ -1892,6 +2007,30 @@
             $('.kelas').on('select2:select', function(){
                 var id = $(this).attr('d-id');
                 resetOkupasi(id);
+            });
+
+            $("#kodepos_insured").select2({
+                language: "id",
+                minimumInputLength: 3,
+                placeholder: "Masukkan Kode Pos / Kelurahan / Kecamatan",
+                ajax: {
+                    dataType: "json",
+                    url: "{{ url('api/selectkodepos') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                        };
+                    },
+                    processResults: function(data, page) {
+                        // console.log('kodepos',data);
+                        return {
+                            results: data,
+                        };
+                    },
+                },
             });
 
             $('#btn-simpan, #btn-ajukan').click(function(e){
@@ -2229,6 +2368,32 @@
                 },
             }).on('select2:select', function(e) {
                 cekTipeAsuransi();
+            });
+
+            $("#currency").select2({
+                language: "id",
+                placeholder: "Pilih Mata Uang",
+                ajax: {
+                    dataType: "json",
+                    url: "{{ url('api/selectcurrency') }}",
+                    headers: {
+                        'Authorization': `Bearer {{ Auth::user()->api_token }}`,
+                    },
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                        };
+                    },
+                    processResults: function(data, page) {
+                        return {
+                            results: data,
+                        };
+                    },
+                },
+            }).on('select2:select', function(e) {
+                // var data = e.params.data;
+                // var tanggal_kurs = $('[name="tanggal_kurs"]').val()
+                // cekExchangeRate(data.id, tanggal_kurs);
             });
 
             $('.okupasi').on('select2:select', function(e) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Helpers\Functions;
+use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\CetakController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\NotificationController;
@@ -11,6 +12,7 @@ use App\Models\User;
 use App\Models\Activity;
 use App\Models\Asuransi;
 use App\Models\Cabang;
+use App\Models\Currency;
 use App\Models\Installment;
 use App\Models\Insured;
 use App\Models\KodeTrans;
@@ -25,6 +27,7 @@ use App\Models\TransaksiPerluasan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -246,23 +249,82 @@ class ProcessController extends Controller
             case 'delete':
                 DB::enableQueryLog();
                 $data   = Document::find($request->id);
+                $transaksi  = Transaksi::find($data->id_transaksi);
+
                 if ($data->jenis_file == "POLIS" || $data->jenis_file == 'COVERNOTE') {
                     if ($role !== 'insurance') {
                         return response()->json([
                             'message'   => 'Anda tidak memiliki hak untuk menghapus POLIS/COVERNOTE',
                             'data'      => $data,
                         ], 401);
+                    } else {
+                        if ($data->jenis_file == 'COVERNOTE') {
+                            $transaksi->update(['cover_note' => null]);
+                        }
                     }
                 }
-                $transaksi  = Transaksi::find($data->id_transaksi);
+
                 $nama_file  = $data->nama_file;
-                $data->delete();
+                $data->forceDelete();
 
                 $this->aktifitas($request->transid, $transaksi->id_status, 'Menghapus file ' . $nama_file);
 
                 return response()->json([
                     'message'   => 'File ' . $nama_file . ' berhasil dihapus',
                     'data'      => $data,
+                ], 200);
+                break;
+
+            case 'covernote':
+                $request->validate([
+                    'transid'       => 'required',
+                    'no_covernote'  => 'required',
+                    'file'          => 'required|mimes:pdf|max:52428', // 50 MB
+                ], [
+                    'file.max'      => 'Ukuran dokumen tidak boleh melebihi 50 MB.'
+                ]);
+
+                $transaksi = Transaksi::find($request->transid);
+                $transaksi->update(
+                    [
+                        'cover_note'        => $request->no_covernote,
+                        'cover_note_manual' => 1
+                    ]
+                );
+
+                $file = $request->file('file');
+                $name = $file->getClientOriginalName();
+                $type = $file->extension();
+                $size = $file->getSize();
+                $path   = "public/files/$request->transid/";
+                $filename = "Cover_Note-$request->transid.pdf";
+
+                $eksis = false;
+                if (file_exists($path . $filename)) {
+                    $eksis = true;
+                }
+                if (!is_dir($path)) {
+                    mkdir($path, 0777, TRUE);
+                }
+
+                $path = $file->move($path, $filename);
+                // return redirect($path . $filename);
+                $insert = [
+                    'id_transaksi'  => $transaksi->transid,
+                    'nama_file'     => $filename,
+                    'tipe_file'     => $type,
+                    'ukuran_file'   => $size / 1024000,
+                    'lokasi_file'   => $path,
+                    'jenis_file'    => "COVERNOTE",
+                    'created_by'    => 1,
+                ];
+
+                if (!$eksis) {
+                    Document::create($insert);
+                }
+
+                return response()->json([
+                    'message'   => 'Covernote berhasil diupload',
                 ], 200);
                 break;
 
@@ -496,8 +558,6 @@ class ProcessController extends Controller
                 } else if ($exists = Storage::exists(public_path($public_path . "/" . $fileInvoice . "." . $invoiceExt))) {
                     echo "polis eksis";
                 }
-                echo public_path($public_path . "/" . $fileInvoice . "." . $invoiceExt);
-                die;
 
                 if ($exists = file_exists(public_path($public_path . "/" . $filePolis . "." . $polisExt))) {
                     Storage::move(public_path($public_path . "/" . $filePolis . "." . $polisExt), public_path($public_path . $filePolis . " - Copy" . "." . $polisExt));
@@ -609,7 +669,9 @@ class ProcessController extends Controller
 
     public function wholesales(Request $request)
     {
-        // return $request->all();
+        // return response()->json([
+        //     'message'   => $request->all(),
+        // ], 400);
         // return $this->objek($request);
         $role = Auth::user()->getRoleNames()[0];
         switch ($request->method) {
@@ -629,6 +691,7 @@ class ProcessController extends Controller
                     'cabang'            => 'required',
                     'id_instype'        => 'string|required',
                     'id_kodepos'        => 'array|required',
+                    'id_currency'       => 'required',
                     'masa'              => 'numeric|required',
                     'nik_insured'       => 'numeric|nullable',
                     'no_jaminan'        => 'required',
@@ -665,9 +728,14 @@ class ProcessController extends Controller
                 $cabang     = $this->cabang($request);
                 $objek      = $this->objek($request); // udah termasuk pricing objeknya
                 // $perluasan  = $this->perluasan($request);
+                $data       = Transaksi::find($request->transid);
 
-                $data   = Transaksi::find($request->transid);
-
+                $dataController = new DataController;
+                $currency = $dataController->getExchangeRate($request);
+                // $currency = $dataController->getExchangeRate($request);
+                return response()->json([
+                    'message'   => $currency,
+                ], 400);
                 if (empty($data)) {
                     $id_status = 0;
                     $textResponse = " Berhasil Disimpan";
@@ -683,21 +751,24 @@ class ProcessController extends Controller
                         'transid'           => $request->transid,
                     ],
                     [
-                        'id_cabang'         => $cabang->id,
-                        'cif'               => $request->cif,
-                        'id_insured'        => $insured->id,
-                        'kjpp_end'          => $request->kjpp_end,
-                        'kjpp_start'        => $request->kjpp_start,
-                        'masa'              => $request->masa,
-                        'nopinjaman'        => $request->nopinjaman,
-                        'outstanding_kredit' => round($request->outstanding_kredit, 2),
-                        'plafond_kredit'    => round($request->plafond_kredit, 2),
-                        'polis_end'         => $request->polis_end,
-                        'polis_start'       => $request->polis_start,
-                        'id_instype'        => $request->id_instype,
-                        'created_by'        => Auth::user()->id,
-                        'bisnis'            => 'wholesales',
-                        'id_status'         => $id_status,
+                        'id_cabang'             => $cabang->id,
+                        'cif'                   => $request->cif,
+                        'id_insured'            => $insured->id,
+                        'kjpp_end'              => $request->kjpp_end,
+                        'kjpp_start'            => $request->kjpp_start,
+                        'masa'                  => $request->masa,
+                        'nopinjaman'            => $request->nopinjaman,
+                        'outstanding_kredit'    => round($request->outstanding_kredit, 2),
+                        'plafond_kredit'        => round($request->plafond_kredit, 2),
+                        'polis_end'             => $request->polis_end,
+                        'polis_start'           => $request->polis_start,
+                        'id_instype'            => $request->id_instype,
+                        'created_by'            => Auth::user()->id,
+                        'bisnis'                => 'wholesales',
+                        'id_currency'           => $request->id_currency,
+                        // 'exchange_rate'         => round($currency->kurs_tengah, 2),
+                        // 'exchange_rate_date'    => $currency->tanggal_kurs,
+                        'id_status'             => $id_status,
                     ]
                 );
 
@@ -743,7 +814,7 @@ class ProcessController extends Controller
                 switch ($role) {
                     case 'maker':
                         if ($transaksi->id_status == 4) {
-                            $status         = "4.5";
+                            $status         = "5";
                             $string         = "setujui";
                         }
                         break;
@@ -753,7 +824,7 @@ class ProcessController extends Controller
                         $string = "setujui";
                         break;
 
-                    case 'broker':
+                    case 'broker' || 'adm':
                         if ($transaksi->id_status == 2) {
                             $status = 3;
                             $string = "verifikasi";
@@ -769,6 +840,10 @@ class ProcessController extends Controller
                                 'kodetrans_value.11'    => 'required|not_in:0',
                             ]);
 
+                            $update = [
+                                'klausula'  => $request->klausula,
+                            ];
+
                             $this->pricing($request);
                             $this->objek($request);
                             // $this->perluasan($request);
@@ -780,11 +855,13 @@ class ProcessController extends Controller
                             $request->validate([
                                 'asuransi'               => 'required|array',
                                 'asuransi.*'             => 'required',
+                                'total_share'            => 'required',
                             ]);
 
-                            if ($request->total_share !== 100) {
+                            if ($request->total_share != 100) {
                                 return response()->json([
                                     'message'   => 'Total share belum mencapai 100%',
+                                    'data'      => $request->all(),
                                 ], 400);
                             }
 
@@ -867,10 +944,7 @@ class ProcessController extends Controller
 
                         // DISETUJUI ASURANSI
                         if ($transaksi->id_status == 4) {
-                            $update = [
-                                'id_okupasi'    => NULL,
-                            ];
-                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans', [1, 3, 4, 5, 6, 7, 8, 9])->update(['value' => 0]);
+                            $status = 3;
                         }
                         break;
 
@@ -880,19 +954,21 @@ class ProcessController extends Controller
 
                         // DISETUJUI ASURANSI
                         if ($transaksi->id_status == 4) {
-                            $update = [
-                                'id_okupasi'    => NULL,
-                            ];
-                            Pricing::where('id_transaksi', $request->transid)->whereNotIn('id_kodetrans', [1, 3, 4, 5, 6, 7, 8, 9])->update(['value' => 0]);
+                            $status = 3;
                         }
                         break;
 
                     case 'approver':
                         // PENDING
                         $status = 0;
+
+                        // DISETUJUI ASURANSI
+                        if ($transaksi->id_status == 4) {
+                            $status = 3;
+                        }
                         break;
 
-                    case 'broker':
+                    case 'broker' || 'adm':
                         // DISETUJUI -> TERTUNDA
                         if ($transaksi->id_status == "2") {
                             $status = 1;
@@ -920,7 +996,7 @@ class ProcessController extends Controller
                     ]);
                 }
                 if (!empty($request->catatan)) {
-                    $catatan .= " Catatan: " . $request->catatan;
+                    $catatan .= " Dengan Catatan: " . $request->catatan;
                 }
                 $update['id_status']    = $status;
                 $update['catatan']      = $catatan;
@@ -986,7 +1062,7 @@ class ProcessController extends Controller
                     'catatan'           => 'string|nullable',
                     'kodetrans_value'   => 'required|array|min:1|nullable',
                     'kodetrans_remarks' => 'array|nullable',
-                    'klausula'          => 'required',
+                    // 'klausula'          => 'required',
                 ]);
                 // return $request->all();
 
@@ -1105,7 +1181,7 @@ class ProcessController extends Controller
             case 'approve':
                 $transaksi = Transaksi::find($request->transid);
                 switch ($role) {
-                    case 'maker':
+                    case 'makerchecker' || 'checker':
                         if ($transaksi->id_status == 0) {
                             $status     = 1;
                             $string     = "ajukan";
@@ -1142,111 +1218,13 @@ class ProcessController extends Controller
                         }
                         break;
 
-                    case 'checker':
-                        if ($transaksi->id_status == 0) {
-                            $status     = 1;
-                            $string     = "ajukan";
-                            $insured    = $this->tertanggung($request);
-                            $cabang     = $this->cabang($request);
-                            $pricing    = $this->pricing($request);
-
-                            $request->validate([
-                                'type_insurance'    => 'required|string',
-                                'cabang'            => 'required',
-                                'alamat_cabang'     => 'required|string',
-                                'nama_cabang'       => 'required|string',
-                                'nopinjaman'        => 'required|string',
-                                'cif'               => 'string',
-                                'insured'           => 'required',
-                                'nik_insured'       => 'numeric',
-                                'npwp_insured'      => 'numeric',
-                                'nama_insured'      => 'required|string',
-                                'nohp_insured'      => 'required|string',
-                                'alamat_insured'    => 'required|string',
-                                'plafond_kredit'    => 'required',
-                                'outstanding_kredit' => 'required',
-                                'nopolis_lama'      => 'alpha_dash|nullable',
-                                'polis_start'       => 'required|string',
-                                'polis_end'         => 'required|string',
-                                'masa'              => 'required|numeric',
-                                'kjpp_start'        => 'required|string',
-                                'kjpp_end'          => 'required|string',
-                                'agunan_kjpp'       => 'required',
-                                'jaminan'           => 'required|string',
-                                'no_jaminan'        => 'required',
-                                'catatan'           => 'string|nullable',
-                                'kodetrans_value'   => 'required|array|min:1|nullable',
-                                'kodetrans_remarks' => 'array|nullable',
-                            ]);
-
-                            $update     = [
-                                'id_instype'        => $request->type_insurance,
-                                'id_cabang'         => $cabang->id,
-                                'nopinjaman'        => $request->nopinjaman,
-                                'cif'               => $request->cif,
-                                'id_insured'        => $insured->id,
-                                'plafond_kredit'    => round($request->plafond_kredit, 2),
-                                'outstanding_kredit' => round($request->outstanding_kredit, 2),
-                                'policy_parent'     => $request->nopolis_lama,
-                                'polis_start'       => $request->polis_start,
-                                'polis_end'         => $request->polis_end,
-                                'masa'              => $request->masa,
-                                'kjpp_start'        => $request->kjpp_start,
-                                'kjpp_end'          => $request->kjpp_end,
-                                'agunan_kjpp'       => round($request->agunan_kjpp, 2),
-                                'id_jaminan'        => $request->jaminan,
-                                'no_jaminan'        => $request->no_jaminan,
-                                'catatan'           => $request->catatan,
-                            ];
-                            $pricing = true;
-                        } else if ($transaksi->id_status == 4) {
-                            $status         = 5;
-                            $string         = "setujui";
-                            $cetakCoverNote = true;
-                            $pricing        = false;
-                        }
-                        break;
-
                     case 'approver':
                         $status = 2;
                         $string = "setujui";
                         $pricing = true;
                         break;
 
-                    case 'broker':
-                        if ($transaksi->id_status == 2) {
-                            $status = 3;
-                            $string = "verifikasi";
-
-                            $request->validate([
-                                'asuransi'           => 'required|string',
-                                'okupasi'            => 'required|numeric',
-                                'kodepos'            => 'required|numeric',
-                                'lokasi_okupasi'     => 'required|string',
-                                'objek_okupasi'      => 'required|string',
-                                'klausula'           => ['required', Rule::notIn(['<p><br></p>'])],
-                                'kodetrans_value.10' => 'required|not_in:0',
-                                'kodetrans_value.11' => 'required|not_in:0',
-                            ]);
-
-                            $update = [
-                                'id_asuransi'   => $request->asuransi,
-                                'id_okupasi'    => $request->okupasi,
-                                'id_kodepos'    => $request->kodepos,
-                                'location'      => $request->lokasi_okupasi,
-                                'object'        => $request->objek_okupasi,
-                                'klausula'      => $request->klausula,
-                            ];
-                            $pricing = true;
-                        } else if ($transaksi->id_status == 8) {
-                            $status = 10;
-                            $string = "cek kebenaran polisnya";
-                            $pricing = false;
-                        }
-
-                        break;
-
-                    case 'adm':
+                    case 'broker' || 'adm':
                         if ($transaksi->id_status == 2) {
                             $status = 3;
                             $string = "verifikasi";
@@ -1372,7 +1350,7 @@ class ProcessController extends Controller
                         $status = 0;
                         break;
 
-                    case 'broker':
+                    case 'broker' || 'adm':
                         // DISETUJUI -> TERTUNDA
                         if ($transaksi->id_status == "2") {
                             $status = 1;
@@ -1598,6 +1576,7 @@ class ProcessController extends Controller
                 'npwp_insured'      => $request->npwp_insured,
                 'alamat_insured'    => $request->alamat_insured,
                 'nohp_insured'      => $request->nohp_insured,
+                'id_kodepos'        => $request->kodepos_insured,
                 'created_by'        => Auth::user()->id,
             ]
         );
@@ -1851,7 +1830,7 @@ class ProcessController extends Controller
 
     public function cekGagalBayar()
     {
-        $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`billing_at`) > 30')->where('id_status', '<', '7');
+        $transaksi = Transaksi::whereRaw('DATEDIFF(NOW(),`billing_at`) > 30')->whereRaw('CAST(id_status AS int) < 7');
         foreach ($transaksi->get() as $row) {
             $this->aktifitas($row->transid, 18, "Pembayaran tidak diterima BDS selama 30 hari. Covernote Dibatalkan.", "1");
             // echo $row->transid;
